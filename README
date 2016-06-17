@@ -1,0 +1,24 @@
+Basic React-Native instructions are here:
+
+https://facebook.github.io/react-native/
+
+
+To run this in iOS / Xcode, just open the ios/FbW.xcodeproj file.
+
+To run this in an Android simulator, run "react-native run-android" from the InstructorApp directory.
+
+
+https://facebook.github.io/react-native/docs/tutorial.html#content
+
+
+Config
+========================
+
+Right now content library IDs => subject semester IDs => learning outcome bank IDs need
+to be hardcoded in the files:
+
+ * constants/Item (for subject offering -> the content library)
+ * constants/Module (for subject offering -> learning outcomes)
+ * stores/User (for the subject offering assessment bank to work with)
+
+The MathJax config url is in constants/AssessmentItem.js

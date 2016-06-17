@@ -1,0 +1,58 @@
+{
+  "name": "FbW",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "babel-jest": "^10.0.2",
+    "babel-polyfill": "^6.8.0",
+    "buffer": "^4.6.0",
+    "crypto-js": "^3.1.6",
+    "es6-promise": "^3.2.1",
+    "events": "^1.1.0",
+    "fbjs": "^0.8.2",
+    "fbw-utils": "^0.0.1",
+    "flux": "^2.1.1",
+    "jest-cli": "^0.10.2",
+    "keymirror": "^0.1.1",
+    "lodash": "^4.12.0",
+    "react": "^15.1.0",
+    "react-native": "https://github.com/facebook/react-native/archive/v0.27.0-rc1.tar.gz",
+    "react-native-collapsible": "^0.6.0",
+    "react-native-drawer": "^2.2.3",
+    "react-native-orientation": "^1.16.0",
+    "react-native-picker": "^3.0.4",
+    "react-native-store": "^0.4.1",
+    "react-native-vector-icons": "^2.0.2"
+  },
+  "devDependencies": {
+    "babel-jest": "^10.0.1",
+    "babel-polyfill": "^6.7.4",
+    "babel-preset-react-native-stage-0": "^1.0.1",
+    "jest": "^0.1.40",
+    "jest-cli": "^0.10.0",
+    "react-addons-test-utils": "^0.14.5"
+  },
+  "jest": {
+    "scriptPreprocessor": "node_modules/react-native/jestSupport/preprocessor.js",
+    "setupEnvScriptFile": "node_modules/react-native/jestSupport/env.js",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "packager/react-packager/src/Activity/"
+    ],
+    "testFileExtensions": [
+      "js"
+    ],
+    "unmockedModulePathPatterns": [
+      "promise",
+      "source-mapx",
+      "keymirror",
+      "flux",
+      "events",
+      "object-assign"
+    ]
+  }
+}
