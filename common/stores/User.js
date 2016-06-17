@@ -7,7 +7,10 @@ var UserConstants = require('../constants/User');
 var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
 
-var qbankFetch = require('../../utilities/fetch/fetch');
+var credentials = require('../credentials');
+var fbwUtils = require('fbw-utils')(credentials);
+
+var qbankFetch = fbwUtils.qbankFetch;
 
 var ActionTypes = UserConstants.ActionTypes;
 var CHANGE_EVENT = ActionTypes.CHANGE_EVENT;

@@ -5,7 +5,10 @@ var ItemConstants = require('../constants/Item');
 var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
 
-var qbankFetch = require('../../utilities/fetch/fetch');
+var credentials = require('../credentials');
+var fbwUtils = require('fbw-utils')(credentials);
+
+var qbankFetch = fbwUtils.qbankFetch;
 
 var ActionTypes = ItemConstants.ActionTypes;
 var BankMap = ItemConstants.BankMap;

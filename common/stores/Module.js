@@ -4,7 +4,10 @@ var ModuleConstants = require('../constants/Module');
 var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
 
-var HandcarFetch = require('../../utilities/handcar/fetch');
+var credentials = require('../credentials');
+var fbwUtils = require('fbw-utils')(credentials);
+
+var HandcarFetch = fbwUtils.handcarFetch;
 
 var ActionTypes = ModuleConstants.ActionTypes;
 var BankMap = ModuleConstants.BankMap;
