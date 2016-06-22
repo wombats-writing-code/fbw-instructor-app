@@ -27,7 +27,9 @@ var DateConvert = require('fbw-utils').ConvertDateToDictionary;
 var Dispatcher = require('../../dispatchers/Assessment');
 var GenusTypes = AssessmentConstants.GenusTypes;
 var MissionQuestions = require('./MissionQuestions');
-var MissionStatus = require('fbw-utils').CheckMissionStatus;
+
+var credentials = require('../../constants/credentials');
+var MissionStatus = require('fbw-utils')(credentials).CheckMissionStatus;
 
 var styles = StyleSheet.create({
   activeHeaderText: {
