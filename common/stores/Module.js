@@ -4,10 +4,8 @@ var ModuleConstants = require('../constants/Module');
 var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
 
-var credentials = require('../credentials');
-var fbwUtils = require('fbw-utils')(credentials);
-
-var HandcarFetch = fbwUtils.handcarFetch;
+var credentials = require('../constants/credentials');
+var handcarFetch = require('fbw-utils')(credentials).handcarFetch;
 
 var ActionTypes = ModuleConstants.ActionTypes;
 var BankMap = ModuleConstants.BankMap;
@@ -37,7 +35,7 @@ var ModuleStore = _.assign({}, EventEmitter.prototype, {
       params = {
         path: '/learning/objectivebanks/' + BankMap[bankId] + '/objectives/roots?descendentlevels=2'
       };
-    HandcarFetch(params, function (data) {
+    handcarFetch(params, function (data) {
       _modules = data;
       _.each(_modules, function (module) {
         _.each(module.childNodes, function (outcome) {

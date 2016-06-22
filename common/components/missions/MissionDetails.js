@@ -23,11 +23,11 @@ var AssessmentConstants = require('../../constants/Assessment');
 
 var ActionTypes = AssessmentConstants.ActionTypes;
 var AssessmentStore = require('../../stores/Assessment');
-var DateConvert = require('../../../utilities/dateUtil/ConvertDateToDictionary');
+var DateConvert = require('fbw-utils').ConvertDateToDictionary;
 var Dispatcher = require('../../dispatchers/Assessment');
 var GenusTypes = AssessmentConstants.GenusTypes;
 var MissionQuestions = require('./MissionQuestions');
-var MissionStatus = require('../../../utilities/dateUtil/CheckMissionStatus');
+var MissionStatus = require('fbw-utils').CheckMissionStatus;
 
 var styles = StyleSheet.create({
   activeHeaderText: {

@@ -5,10 +5,8 @@ var AssessmentItemConstants = require('../constants/AssessmentItem');
 var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
 
-var credentials = require('../credentials');
-var fbwUtils = require('fbw-utils')(credentials);
-
-var qbankFetch = fbwUtils.qbankFetch;
+var credentials = require('../constants/credentials');
+var qbankFetch = require('fbw-utils')(credentials).qbankFetch;
 
 var ActionTypes = AssessmentItemConstants.ActionTypes;
 var CHANGE_EVENT = ActionTypes.CHANGE_EVENT;

@@ -16,8 +16,6 @@ import {
 } from 'react-native';
 
 var _ = require('lodash');
-var Icon = require('react-native-vector-icons/FontAwesome');
-
 var styles = require('./Navigator.styles.js');
 
 class MissionsContentNavbar extends Component {
@@ -43,7 +41,7 @@ class MissionsContentNavbar extends Component {
     if (!this.props.sidebarOpen) {
       toggleSidebar = (
         <TouchableHighlight onPress={() => this.props.toggleSidebar()}
-                                style={styles.navIcon}>
+                              >
             <Image
               source={require('./assets/menu-icon.png')}
             />

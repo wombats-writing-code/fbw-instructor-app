@@ -96,34 +96,79 @@ class QuestionCard extends Component {
 
     return (
       <Animated.View style={{opacity: this.state.opacity}}>
-
-        <TouchableHighlight delayLongPress={2000} onLongPress={this._handleLongPress} style={styles.questionCardWrapper}>
-          <View style={styles.questionCard}>
-            <Text style={styles.itemNumberSection}>
-              {parseInt(this.props.index)+1}
-            </Text>
-
-            <Text style={styles.LOTextSection}>
-              {questionLO.displayName.text}
-            </Text>
-
-            <View style={styles.questionContent}>
+        <View style={styles.questionCard}>
+          <View style={styles.questionActions}>
+            <View style={styles.questionActionsWrapper}>
+              <View style={styles.questionContent}>
+                {moveUp}
+              </View>
+              <View style={styles.questionContent}>
+                <TouchableHighlight onPress={() => this.props.removeItem(this.props.item)}>
+                  <Icon name="trash"
+                        size={20} />
+                </TouchableHighlight>
+              </View>
+              <View style={styles.questionContent}>
+                {moveDown}
+              </View>
+            </View>
+          </View>
+          <View style={styles.questionContent}>
+            <View style={styles.questionDisplayNameWrapper}>
+              <View style={styles.sectionLabel}>
+                <Text>
+                  Q:
+                </Text>
+              </View>
+              <Text style={[styles.questionDisplayName, styles.sectionText]}>
+                {this.props.item.question.displayName.text}
+              </Text>
+            </View>
+            <View>
+              <TouchableHighlight onPress={() => this._toggleLOState()}
+                                  style={styles.toggleLOButton}>
+                <Text style={styles.toggleControl}>
+                  Toggle outcome
+                </Text>
+              </TouchableHighlight>
+              <Animated.View style={[{height: this.state.loHeight}, styles.questionLOWrapper]}>
+                <View style={styles.sectionLabel}>
+                  <Icon name="crosshairs" />
+                </View>
+                <View style={styles.questionLOTextWrapper}>
+                  <Text style={styles.sectionText}>
+                    {questionLO.displayName.text}
+                  </Text>
+                </View>
+              </Animated.View>
+            </View>
+            <View>
               <WebView scrollEnabled={false}
                        source={{html: this._wrapHTMLWithMathjax(this.props.item.question.text.text)}}
                        style={styles.questionText} />
-             </View>
+            </View>
+            <View>
+              <View>
+                <TouchableHighlight onPress={() => this._toggleChoiceState()}
+                                    style={styles.toggleChoicesButton} >
+                  <Text style={styles.toggleControl}>
+                    Toggle choices
+                  </Text>
+                </TouchableHighlight>
+              </View>
+              <View style={styles.choicesContent}>
+                <Animated.View style={{height: this.state.contentHeight}}>
+                  <ListView dataSource={ds.cloneWithRows(this.props.item.question.choices)}
+                            renderRow={this.renderChoices}>
+                  </ListView>
+                </Animated.View>
+              </View>
+            </View>
           </View>
-        </TouchableHighlight>
-
-
+        </View>
       </Animated.View>
     );
   }
-
-  _handleLongPress = () => {
-    console.log('long pressing now')
-  }
-
   _toggleChoiceState = () => {
     var _this = this;
     this.setState({ contentExpanded: !this.state.contentExpanded }, function () {
@@ -138,7 +183,20 @@ class QuestionCard extends Component {
       }
     });
   }
-
+  _toggleLOState = () => {
+    var _this = this;
+    this.setState({ loExpanded: !this.state.loExpanded }, function () {
+      if (_this.state.loExpanded) {
+        Animated.timing(_this.state.loHeight, {
+          toValue: 75
+        }).start();
+      } else {
+        Animated.timing(_this.state.loHeight, {
+          toValue: 0
+        }).start();
+      }
+    });
+  }
   _wrapHTMLWithMathjax = (markup) => {
     return `<!DOCTYPE html>
       <html>

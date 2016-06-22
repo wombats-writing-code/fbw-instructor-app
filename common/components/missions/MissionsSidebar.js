@@ -14,14 +14,14 @@ import {
   View
   } from 'react-native';
 
-import SwipeableListView from 'SwipeableRow';
+// import SwipeableListView from 'SwipeableRow';
 
 var _ = require('lodash');
 var Icon = require('react-native-vector-icons/FontAwesome');
 
 var AssessmentConstants = require('../../constants/Assessment');
 var GenusTypes = AssessmentConstants.GenusTypes;
-var MissionStatus = require('../../../utilities/dateUtil/CheckMissionStatus');
+var MissionStatus = require('fbw-utils').CheckMissionStatus;
 
 var styles = require('./MissionsSidebar.styles');
 
@@ -78,6 +78,9 @@ class MissionsSidebar extends Component {
 
     } else if (rowData.genusTypeId == GenusTypes.HOMEWORK && missionStatus == 'pending') {
       missionTypeIcon = require('./assets/mission-type--pending-out-class.png');
+
+    } else {
+      console.log('warning: mission icon not found')
     }
 
     return ( // TODO: Change this onPress call depending on what is swiped / touched
@@ -126,21 +129,16 @@ class MissionsSidebar extends Component {
                       No existing missions.
                     </Text>
                   </View> );
-
-    if (this.props.sidebarOpen) {
-      toggleIcon = <Icon name="caret-left"
-                         style={styles.toggleCaret} />;
-    }
     return (
       <View style={styles.container}>
 
         <View style={styles.sideBarNav}>
           <TouchableHighlight onPress={() => this._addNewMission()}>
-            <Image style={styles.addNewMissionButton} source={require('./assets/add-icon.png')} />
+            <Image source={require('./assets/add-icon.png')} />
           </TouchableHighlight>
 
           <TouchableHighlight onPress={() => this.props.toggleSidebar()}>
-            {toggleIcon}
+            <Image source={require('./assets/menu-icon.png')} />
           </TouchableHighlight>
         </View>
 

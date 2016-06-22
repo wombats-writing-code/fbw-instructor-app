@@ -6,10 +6,8 @@ var EventEmitter = require('events').EventEmitter;
 var assign = require('object-assign');
 var _ = require('lodash');
 
-var credentials = require('../credentials');
-var fbwUtils = require('fbw-utils')(credentials);
-
-var qbankFetch = fbwUtils.qbankFetch;
+var credentials = require('../constants/credentials');
+var qbankFetch = require('fbw-utils')(credentials).qbankFetch;
 
 var ActionTypes = AssessmentConstants.ActionTypes;
 var CHANGE_EVENT = ActionTypes.CHANGE_EVENT;
