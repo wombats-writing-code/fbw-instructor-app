@@ -67,7 +67,7 @@ class MissionsMainContent extends Component {
       // TODO: this subtitle should reflect the term of the chosen course
       subtitle = 'Spring 2016';
       title = 'Mission Control';
-      
+
     } else if (this.props.content == 'addMission') {
       content = <AddMission bankId={this.props.bankId}
                             closeAdd={this._revertToDefaultContent}
@@ -99,7 +99,7 @@ class MissionsMainContent extends Component {
                                  sidebarOpen={this.props.sidebarOpen}
                                  subtitle={subtitle}
                                  title={title}
-                                 toggleSidebar={this.props.toggleSidebar} />
+           />
 
           {content}
         </Animated.View>

@@ -5,9 +5,7 @@ import {
 
 module.exports = StyleSheet.create({
   container: {
-    flex: 3,
     padding: 9,
-    paddingLeft: 300,
     justifyContent: 'space-between'
   },
   buttons: {

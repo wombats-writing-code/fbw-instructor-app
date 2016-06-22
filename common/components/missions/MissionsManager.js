@@ -38,6 +38,12 @@ var styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row'
   },
+  missionsSidebarContainer: {
+    flex: 1
+  },
+  missionsMainContentContainer: {
+    flex: 3.2
+  },
   questionDrawer: {
     backgroundColor: '#7A7A7A',
     opacity: 0.5
@@ -103,35 +109,36 @@ class MissionsManager extends Component {
       return this.renderLoadingView();
     }
 
-    // set panThreshold to 1.5 because acceptPan doesn't seem to work?
-    // TODO: fix pan gesture
-    return (
-      <Drawer acceptPan={true}
-              panCloseMask={5}
-              negotiatePan={true}
-              type="overlay"
-              content={<MissionsSidebar changeContent={this._changeContent}
-                                        missions={this.state.missions}
-                                        selectMission={this.setSelectedMission}
-                                        sidebarOpen={this.state.drawerOpen}
-                                        toggleSidebar={this._toggleSidebar} />}
-              open={this.state.drawerOpen}
-              openDrawerOffset={.75}
-              style={styles.container}
-      >
+    var questionsDrawer;
+    if (this.state.questionDrawerOpen) {
+      questionsDrawer = (<QuestionsDrawer items={this.state.sortedItems}
+                            missionItems={this.state.missionItems}
+                            updateItemsInMission={this._updateItemsInMission} />)
+    }
 
-              <MissionsMainContent bankId={bankId}
-                                   changeContent={this._changeContent}
-                                   content={this.state.content}
-                                   missionItems={this.state.missionItems}
-                                   missions={this.state.missions}
-                                   selectedMission={this.state.selectedMission}
-                                   sidebarOpen={this.state.drawerOpen}
-                                   toggleQuestionDrawer={this._toggleQuestionDrawer}
-                                   toggleSidebar={this._toggleSidebar}
-                                   width={this._mainContentWidth}
-                                   />
-      </Drawer>
+    return (
+      <View style={styles.container}>
+        <MissionsSidebar style={styles.missionsSidebarContainer}
+                          changeContent={this._changeContent}
+                          missions={this.state.missions}
+                          selectMission={this.setSelectedMission}
+        />
+
+      {questionsDrawer}
+
+      <MissionsMainContent style={styles.missionsMainContentContainer}
+                            bankId={bankId}
+                             changeContent={this._changeContent}
+                             content={this.state.content}
+                             missionItems={this.state.missionItems}
+                             missions={this.state.missions}
+                             selectedMission={this.state.selectedMission}
+                             sidebarOpen={this.state.drawerOpen}
+                             toggleQuestionDrawer={this._toggleQuestionDrawer}
+                             width={this._mainContentWidth}
+         />
+      </View>
+
     )
   }
 
@@ -150,13 +157,8 @@ class MissionsManager extends Component {
   }
   _toggleQuestionDrawer = () => {
     this.setState({ questionDrawerOpen: !this.state.questionDrawerOpen });
-    if (this.state.drawerOpen) {
-      this._toggleSidebar();
-    }
   }
-  _toggleSidebar = () => {
-    this.setState({ drawerOpen: !this.state.drawerOpen });
-  }
+
   _updateItemsFromStore = (items) => {
     var alphabeticalItems = _.sortBy(items,
       ['displayName.text']),

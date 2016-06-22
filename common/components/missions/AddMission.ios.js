@@ -25,7 +25,8 @@ var AssessmentConstants = require('../../constants/Assessment');
 
 var ActionTypes = AssessmentConstants.ActionTypes;
 var AssessmentStore = require('../../stores/Assessment');
-var DateConvert = require('fbw-utils').ConvertDateToDictionary;
+var credentials = require('../../constants/credentials');
+var DateConvert = require('fbw-utils')(credentials).ConvertDateToDictionary;
 var Dispatcher = require('../../dispatchers/Assessment');
 var GenusTypes = AssessmentConstants.GenusTypes;
 
@@ -66,6 +67,7 @@ class AddMission extends Component {
 //    }
   }
   createAssessment() {
+
     var data = {
       bankId: this.props.bankId,
       deadline: DateConvert(this.state.missionDeadline),
