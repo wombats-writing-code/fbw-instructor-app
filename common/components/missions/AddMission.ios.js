@@ -14,6 +14,7 @@ import {
   ScrollView,
   StyleSheet,
   Switch,
+  Image,
   Text,
   TextInput,
   TouchableHighlight,
@@ -28,97 +29,7 @@ var DateConvert = require('fbw-utils').ConvertDateToDictionary;
 var Dispatcher = require('../../dispatchers/Assessment');
 var GenusTypes = AssessmentConstants.GenusTypes;
 
-var styles = StyleSheet.create({
-  actions: {
-    flex: 1,
-    flexDirection: 'row'
-  },
-  addItemText: {
-    padding: 5,
-    textAlign: 'center'
-  },
-  addItemWrapper: {
-    backgroundColor: '#BBEDBB',
-    borderColor: '#A9D6A9',
-    borderRadius: 5,
-    borderWidth: 1,
-    marginTop: 5
-  },
-  buttonText: {
-    color: '#444',
-    fontSize: 10
-  },
-  cancelButton: {
-  },
-  container: {
-    flex: 3,
-    padding: 5
-  },
-  createButton: {
-  },
-  createButtonWrapper: {
-    position: 'absolute',
-    right: 0
-  },
-  inputLabel: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    marginBottom: 5
-  },
-  inputRow: {
-    flex: 1,
-    flexDirection: 'row',
-    marginBottom: 5
-  },
-  itemLabel: {
-    fontSize: 10
-  },
-  modalBackdrop: {
-    backgroundColor: 'gray',
-    opacity: 0.5
-  },
-  noItemsText: {
-    padding: 5,
-    textAlign: 'center'
-  },
-  noItemsWarning: {
-    backgroundColor: '#ff9c9c',
-    borderColor: '#ff9c9c',
-    borderRadius: 5,
-    borderWidth: 1
-  },
-  roundedButton: {
-    borderColor: 'white',
-    borderRadius: 3,
-    borderWidth: 1,
-    margin: 5,
-    padding: 3
-  },
-  rowInput: {
-    flex: 2
-  },
-  rowLabel: {
-    flex: 1
-  },
-  separator: {
-    borderColor: '#DBDBDB',
-    borderWidth: 1,
-    marginLeft: 5,
-    marginRight: 5
-  },
-  textInput: {
-    borderColor: 'gray',
-    borderRadius: 3,
-    borderWidth: 1,
-    height: 40,
-    padding: 5
-  },
-  typePicker: {
-  },
-  typeWrapper: {
-  }
-});
-
+var styles = require('./AddMission.ios.styles');
 
 class AddMission extends Component {
   constructor(props) {
@@ -185,64 +96,55 @@ class AddMission extends Component {
   renderItemRow = (rowData, sectionId, rowId) => {
 
   }
-  render() {
+  render = () => {
     var currentItems = this.state.items.length > 0 ?
                        ( <ListView dataSource={this.state.items}
                                    renderRow={this.renderItemRow}>
                          </ListView> ) :
                        ( <View style={styles.noItemsWarning}>
                            <Text style={[styles.itemLabel, styles.noItemsText]}>No questions</Text>
-                         </View> ),
-      cancelButtonStyle = [styles.cancelButton, styles.roundedButton];
-
-    if (!this.props.sidebarOpen) {
-      cancelButtonStyle.push({ left: 20 });
-    }
+                         </View> )
 
     return (
       <View style={styles.container}>
         <Animated.View style={{opacity: this.state.opacity}}>
 
-          <View style={styles.actions}>
+          <View style={styles.buttons}>
             <TouchableHighlight onPress={() => this.props.closeAdd()}>
-              <View style={cancelButtonStyle}>
-                <Text style={styles.buttonText}>Cancel</Text>
-              </View>
+                <Text style={styles.button}>Cancel</Text>
             </TouchableHighlight>
 
             <TouchableHighlight onPress={() => this.createAssessment()}
                                 style={styles.createButtonWrapper}>
-              <View style={[styles.createButton, styles.roundedButton]}>
-                <Text style={styles.buttonText}>Create</Text>
-              </View>
+                <Text style={styles.button}>Create</Text>
             </TouchableHighlight>
-
           </View>
+
           <ScrollView onScroll={(event) => {console.log('scroll!')}}
                       style={ {height: this.state.height - 50 } }>
-            <View style={styles.inputRow}>
-              <View style={styles.rowLabel}>
-                <Text style={styles.inputLabel}>In-class</Text>
+
+              <View style={styles.missionTypeSelector}>
+                <TouchableHighlight onPress={() => this._onSelectMissionType('homework')}>
+                  <Image
+                    source={require('./assets/mission-selector-icon--homework.png')}
+                    style={[styles.missionTypeSelectorIcon, !this.state.inClass && styles.active]}
+                  />
+                </TouchableHighlight>
+                <TouchableHighlight onPress={() => this._onSelectMissionType('in-class')}>
+                  <Image
+                    source={require('./assets/mission-selector-icon--in-class.png')}
+                    style={[styles.missionTypeSelectorIcon, this.state.inClass && styles.active]}
+                  />
+                </TouchableHighlight>
               </View>
-              <View style={[styles.rowInput, styles.typeWrapper]}>
-                <Switch onValueChange={(value) => this.setState({ inClass: value })}
-                        value={this.state.inClass} />
-              </View>
-            </View>
-            <View style={styles.inputRow}>
-              <View style={styles.rowLabel}>
-                <Text style={styles.inputLabel}>Display Name</Text>
-              </View>
-              <View style={styles.rowInput}>
-                <TextInput autoFocus={true}
-                           maxLength={255}
-                           onChangeText={(text) => this.setState({missionDisplayName: text})}
-                           placeholder="A label for the mission"
-                           style={styles.textInput}
-                           value={this.state.missionDisplayName} />
-              </View>
-            </View>
-            <View>
+
+              <TextInput maxLength={255}
+                         onChangeText={(text) => this.setState({missionDisplayName: text})}
+                         placeholder="A name for this mission"
+                         style={styles.missionNameInput}
+                         value={this.state.missionDisplayName} />
+
+           <View styles={styles.startDateWrapper}>
               <Text style={styles.inputLabel}>Start Date</Text>
               <DatePickerIOS date={this.state.missionStartDate}
                              minuteInterval={30}
@@ -251,6 +153,7 @@ class AddMission extends Component {
                              ref="startDateDatepicker"
                              timeZoneOffsetInMinutes={this.state.timeZoneOffsetInHours * 60}/>
             </View>
+
             <View>
               <Text style={styles.inputLabel}>Deadline</Text>
               <DatePickerIOS date={this.state.missionDeadline}
@@ -266,6 +169,14 @@ class AddMission extends Component {
       </View>
     );
   }
+
+  _onSelectMissionType = (missionTypeString) => {
+
+    let value = (missionTypeString === 'in-class');
+    console.log('selected value', value)
+    this.setState({ inClass: value });
+  }
 }
+
 
 module.exports = AddMission;
