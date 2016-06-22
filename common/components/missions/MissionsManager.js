@@ -18,7 +18,6 @@ import {
 import Drawer from 'react-native-drawer';
 
 var _ = require('lodash');
-var Icon = require('react-native-vector-icons/FontAwesome');
 
 var AssessmentStore = require('../../stores/Assessment');
 var AssessmentItemConstants = require('../../constants/AssessmentItem');
@@ -32,7 +31,7 @@ var MissionsSidebar = require('./MissionsSidebar');
 var MissionsMainContent = require('./MissionsMainContent');
 var QuestionsDrawer = require('./AllQuestionsDrawer');
 
-var SortItemsByModules = require('../../../utilities/handcar/sortItemsByModules');
+var SortItemsByModules = require('../../stores/sortItemsByModules');
 
 var styles = StyleSheet.create({
   container: {

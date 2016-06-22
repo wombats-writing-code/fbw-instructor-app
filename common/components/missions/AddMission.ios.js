@@ -24,7 +24,7 @@ var AssessmentConstants = require('../../constants/Assessment');
 
 var ActionTypes = AssessmentConstants.ActionTypes;
 var AssessmentStore = require('../../stores/Assessment');
-var DateConvert = require('../../../utilities/dateUtil/ConvertDateToDictionary');
+var DateConvert = require('fbw-utils').ConvertDateToDictionary;
 var Dispatcher = require('../../dispatchers/Assessment');
 var GenusTypes = AssessmentConstants.GenusTypes;
 
@@ -216,7 +216,7 @@ class AddMission extends Component {
                 <Text style={styles.buttonText}>Create</Text>
               </View>
             </TouchableHighlight>
-            
+
           </View>
           <ScrollView onScroll={(event) => {console.log('scroll!')}}
                       style={ {height: this.state.height - 50 } }>

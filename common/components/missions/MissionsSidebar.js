@@ -14,14 +14,15 @@ import {
   View
   } from 'react-native';
 
-import SwipeableListView from 'SwipeableRow';
+// TODO: luwen to implement this
+// import SwipeableListView from 'SwipeableRow';
 
 var _ = require('lodash');
 var Icon = require('react-native-vector-icons/FontAwesome');
 
 var AssessmentConstants = require('../../constants/Assessment');
 var GenusTypes = AssessmentConstants.GenusTypes;
-var MissionStatus = require('../../../utilities/dateUtil/CheckMissionStatus');
+var MissionStatus = require('fbw-utils').CheckMissionStatus;
 
 var styles = require('./MissionsSidebar.styles');
 

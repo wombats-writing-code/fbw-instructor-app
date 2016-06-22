@@ -4,7 +4,8 @@ var BankDispatcher = require('../dispatchers/Bank');
 var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
 
-var qbankFetch = require('../../utilities/fetch/fetch');
+var credentials = require('../constants/credentials');
+var qbankFetch = require('fbw-utils')(credentials).qbankFetch;
 
 var ActionTypes = AssessmentConstants.ActionTypes;
 var CHANGE_EVENT = ActionTypes.CHANGE_EVENT;

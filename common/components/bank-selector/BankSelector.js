@@ -17,8 +17,10 @@ import {
 
 var AssessmentConstants = require('../../constants/Assessment');
 var Dispatcher = require('../../dispatchers/User');
-var Icon = require('react-native-vector-icons/FontAwesome');
-var qbankFetch = require('../../../utilities/fetch/fetch');
+
+var credentials = require('../../constants/credentials');
+var qbankFetch = require('fbw-utils')(credentials).qbankFetch;
+
 var UserConstants = require('../../constants/User');
 var _ = require('lodash');
 
