@@ -3,26 +3,10 @@
  * https://github.com/facebook/react-native
  */
 
-import React, {
-    Component,
-} from 'react';
-
 import {
   AppRegistry,
-  StyleSheet,
-  Text,
-  View
 } from 'react-native';
 
-var FbWNavigator = require('./common/components/Navigator');
+var FbWRouter = require('./common/components/FbWRouter');
 
-class FbW extends Component {
-  render() {
-    return (
-      <FbWNavigator>
-      </FbWNavigator>
-    );
-  }
-}
-
-AppRegistry.registerComponent('FbW', () => FbW);
+AppRegistry.registerComponent('FbW', () => FbWRouter);

@@ -25,7 +25,12 @@ var AssessmentConstants = require('../../constants/Assessment');
 var ActionTypes = AssessmentConstants.ActionTypes;
 var AssessmentStore = require('../../stores/Assessment');
 var AssessmentItemStore = require('../../stores/AssessmentItem');
-var DateConvert = require('../../../utilities/dateUtil/ConvertDateToDictionary');
+
+var credentials = require('../../credentials');
+var fbwUtils = require('fbw-utils')(credentials);
+
+var DateConvert = fbwUtils.ConvertDateToDictionary;
+
 var Dispatcher = require('../../dispatchers/Assessment');
 var GenusTypes = AssessmentConstants.GenusTypes;
 var QuestionAccordion = require('./QuestionAccordion');

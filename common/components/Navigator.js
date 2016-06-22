@@ -80,7 +80,10 @@ var NavigationBarRouteMapper = {
 
 };
 
-
+// TODO: it would be nice to have a screen where the faculty
+// can create / associate a QBank assessment bank / Handcar objective bank with
+// the D2L class ID, as aliases...would make the student app easier to deal
+// with as well
 var FbWNavigator = React.createClass({
     statics: {
         title: 'Fly-by-Wire',

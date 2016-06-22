@@ -70,7 +70,7 @@
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Run Script"
-               scriptText = "source ~/.bash_profile&#10;shopt -s expand_aliases&#10;cd /Users/cjshaw/Documents/Projects/FirstInTheWorld/fbw-author/fbw_author/static/fbw_author/js/InstructorApp&#10;workon fbw-author&#10;">
+               scriptText = "source ~/.bash_profile&#10;shopt -s expand_aliases&#10;cd /Users/cjshaw/Documents/Projects/FirstInTheWorld/fbw-instructor-app&#10;workon fbw-instructor-app&#10;">
             </ActionContent>
          </ExecutionAction>
       </PreActions>
