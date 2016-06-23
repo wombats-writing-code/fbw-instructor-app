@@ -12,6 +12,7 @@ import {
   View,
   ActivityIndicatorIOS,
   TouchableHighlight,
+  LayoutAnimation,
   StyleSheet
 } from 'react-native';
 
@@ -63,6 +64,10 @@ class MissionsManager extends Component {
       missions: [],
       modules: [],
       questionDrawerOpen: false,
+      questionDrawerViewStyle: {
+        height: 0
+      },
+      // questionDrawerOpen: true,     // temporary for dev only
       selectedMission: {},
       sortedItems: {}
     };
@@ -109,9 +114,11 @@ class MissionsManager extends Component {
       return this.renderLoadingView();
     }
 
-    var questionsDrawer;
+    let questionDrawerViewStyle = [this.state.questionDrawerViewStyle];
+    let questionDrawer;
     if (this.state.questionDrawerOpen) {
-      questionsDrawer = (<QuestionsDrawer items={this.state.sortedItems}
+      questionDrawer = (<QuestionsDrawer style={questionDrawerViewStyle}
+                            items={this.state.sortedItems}
                             missionItems={this.state.missionItems}
                             updateItemsInMission={this._updateItemsInMission} />)
     }
@@ -124,19 +131,19 @@ class MissionsManager extends Component {
                           selectMission={this.setSelectedMission}
         />
 
-      {questionsDrawer}
+        {questionDrawer}
 
-      <MissionsMainContent style={styles.missionsMainContentContainer}
-                            bankId={bankId}
-                             changeContent={this._changeContent}
-                             content={this.state.content}
-                             missionItems={this.state.missionItems}
-                             missions={this.state.missions}
-                             selectedMission={this.state.selectedMission}
-                             sidebarOpen={this.state.drawerOpen}
-                             toggleQuestionDrawer={this._toggleQuestionDrawer}
-                             width={this._mainContentWidth}
-         />
+        <MissionsMainContent style={styles.missionsMainContentContainer}
+                              bankId={bankId}
+                               changeContent={this._changeContent}
+                               content={this.state.content}
+                               missionItems={this.state.missionItems}
+                               missions={this.state.missions}
+                               selectedMission={this.state.selectedMission}
+                               sidebarOpen={this.state.drawerOpen}
+                               toggleQuestionDrawer={this._toggleQuestionDrawer}
+                               width={this._mainContentWidth}
+           />
       </View>
 
     )
@@ -157,6 +164,13 @@ class MissionsManager extends Component {
   }
   _toggleQuestionDrawer = () => {
     this.setState({ questionDrawerOpen: !this.state.questionDrawerOpen });
+
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+    this.setState({
+      questionDrawerViewStyle: {
+        height: 700
+      }
+    });
   }
 
   _updateItemsFromStore = (items) => {

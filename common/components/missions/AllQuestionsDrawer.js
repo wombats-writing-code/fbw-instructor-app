@@ -25,18 +25,24 @@ var AssessmentConstants = require('../../constants/Assessment');
 var ActionTypes = AssessmentConstants.ActionTypes;
 var AssessmentStore = require('../../stores/Assessment');
 var AssessmentItemStore = require('../../stores/AssessmentItem');
-var DateConvert = require('fbw-utils').ConvertDateToDictionary;
 var Dispatcher = require('../../dispatchers/Assessment');
 var GenusTypes = AssessmentConstants.GenusTypes;
 var QuestionAccordion = require('./QuestionAccordion');
 
+var credentials = require('../../constants/credentials');
+var DateConvert = require('fbw-utils')(credentials).ConvertDateToDictionary;
+
 var styles = StyleSheet.create({
   container: {
+    position: 'absolute',
+    // top: 0,
+    left: 0,
+    width: 300,
     backgroundColor: '#2B2B2B',
-    flex: 1,
-    opacity: 0.9
+    // opacity: 0.9
   },
   header: {
+    paddingTop: 30,
     padding: 3
   },
   headerText: {
@@ -73,12 +79,6 @@ class AllQuestionsDrawer extends Component {
   componentDidMount() {
   }
   componentDidUpdate() {
-    // issue with styling DatePickerIOS:
-    // https://github.com/facebook/react-native/issues/1587
-//    if (this.refs.startDateDatepicker && this.refs.deadlineDatePicker) {
-//      this.refs.startDateDatepicker.refs.datepicker.setNativeProps({width: Window.width - 500});
-//      this.refs.deadlineDatePicker.refs.datepicker.setNativeProps({width: Window.width - 100});
-//    }
   }
   onLayout = (event) => {
     // TODO: how to make this height change when device is rotated?
@@ -90,6 +90,7 @@ class AllQuestionsDrawer extends Component {
     this.setState({ items: items });
   }
   render() {
+
     // TODO: make this a set of collapsible accordions with <ListView> inside of each...
     // TODO: close X button
     var currentItems = _.keys(this.props.items).length > 0 ?

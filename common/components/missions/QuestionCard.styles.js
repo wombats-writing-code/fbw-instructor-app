@@ -11,6 +11,7 @@ import {
       // borderColor: '#ccc',
       // borderRadius: 1,
       // borderWidth: 1,
+      backgroundColor: '#ffffff',
       flex: 1,
       flexDirection: 'row',
       shadowColor: "#000000",
