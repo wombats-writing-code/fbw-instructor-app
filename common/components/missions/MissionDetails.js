@@ -32,6 +32,7 @@ var fbwUtils = require('fbw-utils')(credentials);
 var DateConvert = fbwUtils.ConvertDateToDictionary;
 var MissionStatus = fbwUtils.CheckMissionStatus;
 
+
 var styles = StyleSheet.create({
   activeHeaderText: {
     color: '#2A47C9',
