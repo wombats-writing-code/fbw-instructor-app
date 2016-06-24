@@ -4,7 +4,7 @@ var ModuleConstants = require('../constants/Module');
 var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
 
-var credentials = require('../credentials');
+var credentials = require('../constants/credentials');
 var fbwUtils = require('fbw-utils')(credentials);
 
 var HandcarFetch = fbwUtils.handcarFetch;

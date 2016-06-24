@@ -19,7 +19,7 @@ import {
   Actions
 } from "react-native-router-flux";
 
-var credentials = require('../../credentials');
+var credentials = require('../../constants/credentials');
 var D2L = require('valence');
 var AppContext = new D2L.ApplicationContext(credentials.d2l.appID, credentials.d2l.appKey);
 

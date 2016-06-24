@@ -26,7 +26,7 @@ var ActionTypes = AssessmentConstants.ActionTypes;
 var AssessmentStore = require('../../stores/Assessment');
 var AssessmentItemStore = require('../../stores/AssessmentItem');
 
-var credentials = require('../../credentials');
+var credentials = require('../../constants/credentials');
 var fbwUtils = require('fbw-utils')(credentials);
 
 var DateConvert = fbwUtils.ConvertDateToDictionary;

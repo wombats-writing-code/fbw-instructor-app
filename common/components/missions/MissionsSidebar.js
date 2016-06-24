@@ -22,7 +22,7 @@ var Icon = require('react-native-vector-icons/FontAwesome');
 var AssessmentConstants = require('../../constants/Assessment');
 var GenusTypes = AssessmentConstants.GenusTypes;
 
-var credentials = require('../../credentials');
+var credentials = require('../../constants/credentials');
 var fbwUtils = require('fbw-utils')(credentials);
 
 var MissionStatus = fbwUtils.CheckMissionStatus;
