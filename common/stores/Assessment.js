@@ -41,13 +41,13 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
       // set the Offered params for when solutions can be reviewed
       offeredParams.data['reviewOptions'] = {
         solution: {
-          duringAttempt: false,
+          duringAttempt: true,
           afterAttempt: true,
           beforeDeadline: true,
           afterDeadline: true
         },
         whetherCorrect: {
-          duringAttempt: false,
+          duringAttempt: true,
           afterAttempt: true,
           beforeDeadline: true,
           afterDeadline: true
