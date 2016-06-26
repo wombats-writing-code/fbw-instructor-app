@@ -19,7 +19,7 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
     getData: function () {
 //        return _data;
       return {
-        bankId: 'assessment.Bank%3A57279fc9e7dde086c7fe2102%40bazzim.MIT.EDU'  // CAD1 Spring 2017
+        bankId: 'assessment.Bank%3A576d6d3271e4828c441d721a%40bazzim.MIT.EDU'  // MAT121 Fall 2016 for testing
       }
     },
     setBankId: function (payload) {
