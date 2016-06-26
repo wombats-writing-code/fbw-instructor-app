@@ -26,16 +26,20 @@ var UserStore = require('../../stores/User');
 
 
 var styles = StyleSheet.create({
+  container: {
+    position:'relative'
+  },
+  controls: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end'
+  },
   draggable: {
-    position: 'absolute'
+    flex: 2,
+    position: 'absolute',
   },
-  header: {
-    margin: 5
-  },
-  headerText: {
-    color: 'gray',
-    fontSize: 10,
-    textAlign: 'center'
+  addQuestionsButton: {
+    color: '#444',
+    textAlign: 'right'
   },
   notification: {
     backgroundColor: '#ff9c9c',
@@ -59,6 +63,8 @@ class MissionQuestions extends Component {
       opacity: new Animated.Value(0)
     };
 
+
+    // TODO: not done
     this.panResponder = PanResponder.create({
       onStartShouldSetPanResponder : () => {
         console.log('starting pan responder')
@@ -92,7 +98,7 @@ class MissionQuestions extends Component {
   }
   renderItemRow = (rowData, sectionId, rowId) => {
     // rowId is index of the row
-    return <Animated.View {...this.panResponder.panHandlers} key={rowData.id}>
+    return (<Animated.View {...this.panResponder.panHandlers} key={rowData.id}>
           <QuestionCard index={rowId}
                         item={rowData}
                         isActive={this.state.currentQuestionId === rowData.id}
@@ -101,7 +107,7 @@ class MissionQuestions extends Component {
                         numItems={this.props.missionItems.length}
                         removeItem={this._removeItemFromMission}
                         swapItems={this._swapItems} />
-    </Animated.View>
+        </Animated.View>)
   }
   render() {
     var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
@@ -114,22 +120,15 @@ class MissionQuestions extends Component {
                          </View> );
     return (
       <View style={styles.container}>
-
-        <Animated.View {...this.panResponder.panHandlers} style={[styles.draggable, this.state.pan.getLayout()]}>
-          <Text>
-            Test, pan me
-          </Text>
-        </Animated.View>
-
-
-        <Animated.View style={{opacity: this.state.opacity}}>
-          <TouchableHighlight onPress={() => this.props.toggleQuestionDrawer()}
-                              style={styles.header}>
-            <Text style={styles.headerText}>
-              Tap here to toggle the "Add Question" drawer.
-            </Text>
-          </TouchableHighlight>
-        </Animated.View>
+        <View style={styles.controls}>
+          <Animated.View style={{opacity: this.state.opacity}}>
+            <TouchableHighlight onPress={() => this.props.toggleQuestionDrawer()}>
+              <Text style={styles.addQuestionsButton}>
+                Tap here to toggle the "Add Question" drawer.
+              </Text>
+            </TouchableHighlight>
+          </Animated.View>
+        </View>
 
         {currentItems}
       </View>
@@ -142,7 +141,7 @@ class MissionQuestions extends Component {
   _setCurrentQuestion = (questionId) => {
     console.log('long pressing now', questionId)
 
-    this.panResponder.onStartShouldSetPanResponder();
+    // this.panResponder.onStartShouldSetPanResponder();
 
     this.setState({currentQuestionId: questionId});
   }
