@@ -94,11 +94,13 @@ class QuestionCard extends Component {
       </TouchableHighlight>
     }
 
-    return (
-      <Animated.View style={{opacity: this.state.opacity}}>
+    let questionCardStyle = [styles.questionCard, this.props.isActive && styles.questionCardActive];
 
-        <TouchableHighlight delayLongPress={2000} onLongPress={this._handleLongPress} style={styles.questionCardWrapper}>
-          <View style={styles.questionCard}>
+    return (
+        <TouchableHighlight delayLongPress={2000} onLongPress={() => this.props.onLongPress(this.props.item.id)}
+          style={styles.questionCardWrapper}>
+
+          <View style={questionCardStyle}>
             <Text style={styles.itemNumberSection}>
               {parseInt(this.props.index)+1}
             </Text>
@@ -114,14 +116,7 @@ class QuestionCard extends Component {
              </View>
           </View>
         </TouchableHighlight>
-
-
-      </Animated.View>
     );
-  }
-
-  _handleLongPress = () => {
-    console.log('long pressing now')
   }
 
   _toggleChoiceState = () => {

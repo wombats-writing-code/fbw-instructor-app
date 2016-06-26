@@ -10,7 +10,6 @@ import {
   Dimensions,
   ListView,
   ScrollView,
-  StyleSheet,
   Switch,
   Text,
   TextInput,
@@ -32,40 +31,7 @@ var QuestionAccordion = require('./QuestionAccordion');
 var credentials = require('../../constants/credentials');
 var DateConvert = require('fbw-utils')(credentials).ConvertDateToDictionary;
 
-var styles = StyleSheet.create({
-  container: {
-    position: 'absolute',
-    // top: 0,
-    left: 0,
-    width: 300,
-    backgroundColor: '#2B2B2B',
-    // opacity: 0.9
-  },
-  header: {
-    paddingTop: 30,
-    padding: 3
-  },
-  headerText: {
-    color: '#C2C2C2',
-    textAlign: 'center'
-  },
-  notification: {
-    backgroundColor: '#ff9c9c',
-    padding: 3
-  },
-  notificationText: {
-    fontSize: 10,
-    padding: 5
-  },
-  separator: {
-    borderColor: '#C2C2C2',
-    borderRadius: 5,
-    borderWidth: 1,
-    marginBottom: 10,
-    marginLeft: 5,
-    marginRight: 5
-  }
-});
+var styles = require('./AllQuestionsDrawer.styles');
 
 
 class AllQuestionsDrawer extends Component {
@@ -97,8 +63,8 @@ class AllQuestionsDrawer extends Component {
                        ( <QuestionAccordion items={this.props.items}
                                             missionItems={this.props.missionItems}
                                             updateItemsInMission={this.props.updateItemsInMission} /> ) :
-                       ( <View style={styles.notification}>
-                           <Text style={[styles.notificationText]}>No questions</Text>
+                       ( <View style={styles.noQuestionsIndicator}>
+                           <Text style={[styles.noQuestionsIndicatorText]}>No questions</Text>
                          </View> );
     return (
       <View style={styles.container}>
