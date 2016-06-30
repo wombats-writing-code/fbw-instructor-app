@@ -21,6 +21,7 @@ var Icon = require('react-native-vector-icons/FontAwesome');
 
 var AssessmentConstants = require('../../constants/Assessment');
 var GenusTypes = AssessmentConstants.GenusTypes;
+
 var credentials = require('../../constants/credentials');
 var MissionStatus = require('fbw-utils')(credentials).CheckMissionStatus;
 
@@ -138,7 +139,7 @@ class MissionsSidebar extends Component {
             <Image source={require('./assets/add-icon.png')} />
           </TouchableHighlight>
 
-          <TouchableHighlight onPress={() => this.props.toggleSidebar()}>
+          <TouchableHighlight onPress={() => _.noop()}>
             <Image source={require('./assets/menu-icon.png')} />
           </TouchableHighlight>
         </View>

@@ -5,17 +5,21 @@ import {
 
   module.exports = StyleSheet.create({
     questionCardWrapper: {
-      marginBottom: 18,
+      marginBottom: 9,
+      marginTop: 9,
+      // marginRight: 5,
+      // marginLeft: 4
     },
     questionCard: {
-      // borderColor: '#ccc',
-      // borderRadius: 1,
-      // borderWidth: 1,
+      backgroundColor: '#ffffff',
       flex: 1,
       flexDirection: 'row',
+    },
+    questionCardActive: {
+      backgroundColor: '#ffffff',
       shadowColor: "#000000",
       shadowOpacity: 0.3,
-      shadowRadius: 2,
+      shadowRadius: 3,
       shadowOffset: {
         height: 0,
         width: 0
