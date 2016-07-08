@@ -7,6 +7,7 @@ import React, {
 import {
   Animated,
   Dimensions,
+  Linking,
   Picker,
   StyleSheet,
   Text,
@@ -19,24 +20,18 @@ import {
   Actions
 } from "react-native-router-flux";
 
-var credentials = require('../../constants/credentials');
-var D2L = require('valence');
-var AppContext = new D2L.ApplicationContext(credentials.d2l.appID, credentials.d2l.appKey);
-
+var UserStore = require('../../stores/User');
 
 var {
   height: deviceHeight
 } = Dimensions.get("window");
 
-var styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#dddddd',
-    flex: 1
-  },
-  d2lLoginView: {
-    height: 200
-  }
-});
+var styles = require('./D2LLogin.styles');
+
+var credentials = require('../../constants/credentials');
+var D2L = require('valence');
+var AppContext = new D2L.ApplicationContext(credentials.d2l.appID, credentials.d2l.appKey);
+
 
 class D2LLogin extends Component {
   constructor(props) {
@@ -52,33 +47,64 @@ class D2LLogin extends Component {
     };
   }
   componentDidMount() {
+    // if user already has a token from d2l, pass them off to the next view
     Animated.timing(this.state.offset, {
       duration: 150,
       toValue: 0
     }).start();
+    Linking.addEventListener('url', this._handleLogin);
+  }
+  componentWillUnmount() {
+    Linking.removeEventListener('url', this._handleLogin);
   }
   render() {
-    console.log(this.state.authenticationUrl);
     return <View style={styles.container}>
-      <WebView source={{uri: this.state.authenticationUrl }}
-               style={styles.d2lLoginView} />
+      <View>
+        <Text style={styles.schoolPrompt}>
+          Select your school
+        </Text>
+      </View>
+      <Picker onValueChange={(school) => this.setState({ school: school })}
+              selectedValue={this.state.school}>
+        <Picker.Item label="ACC" value="acc" />
+        <Picker.Item label="QCC" value="qcc" />
+      </Picker>
+
+      <View style={styles.loginPanel}>
+        <TouchableHighlight onPress={() => this._loginUser()}
+                            style={styles.loginButton}>
+          <Text style={styles.loginButtonText}>
+            Login
+          </Text>
+        </TouchableHighlight>
+      </View>
+
     </View>;
   }
-  _authenticated = () => {
-    console.log('authenticated!')
+  _handleLogin = (event) => {
+    console.log('authenticated!');
+    console.log(event.url);
+    let userContext = AppContext.createUserContext(credentials.d2l.host,
+      credentials.d2l.port,
+      event.url
+    );
+    UserStore.setContext(userContext);
+    UserStore.enrollments(function () {
+
+    });
+    Actions.missions({
+      schoolId: this.state.school,
+      username: 'token?'
+    });
   }
   _loginUser = () => {
-    // in an OAuth-ish login, this should be the token?
-    if (this.state.username == '') {
-      Actions.error({
-        message: 'You must supply a username'
-      })
-    } else {
-      Actions.missions({
-        schoolId: this.state.school,
-        username: this.state.username
-      });
-    }
+    Linking.canOpenURL(this.state.authenticationUrl).then(supported => {
+      if (!supported) {
+        console.log('Cannot authenticate to D2L right now.');
+      } else {
+        Linking.openURL(this.state.authenticationUrl);
+      }
+    }).catch(err => console.error('D2L Authentication error: ', err));
   }
 }
 
