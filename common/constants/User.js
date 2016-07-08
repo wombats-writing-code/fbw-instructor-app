@@ -1,6 +1,6 @@
 // user constants
 
-import Store from 'react-native-store';
+//import Store from 'react-native-store';
 
 var keyMirror = require('keymirror');
 

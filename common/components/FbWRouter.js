@@ -17,6 +17,8 @@ import {
   Scene
 } from 'react-native-router-flux';
 
+var _ = require('lodash');
+
 var Error = require('./error/Error');
 var Login = require('./login/D2LLogin');
 var Missions = require('./missions/MissionsManager');
@@ -28,6 +30,17 @@ var createReducer = (params) => {
   }
 }
 
+var styles = StyleSheet.create({
+  navigationBarStyle: {
+    backgroundColor: '#fff',
+    borderBottomColor: '#ddd',
+  },
+  titleStyle: {
+    color: '#555',
+    fontWeight: "700",
+    fontSize: 12
+  }
+});
 
 class FbWRouter extends Component {
   constructor(props) {
@@ -36,17 +49,33 @@ class FbWRouter extends Component {
     };
   }
   render() {
+    var loginTitleStyle = _.assign({}, styles.titleStyle, {
+      color: '#fff',
+      fontWeight: "300",
+      fontSize: 14,
+      letterSpacing: 5,
+    });
+    var loginNavBarStyle = _.assign({}, styles.navigationBarStyle, {
+      paddingTop: 60,
+      backgroundColor: '#3498DB',
+      borderBottomWidth: 0,
+    });
+
     return <Router createReducer={createReducer}>
       <Scene key="modal" component={Modal} >
         <Scene key="root">
           <Scene component={Login}
                  initial={true}
                  key="login"
-                 title="Fly-by-Wire Login" />
+                 title="Fly-by-Wire Login"
+                 titleStyle={loginTitleStyle}
+                 navigationBarStyle={loginNavBarStyle} />
           <Scene component={Missions}
                  key="missions"
                  title="Mission Control"
-                 type="reset" />
+                 type="reset"
+                 titleStyle={loginTitleStyle}
+                 navigationBarStyle={loginNavBarStyle} />
         </Scene>
         <Scene key="error" component={Error} title="Error!" />
       </Scene>

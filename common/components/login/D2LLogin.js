@@ -98,6 +98,7 @@ class D2LLogin extends Component {
     });
   }
   _loginUser = () => {
+    console.log(this.state.authenticationUrl);
     Linking.canOpenURL(this.state.authenticationUrl).then(supported => {
       if (!supported) {
         console.log('Cannot authenticate to D2L right now.');
