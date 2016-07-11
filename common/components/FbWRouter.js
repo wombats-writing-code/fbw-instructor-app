@@ -61,8 +61,8 @@ class FbWRouter extends Component {
     var _this = this;
     console.log('checking user state');
     UserStore.hasSession(function (hasSession) {
-      if (hasSession) {
-        Actions.missions();
+      if (!hasSession) {
+        Actions.login();
       }
     });
   }
@@ -83,12 +83,12 @@ class FbWRouter extends Component {
       <Scene key="modal" component={Modal} >
         <Scene key="root">
           <Scene component={Login}
-                 initial={true}
                  key="login"
                  title="Fly-by-Wire Login"
                  titleStyle={loginTitleStyle}
                  navigationBarStyle={loginNavBarStyle} />
           <Scene component={Missions}
+                 initial={true}
                  key="missions"
                  title="Mission Control"
                  type="reset"
