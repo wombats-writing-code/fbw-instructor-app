@@ -57,7 +57,8 @@ var styles = StyleSheet.create({
   },
   container: {
     flex: 3,
-    padding: 5
+    padding: 5,
+    paddingTop: 30
   },
   createButton: {
   },

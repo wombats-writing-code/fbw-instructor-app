@@ -9,8 +9,9 @@ var _lineHeight = 18;
 module.exports = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f0f0'
+    backgroundColor: '#f0f0f0',
     // alignItems: 'stretch'
+    paddingTop: 60
   },
   sideBarNav: {
     alignItems: 'center',

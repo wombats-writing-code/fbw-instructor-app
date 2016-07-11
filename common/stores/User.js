@@ -22,7 +22,47 @@ var _data = {};
 
 var UserStore = _.assign({}, EventEmitter.prototype, {
   enrollments: function (callback) {
-    this._fetch('/d2l/api/lp/1.9/enrollments/myenrollments/', 'GET', callback);
+    // need to get all of these, because paginated
+    var url = '/d2l/api/lp/1.9/enrollments/myenrollments/',
+      bookmark = '',
+      enrollments = [],
+      hasMoreItems = true,
+      _this = this;
+
+    function getNextPage () {
+      console.log('getting enrollments');
+      _this._fetch(url + '?bookmark=' + bookmark, 'GET', function (data) {
+        console.log(data);
+        hasMoreItems = data.PagingInfo.HasMoreItems;
+        bookmark = data.PagingInfo.Bookmark;
+        enrollments = enrollments.concat(data.Items);
+        if (!hasMoreItems) {
+          enrollments = _.filter(enrollments, function (enrollment) {
+            return enrollment.OrgUnit.Type.Code == 'Course Offering' &&
+              enrollment.Access.IsActive &&
+              enrollment.Access.CanAccess;
+          });
+
+          // now inject the terms
+          let numEnrollments = enrollments.length;
+          console.log(numEnrollments);
+          _.each(enrollments, function (enrollment) {
+            _this._getCourseOffering(enrollment.OrgUnit.Id, function (offeringData) {
+              enrollment.Semester = offeringData.Semester.Name;
+              numEnrollments--;
+              if (numEnrollments === 0) {
+                console.log(enrollments);
+                callback(enrollments);
+              }
+            });
+          });
+        } else {
+          getNextPage();
+        }
+      });
+    }
+
+    getNextPage();
   },
   getData: function () {
 //        return _data;
@@ -33,13 +73,10 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
   hasSession: function (callback) {
     var _this = this;
     this._getUserContext(userContext => {
-        console.log(userContext);
         if (!userContext) {
           callback(false);
         } else {
-          console.log('has context already');
           _this.whoAmI(function (success) {
-            console.log(success);
             if (!success) {
               callback(false);
             } else {
@@ -61,7 +98,6 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
   },
   _fetch: function (path, method, callback) {
     this._getUserContext(userContext => {
-      console.log('using context to fetch');
       let authenticatedUrl = userContext.createAuthenticatedUrl(path, method),
         params = {};
       if (method != 'GET') {
@@ -71,7 +107,6 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
         .then(function (response) {
           if (response.ok) {
             response.json().then(function (data) {
-              console.log(data);
               callback(data);
             });
           } else {
@@ -88,6 +123,10 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
         });
     });
   },
+  _getCourseOffering: function (orgUnitId, callback) {
+    let offeringUrl = '/d2l/api/lp/1.5/courses/' + orgUnitId;
+    this._fetch(offeringUrl, 'GET', callback);
+  },
   _getUserContext: function (callback) {
     store.get('authenticationURL')
       .then(authenticationURL => {
@@ -103,11 +142,11 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
 });
 
 UserStore.dispatchToken = UserDispatcher.register(function (action) {
-    switch(action.type) {
-        case ActionTypes.BANK_SELECTED:
-            UserStore.setBankId(action.content);
-            break;
-    }
+  switch(action.type) {
+    case ActionTypes.BANK_SELECTED:
+      UserStore.setBankId(action.content);
+      break;
+  }
 });
 
 module.exports = UserStore;

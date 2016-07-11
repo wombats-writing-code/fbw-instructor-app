@@ -18,6 +18,7 @@ import SwipeableListView from 'SwipeableRow';
 
 var _ = require('lodash');
 var Icon = require('react-native-vector-icons/FontAwesome');
+var UserStore = require('../../stores/User');
 
 var AssessmentConstants = require('../../constants/Assessment');
 var GenusTypes = AssessmentConstants.GenusTypes;
@@ -36,12 +37,16 @@ class MissionsSidebar extends Component {
 
     this.state = {
       selectedId: '',
-      sortedMissions: _.sortBy(this.props.missions, 'displayName.text') // this should be passed in already sorted by date
+      sortedMissions: _.sortBy(this.props.missions, 'displayName.text'), // this should be passed in already sorted by date
+      subjects: []
     }
   }
   componentWillUnmount() {
   }
   componentDidMount() {
+    UserStore.enrollments(data => {
+      this.setState({ subjects: data });
+    });
   }
   componentWillReceiveProps(nextProps) {
     this.setState({ sortedMissions: _.sortBy(nextProps.missions, 'displayName.text') });
@@ -137,7 +142,6 @@ class MissionsSidebar extends Component {
     }
     return (
       <View style={styles.container}>
-
         <View style={styles.sideBarNav}>
           <TouchableHighlight onPress={() => this._addNewMission()}>
             <Image style={styles.addNewMissionButton} source={require('./assets/add-icon.png')} />
@@ -147,7 +151,9 @@ class MissionsSidebar extends Component {
             {toggleIcon}
           </TouchableHighlight>
         </View>
+        <View style={styles.subjectWrapper}>
 
+        </View>
         <View style={[styles.missionsListWrapper]}>
           <ScrollView style={styles.missionsList}>
             {currentMissions}
