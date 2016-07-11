@@ -88,13 +88,11 @@ class D2LLogin extends Component {
       credentials.d2l.port,
       event.url
     );
-    UserStore.setContext(userContext);
+    UserStore.setAuthenticationURL(event.url);
     UserStore.enrollments(function () {
 
     });
     Actions.missions({
-      schoolId: this.state.school,
-      username: 'token?'
     });
   }
   _loginUser = () => {

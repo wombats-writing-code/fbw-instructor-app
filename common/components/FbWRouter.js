@@ -16,8 +16,13 @@ import {
   Router,
   Scene
 } from 'react-native-router-flux';
+import {
+  Actions
+} from "react-native-router-flux";
 
 var _ = require('lodash');
+
+var UserStore = require('../stores/User');
 
 var Error = require('./error/Error');
 var Login = require('./login/D2LLogin');
@@ -46,7 +51,20 @@ class FbWRouter extends Component {
   constructor(props) {
     super (props);
     this.state = {
+      showLogin: true
     };
+  }
+  componentDidMount() {
+    this.checkUserState();
+  }
+  checkUserState() {
+    var _this = this;
+    console.log('checking user state');
+    UserStore.hasSession(function (hasSession) {
+      if (hasSession) {
+        Actions.missions();
+      }
+    });
   }
   render() {
     var loginTitleStyle = _.assign({}, styles.titleStyle, {
