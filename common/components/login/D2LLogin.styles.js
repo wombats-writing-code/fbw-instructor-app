@@ -31,7 +31,7 @@ var styles = StyleSheet.create({
     textAlign: 'center',
     height: 42,
     color: '#fff',
-    paddingTop: 10.5,
+    paddingTop: 20,
     paddingBottom: 10.5
   },
 });

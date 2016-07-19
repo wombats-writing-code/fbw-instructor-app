@@ -38,7 +38,7 @@ class D2LLogin extends Component {
     super (props);
 
     this.state = {
-      authenticationUrl: AppContext.createUrlForAuthentication(credentials.d2l.host,
+      authenticationUrlD2L: AppContext.createUrlForAuthentication(credentials.d2l.host,
         credentials.d2l.port,
         "flybywire://"),
       offset: new Animated.Value(-deviceHeight),
@@ -82,28 +82,35 @@ class D2LLogin extends Component {
     </View>;
   }
   _handleLogin = (event) => {
-    console.log('authenticated!');
-    console.log(event.url);
-    let userContext = AppContext.createUserContext(credentials.d2l.host,
-      credentials.d2l.port,
-      event.url
-    );
-    UserStore.setAuthenticationURL(event.url);
-    UserStore.enrollments(function () {
+    if (this.state.school === 'acc') {
+      let userContext = AppContext.createUserContext(credentials.d2l.host,
+        credentials.d2l.port,
+        event.url
+      );
+      UserStore.setAuthenticationUrlD2L(event.url);
+      UserStore.setUsername(
+        Actions.missions({
+        });
+      );
 
-    });
-    Actions.missions({
-    });
+    }
   }
   _loginUser = () => {
-    console.log(this.state.authenticationUrl);
-    Linking.canOpenURL(this.state.authenticationUrl).then(supported => {
-      if (!supported) {
-        console.log('Cannot authenticate to D2L right now.');
-      } else {
-        Linking.openURL(this.state.authenticationUrl);
-      }
-    }).catch(err => console.error('D2L Authentication error: ', err));
+    UserStore.setSchool(this.state.school);
+    if (this.state.school === "acc") {
+      Linking.canOpenURL(this.state.authenticationUrlD2L).then(supported => {
+        if (!supported) {
+          console.log('Cannot authenticate to D2L right now.');
+        } else {
+          Linking.openURL(this.state.authenticationUrlD2L);
+        }
+      }).catch(err => console.error('D2L Authentication error: ', err));
+    } else {
+      Actions.errors({
+        message: 'QCC not supported yet.'
+      });
+      console.log('QCC not implemented');
+    }
   }
 }
 

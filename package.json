@@ -20,8 +20,8 @@
     "jest-cli": "^0.10.2",
     "keymirror": "^0.1.1",
     "lodash": "^4.12.0",
-    "react": "^15.1.0",
-    "react-native": "^0.27.2",
+    "react": "^15.2.1",
+    "react-native": "^0.29.2",
     "react-native-collapsible": "^0.6.0",
     "react-native-drawer": "^2.2.3",
     "react-native-orientation": "^1.16.0",
@@ -36,6 +36,7 @@
     "babel-jest": "^10.0.1",
     "babel-polyfill": "^6.7.4",
     "babel-preset-react-native-stage-0": "^1.0.1",
+    "flow-bin": "^0.29.0",
     "jest": "^0.1.40",
     "jest-cli": "^0.10.0",
     "react-addons-test-utils": "^0.14.5"

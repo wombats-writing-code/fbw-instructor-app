@@ -7,12 +7,13 @@ import React, {
 
 import {
   ListView,
+  Picker,
   ScrollView,
   Text,
   Image,
   TouchableHighlight,
   View
-  } from 'react-native';
+} from 'react-native';
 
 import SwipeableListView from 'SwipeableRow';
 
@@ -21,22 +22,28 @@ var Icon = require('react-native-vector-icons/FontAwesome');
 var UserStore = require('../../stores/User');
 
 var AssessmentConstants = require('../../constants/Assessment');
+var BankConstants = require('../../constants/Bank');
+var BankDispatcher = require('../../dispatchers/Bank');
 var GenusTypes = AssessmentConstants.GenusTypes;
 
 var credentials = require('../../constants/credentials');
 var fbwUtils = require('fbw-utils')(credentials);
 
+var MissionsList = require('./MissionsList');
 var MissionStatus = fbwUtils.CheckMissionStatus;
 
 var styles = require('./MissionsSidebar.styles');
 
+
 class MissionsSidebar extends Component {
   constructor(props) {
     super(props);
-    var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
 
     this.state = {
+      courseOfferingId: '',
+      loadingMissions: props.bankId === null ? false : true,
       selectedId: '',
+      showMissionsNav: props.bankId === null ? false : true,
       sortedMissions: _.sortBy(this.props.missions, 'displayName.text'), // this should be passed in already sorted by date
       subjects: []
     }
@@ -44,121 +51,43 @@ class MissionsSidebar extends Component {
   componentWillUnmount() {
   }
   componentDidMount() {
+    console.log('showing sidebar');
     UserStore.enrollments(data => {
       this.setState({ subjects: data });
     });
   }
   componentWillReceiveProps(nextProps) {
-    this.setState({ sortedMissions: _.sortBy(nextProps.missions, 'displayName.text') });
-  }
 
-  // if we want 'this' to refer to this class, we need to fat arrow renderRow(),
-  // because we're calling it from ListView down below
-  // alternatively, we can bind it below by this.renderRow.bind(this) in ListView.
-  renderRow = (rowData, sectionId, rowId) => {
-    // change icon that appears depending on now time vs. item deadline + startTime
-    var missionTypeIcon = '',
-      progressIcon = '',
-      missionStatus = MissionStatus(rowData),
-      rowStyles = [styles.missionWrapper],
-      swipeButtons = [{
-        text: 'Edit',
-        backgroundColor: 'green',
-        onPress: () => {this._editMission(rowData)}
-      }, {
-        text: 'Delete',
-        backgroundColor: 'red',
-        onPress: () => {this._deleteMission(rowData)}
-      }];
-
-    if (rowData.id == this.state.selectedId) {
-      rowStyles.push(styles.missionWrapperSelected);
-    }
-
-    // chooses mission icon depending on mission type and status of mission
-    if (rowData.genusTypeId == GenusTypes.IN_CLASS && missionStatus == 'over') {
-      missionTypeIcon = require('./assets/mission-type--complete-in-class.png');
-
-    } else if (rowData.genusTypeId == GenusTypes.IN_CLASS && missionStatus == 'pending') {
-      missionTypeIcon = require('./assets/mission-type--pending-in-class.png');
-
-    } else if (rowData.genusTypeId == GenusTypes.HOMEWORK && missionStatus == 'over') {
-      missionTypeIcon = require('./assets/mission-type--complete-out-class.png');
-
-    } else if (rowData.genusTypeId == GenusTypes.HOMEWORK && missionStatus == 'pending') {
-      missionTypeIcon = require('./assets/mission-type--pending-out-class.png');
-    }
-
-    return ( // TODO: Change this onPress call depending on what is swiped / touched
-        <TouchableHighlight onPress={() => this._editMission(rowData)}
-                            style={rowStyles}>
-
-          <View style={styles.missionRow}>
-            <Image
-              style={styles.missionTypeIcon}
-              source={missionTypeIcon}
-            />
-
-            <View style={styles.missionInformation}>
-                <Text
-                    style={styles.missionTitle}
-                    numberOfLines={2}>
-                  {(rowData.displayName.text || '').toUpperCase()}
-                </Text>
-              <View>
-                <Text style={styles.missionSubtitle}>
-                  Start {rowData.startTime.month}-{rowData.startTime.day}-{rowData.startTime.year}
-                </Text>
-              </View>
-              <View>
-                <Text style={styles.missionSubtitle}>
-                  Due {rowData.deadline.month}-{rowData.deadline.day}-{rowData.deadline.year}
-                </Text>
-              </View>
-            </View>
-
-            <Icon name="angle-right" style={styles.missionRightIcon} />
-          </View>
-
-        </TouchableHighlight>);
   }
   render() {
-    var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
-      toggleIcon = <View />,
-      currentMissions = this.props.missions.length > 0 ?
-                  ( <ListView
-                        dataSource={ds.cloneWithRows(this.state.sortedMissions)}
-                        renderRow={this.renderRow}>
-                    </ListView> ) :
-                  ( <View style={[styles.notification, styles.rounded]} >
-                    <Text style={styles.notificationText}>
-                      No existing missions.
-                    </Text>
-                  </View> );
+    var toggleIcon = <View />,
+      missionsNav = <View />;
 
     if (this.props.sidebarOpen) {
       toggleIcon = <Icon name="caret-left"
                          style={styles.toggleCaret} />;
     }
+
+    if (this.state.showMissionsNav) {
+      missionsNav = ( <View>
+        <MissionsList />
+      </View>);
+    }
     return (
       <View style={styles.container}>
         <View style={styles.sideBarNav}>
-          <TouchableHighlight onPress={() => this._addNewMission()}>
-            <Image style={styles.addNewMissionButton} source={require('./assets/add-icon.png')} />
-          </TouchableHighlight>
-
           <TouchableHighlight onPress={() => this.props.toggleSidebar()}>
             {toggleIcon}
           </TouchableHighlight>
         </View>
         <View style={styles.subjectWrapper}>
-
+          <Picker selectedValue={this.state.courseOfferingId}
+                  onValueChange={(courseOfferingId) => this._setCourseOffering(courseOfferingId)}>
+            <Picker.Item label="Select your D2L course" value="-1"/>
+            {this._pickerItems()}
+          </Picker>
         </View>
-        <View style={[styles.missionsListWrapper]}>
-          <ScrollView style={styles.missionsList}>
-            {currentMissions}
-          </ScrollView>
-        </View>
+        {missionsNav}
         <View style={styles.sidebarFooter} />
       </View>
     );
@@ -174,6 +103,40 @@ class MissionsSidebar extends Component {
   _editMission = (mission) => {
     this.props.selectMission(mission, 'missionEdit');
     this.setState({ selectedId: mission.id });
+  }
+  _pickerItems = () => {
+    return _.map(this.state.subjects, function (subject) {
+      return <Picker.Item key={subject.id}
+                          label={subject.displayName}
+                          value={subject.id} />
+    });
+  }
+  _setCourseOffering = (courseOfferingId) => {
+    if (courseOfferingId != "-1") {
+      var subjectName, termName,
+        subject = _.filter(this.state.subjects, function (subject) {
+          return subject.id == courseOfferingId;
+        })[0];
+
+      this.setState({ courseOfferingId: courseOfferingId });
+
+      // set the bank alias and update user state ...
+      BankDispatcher.dispatch({
+        type: BankConstants.ActionTypes.SET_BANK_ALIAS,
+        content: {
+          aliasId: courseOfferingId,
+          departmentName: subject.department.trim(),
+          subjectName: subject.name.trim(),
+          termName: subject.term.trim()
+        },
+        callback: this._setBankId
+      });
+    }
+  }
+  _setBankId = (bankId) => {
+    this.setState({ loadingMissions: true });
+    this.setState({ showMissionsNav: true });
+    this.props.setBankId(bankId);
   }
   _setMission = (mission) => {
     this.props.selectMission(mission, 'missionStatus');
