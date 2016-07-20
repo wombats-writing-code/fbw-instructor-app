@@ -1,6 +1,9 @@
 // user store
 // saves state for the given user
 // use react-native-store to save these in the device
+import {
+  Actions
+} from "react-native-router-flux";
 
 var UserDispatcher = require('../dispatchers/User');
 var UserConstants = require('../constants/User');
@@ -8,6 +11,7 @@ var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
 var store = require('react-native-simple-store');
 
+var AuthorizationStore = require('./Authorization');
 var D2LMiddlware = require('../middleware/D2L.js');
 
 var ActionTypes = UserConstants.ActionTypes;
@@ -15,6 +19,15 @@ var CHANGE_EVENT = ActionTypes.CHANGE_EVENT;
 
 
 var UserStore = _.assign({}, EventEmitter.prototype, {
+  clearUserContext: function (callback) {
+    store.get('school')
+      .then(function (school) {
+        if (school === 'acc') {
+          D2LMiddlware.clearUserContext();
+        }
+        callback();
+      });
+  },
   enrollments: function (callback) {
     store.get('school')
       .then(function (school) {
@@ -45,8 +58,20 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
     store.get('school')
       .then(function (school) {
         if (school === 'qcc') {
+          store.delete('school');
+          Actions.login();
         } else {
-          D2LMiddlware.hasSession(callback);
+          D2LMiddlware.hasSession((hasSession) => {
+            console.log('has session? ' + hasSession);
+            if (hasSession) {
+              callback(hasSession);
+            } else {
+              UserStore.clearUserContext(() => {
+                console.log('cleared context')
+                callback(false)
+              });
+            }
+          });
         }
     });
   },
@@ -64,8 +89,24 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
       .then(function (school) {
         if (school === 'acc') {
           D2LMiddlware.whoAmI(function (user) {
+            console.log(user);
             store.save('username', user.UserName)
-            .then(callback);
+              .then(function () {
+                // also create the QBank authorizations here
+                var payload = {
+                  schoolId: school,
+                  username: user.UserName
+                };
+                AuthorizationStore.hasAuthorizations(payload,
+                  function (hasAuthz) {
+                    console.log('checking qbank authz: ' + hasAuthz);
+                    if (hasAuthz) {
+                      callback();
+                    } else {
+                      AuthorizationStore.setAuthorizations(payload, callback);
+                    }
+                });
+              });
           });
         }
       });

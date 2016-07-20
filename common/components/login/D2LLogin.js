@@ -82,31 +82,35 @@ class D2LLogin extends Component {
     </View>;
   }
   _handleLogin = (event) => {
+    console.log('here in _handleLogin');
     if (this.state.school === 'acc') {
       let userContext = AppContext.createUserContext(credentials.d2l.host,
         credentials.d2l.port,
         event.url
       );
       UserStore.setAuthenticationUrlD2L(event.url);
-      UserStore.setUsername(
-        Actions.missions({
-        });
+      UserStore.setUsername(() => {
+          Actions.missions({
+          });
+        }
       );
-
     }
   }
   _loginUser = () => {
+    console.log('in _loginUser');
     UserStore.setSchool(this.state.school);
     if (this.state.school === "acc") {
       Linking.canOpenURL(this.state.authenticationUrlD2L).then(supported => {
         if (!supported) {
           console.log('Cannot authenticate to D2L right now.');
         } else {
+          console.log('about to open safari');
+          console.log(this.state.authenticationUrlD2L);
           Linking.openURL(this.state.authenticationUrlD2L);
         }
       }).catch(err => console.error('D2L Authentication error: ', err));
     } else {
-      Actions.errors({
+      Actions.error({
         message: 'QCC not supported yet.'
       });
       console.log('QCC not implemented');

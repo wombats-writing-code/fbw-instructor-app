@@ -61,6 +61,7 @@ class FbWRouter extends Component {
     var _this = this;
     console.log('checking user state');
     UserStore.hasSession(function (hasSession) {
+      console.log('after check session: ' + hasSession);
       if (!hasSession) {
         Actions.login();
       }

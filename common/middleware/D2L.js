@@ -11,6 +11,9 @@ var AppContext = new D2L.ApplicationContext(credentials.d2l.appID, credentials.d
 
 
 var D2LMiddleware = _.assign({}, EventEmitter.prototype, {
+  clearUserContext: function () {
+    store.delete('authenticationUrlD2L');
+  },
   enrollments: function (callback) {
     // need to get all of these, because paginated
     var url = '/d2l/api/lp/1.9/enrollments/myenrollments/',
@@ -21,41 +24,43 @@ var D2LMiddleware = _.assign({}, EventEmitter.prototype, {
 
     function getNextPage () {
       _this._fetch(url + '?bookmark=' + bookmark, 'GET', function (data) {
-        hasMoreItems = data.PagingInfo.HasMoreItems;
-        bookmark = data.PagingInfo.Bookmark;
-        enrollments = enrollments.concat(data.Items);
-        if (!hasMoreItems) {
-          enrollments = _.filter(enrollments, function (enrollment) {
-            return enrollment.OrgUnit.Type.Code == 'Course Offering' &&
-              enrollment.Access.IsActive &&
-              enrollment.Access.CanAccess;
-          });
-
-          // now inject the terms
-          let numEnrollments = enrollments.length;
-          _.each(enrollments, function (enrollment) {
-            _this._getCourseOffering(enrollment.OrgUnit.Id, function (offeringData) {
-              enrollment.Semester = offeringData.Semester.Name.trim();
-              enrollment.Department = offeringData.Department.Name.trim();
-              numEnrollments--;
-              if (numEnrollments === 0) {
-                var d2lCourses = [];
-                _.each(enrollments, function (subject) {
-                  d2lCourses.push({
-                    id: subject.OrgUnit.Id,
-                    department: subject.Department,
-                    displayName: `${subject.OrgUnit.Name.trim()} -- ${subject.Semester}`,
-                    name: subject.OrgUnit.Name.trim(),
-                    term: subject.Semester
-                  });
-                });
-
-                callback(d2lCourses);
-              }
+        if (data) {
+          hasMoreItems = typeof data.PagingInfo.HasMoreItems !== 'undefined' ? data.PagingInfo.HasMoreItems : false;
+          bookmark = typeof data.PagingInfo.Bookmark !== 'undefined' ? data.PagingInfo.Bookmark : '';
+          enrollments = enrollments.concat(data.Items);
+          if (!hasMoreItems) {
+            enrollments = _.filter(enrollments, function (enrollment) {
+              return enrollment.OrgUnit.Type.Code == 'Course Offering' &&
+                enrollment.Access.IsActive &&
+                enrollment.Access.CanAccess;
             });
-          });
-        } else {
-          getNextPage();
+
+            // now inject the terms
+            let numEnrollments = enrollments.length;
+            _.each(enrollments, function (enrollment) {
+              _this._getCourseOffering(enrollment.OrgUnit.Id, function (offeringData) {
+                enrollment.Semester = offeringData.Semester.Name.trim();
+                enrollment.Department = offeringData.Department.Name.trim();
+                numEnrollments--;
+                if (numEnrollments === 0) {
+                  var d2lCourses = [];
+                  _.each(enrollments, function (subject) {
+                    d2lCourses.push({
+                      id: subject.OrgUnit.Id,
+                      department: subject.Department,
+                      displayName: `${subject.OrgUnit.Name.trim()} -- ${subject.Semester}`,
+                      name: subject.OrgUnit.Name.trim(),
+                      term: subject.Semester
+                    });
+                  });
+
+                  callback(d2lCourses);
+                }
+              });
+            });
+          } else {
+            getNextPage();
+          }
         }
       });
     }
@@ -69,6 +74,7 @@ var D2LMiddleware = _.assign({}, EventEmitter.prototype, {
           callback(false);
         } else {
           _this.whoAmI(function (success) {
+            console.log(success)
             if (!success) {
               callback(false);
             } else {
@@ -82,7 +88,9 @@ var D2LMiddleware = _.assign({}, EventEmitter.prototype, {
     return `assessment.Bank%3A${id}%40ACCTEST.D2L.COM`;
   },
   setAuthenticationUrl: function (d2lURL) {
+    store.delete('authenticationUrlD2L');
     store.save('authenticationUrlD2L', d2lURL);
+    console.log(d2lURL);
   },
   whoAmI: function (callback) {
     this._fetch('/d2l/api/lp/1.5/users/whoami', 'GET', callback);
@@ -101,8 +109,8 @@ var D2LMiddleware = _.assign({}, EventEmitter.prototype, {
               callback(data);
             });
           } else {
-            response.text().then(function (data) {
-              console.log("response text: " + data);
+            response.text().then(function (text) {
+              console.log("response text: " + text);
               console.log(response.status);
               callback(false);
             });

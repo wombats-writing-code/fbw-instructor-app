@@ -125,9 +125,9 @@ class MissionsSidebar extends Component {
         type: BankConstants.ActionTypes.SET_BANK_ALIAS,
         content: {
           aliasId: courseOfferingId,
-          departmentName: subject.department.trim(),
-          subjectName: subject.name.trim(),
-          termName: subject.term.trim()
+          departmentName: subject.department,
+          subjectName: subject.name,
+          termName: subject.term
         },
         callback: this._setBankId
       });
