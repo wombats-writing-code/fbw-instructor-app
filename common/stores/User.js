@@ -89,13 +89,12 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
       .then(function (school) {
         if (school === 'acc') {
           D2LMiddlware.whoAmI(function (user) {
-            console.log(user);
-            store.save('username', user.UserName)
+            store.save('username', user.UniqueName)
               .then(function () {
                 // also create the QBank authorizations here
                 var payload = {
                   schoolId: school,
-                  username: user.UserName
+                  username: user.UniqueName
                 };
                 AuthorizationStore.hasAuthorizations(payload,
                   function (hasAuthz) {
