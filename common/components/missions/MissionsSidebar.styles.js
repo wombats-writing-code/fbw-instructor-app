@@ -10,7 +10,7 @@ module.exports = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f0f0f0',
-    paddingTop: 60
+    paddingTop: 60,
     paddingLeft: 9,
     paddingRight: 9,
     // alignItems: 'stretch'

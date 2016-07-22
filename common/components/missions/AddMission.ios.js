@@ -6,7 +6,6 @@ import React, {
 } from 'react';
 
 import {
-  ActivityIndicatorIOS,
   Animated,
   DatePickerIOS,
   Dimensions,
@@ -122,10 +121,6 @@ class AddMission extends Component {
                                 style={styles.createButtonWrapper}>
                 <Text style={styles.button}>Create</Text>
             </TouchableHighlight>
-<<<<<<< HEAD
-
-=======
->>>>>>> master
           </View>
 
           <ScrollView onScroll={(event) => {console.log('scroll!')}}

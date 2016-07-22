@@ -11,7 +11,6 @@ import {
   ListView,
   ScrollView,
   View,
-  ActivityIndicatorIOS,
   TouchableHighlight,
   StyleSheet
 } from 'react-native';

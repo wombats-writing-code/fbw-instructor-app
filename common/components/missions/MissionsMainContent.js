@@ -6,7 +6,6 @@ import React, {
 } from 'react';
 
 import {
-  ActivityIndicatorIOS,
   Animated,
   Dimensions,
   ListView,

@@ -10,7 +10,7 @@ import {
   ListView,
   ScrollView,
   View,
-  ActivityIndicatorIOS,
+  ActivityIndicator,
   TouchableHighlight,
   LayoutAnimation,
   StyleSheet
@@ -165,7 +165,7 @@ class MissionsManager extends Component {
       <Text>
         Loading your missions ...
       </Text>
-      <ActivityIndicatorIOS
+      <ActivityIndicator
         hidden='true'
         size='large'/>
     </View> );

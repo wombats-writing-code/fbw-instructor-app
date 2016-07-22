@@ -56,8 +56,6 @@ class MissionsSidebar extends Component {
     });
   }
   componentWillReceiveProps(nextProps) {
-
-<<<<<<< HEAD
   }
   render() {
     var toggleIcon = <View />,
@@ -80,79 +78,6 @@ class MissionsSidebar extends Component {
         <CourseOfferingSelector setCourse={this._setCourseOffering}
                                 subjects={this.state.subjects} />
         {missionsNav}
-=======
-    } else if (rowData.genusTypeId == GenusTypes.HOMEWORK && missionStatus == 'pending') {
-      missionTypeIcon = require('./assets/mission-type--pending-out-class.png');
-
-    } else {
-      console.log('warning: mission icon not found')
-    }
-
-    return ( // TODO: Change this onPress call depending on what is swiped / touched
-        <TouchableHighlight onPress={() => this._editMission(rowData)}
-                            style={rowStyles}>
-
-          <View style={styles.missionRow}>
-            <Image
-              style={styles.missionTypeIcon}
-              source={missionTypeIcon}
-            />
-
-            <View style={styles.missionInformation}>
-                <Text
-                    style={styles.missionTitle}
-                    numberOfLines={2}>
-                  {(rowData.displayName.text || '').toUpperCase()}
-                </Text>
-              <View>
-                <Text style={styles.missionSubtitle}>
-                  Start {rowData.startTime.month}-{rowData.startTime.day}-{rowData.startTime.year}
-                </Text>
-              </View>
-              <View>
-                <Text style={styles.missionSubtitle}>
-                  Due {rowData.deadline.month}-{rowData.deadline.day}-{rowData.deadline.year}
-                </Text>
-              </View>
-            </View>
-
-            <Icon name="angle-right" style={styles.missionRightIcon} />
-          </View>
-
-        </TouchableHighlight>);
-  }
-  render() {
-    var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
-      toggleIcon = <View />,
-      currentMissions = this.props.missions.length > 0 ?
-                  ( <ListView
-                        dataSource={ds.cloneWithRows(this.state.sortedMissions)}
-                        renderRow={this.renderRow}>
-                    </ListView> ) :
-                  ( <View style={[styles.notification, styles.rounded]} >
-                    <Text style={styles.notificationText}>
-                      No existing missions.
-                    </Text>
-                  </View> );
-    return (
-      <View style={styles.container}>
-
-        <View style={styles.sideBarNav}>
-          <TouchableHighlight onPress={() => this._addNewMission()}>
-            <Image source={require('./assets/add-icon.png')} />
-          </TouchableHighlight>
-
-          <TouchableHighlight onPress={() => _.noop()}>
-            <Image source={require('./assets/menu-icon.png')} />
-          </TouchableHighlight>
-        </View>
-
-        <View style={[styles.missionsListWrapper]}>
-          <ScrollView style={styles.missionsList}>
-            {currentMissions}
-          </ScrollView>
-        </View>
->>>>>>> master
         <View style={styles.sidebarFooter} />
       </View>
     );

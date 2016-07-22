@@ -11,20 +11,14 @@ var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
 var store = require('react-native-simple-store');
 
-<<<<<<< HEAD
 var AuthorizationStore = require('./Authorization');
 var D2LMiddlware = require('../middleware/D2L.js');
-=======
-var credentials = require('../constants/credentials');
-var qbankFetch = require('fbw-utils')(credentials).qbankFetch;
->>>>>>> master
 
 var ActionTypes = UserConstants.ActionTypes;
 var CHANGE_EVENT = ActionTypes.CHANGE_EVENT;
 
 
 var UserStore = _.assign({}, EventEmitter.prototype, {
-<<<<<<< HEAD
   clearUserContext: function (callback) {
     store.get('school')
       .then(function (school) {
@@ -120,18 +114,6 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
         }
       });
   }
-=======
-    getData: function () {
-//        return _data;
-      return {
-        bankId: 'assessment.Bank%3A576d6d3271e4828c441d721a%40bazzim.MIT.EDU'  // MAT121 Fall 2016 for testing
-      }
-    },
-    setBankId: function (payload) {
-        console.log('bankId saved to user store');
-        _data['bankId'] = payload.bankId;
-    }
->>>>>>> master
 });
 
 UserStore.dispatchToken = UserDispatcher.register(function (action) {
