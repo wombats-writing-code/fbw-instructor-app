@@ -77,7 +77,8 @@ class MissionsManager extends Component {
   }
   componentDidMount() {
     var _this = this;
-    UserStore.getBankId(function (bankId) {
+    UserStore.getBankId()
+    .then((bankId) => {
       if (bankId !== null) {
         _this._setBankId(bankId);
       }
@@ -165,11 +166,11 @@ class MissionsManager extends Component {
     this.setState({ content: newContent });
   }
   _setBankId = (bankId) => {
-    console.log('here in missinos manager: ' + bankId);
+    console.log('here in missions manager: ' + bankId);
     this.setState({ bankId: bankId });
     AssessmentStore.getAssessments(bankId);
-    ItemStore.getItems(bankId);
-    ModuleStore.getModules(bankId);
+    ItemStore.getItems();
+    ModuleStore.getModules();
   }
   _toggleQuestionDrawer = () => {
     this.setState({ questionDrawerOpen: !this.state.questionDrawerOpen });
@@ -203,7 +204,6 @@ class MissionsManager extends Component {
         type: AssessmentItemConstants.ActionTypes.SET_ITEMS,
         content: {
           assessmentId: this.state.selectedMission.id,
-          bankId: UserStore.getData().bankId,
           items: items
         }
     });

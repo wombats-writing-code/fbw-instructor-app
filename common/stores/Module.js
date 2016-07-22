@@ -14,6 +14,9 @@ var BankMap = ModuleConstants.BankMap;
 var CHANGE_EVENT = ActionTypes.CHANGE_EVENT;
 var GenusTypes = ModuleConstants.GenusTypes;
 
+var GuessDepartmentCode = require('../../utilities/department/guessDepartmentCode');
+var UserStore = require('./User');
+
 var _modules = [];
 var _outcomes = {};
 
@@ -32,21 +35,26 @@ var ModuleStore = _.assign({}, EventEmitter.prototype, {
       return module.id == id;
     });
   },
-  getModules: function (bankId) {
-    var _this = this,
-      params = {
-        path: '/learning/objectivebanks/' + BankMap[bankId] + '/objectives/roots?descendentlevels=2'
-      };
-    HandcarFetch(params, function (data) {
-      _modules = data;
-      _.each(_modules, function (module) {
-        _.each(module.childNodes, function (outcome) {
-          _outcomes[outcome.id] = outcome;
+  getModules: function () {
+    var _this = this;
+    UserStore.getDepartment()
+      .then((department) => {
+        var departmentCode = GuessDepartmentCode(department),
+          params = {
+            path: '/learning/objectivebanks/' + BankMap[departmentCode] + '/objectives/roots?descendentlevels=2'
+          };
+          
+        HandcarFetch(params, function (data) {
+          _modules = data;
+          _.each(_modules, function (module) {
+            _.each(module.childNodes, function (outcome) {
+              _outcomes[outcome.id] = outcome;
+            });
+          });
+
+          _this.emitChange();
         });
       });
-
-      _this.emitChange();
-    });
   },
   getOutcome: function (outcomeId) {
     if (_.keys(_outcomes).indexOf(outcomeId) >= 0) {

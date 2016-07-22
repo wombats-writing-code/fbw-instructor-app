@@ -14,6 +14,9 @@ var ActionTypes = ItemConstants.ActionTypes;
 var BankMap = ItemConstants.BankMap;
 var CHANGE_EVENT = ActionTypes.CHANGE_EVENT;
 
+var GuessDepartmentCode = require('../../utilities/department/guessDepartmentCode');
+var UserStore = require('./User');
+
 var _items = [];
 
 var ItemStore = _.assign({}, EventEmitter.prototype, {
@@ -31,19 +34,24 @@ var ItemStore = _.assign({}, EventEmitter.prototype, {
       return item.id == id;
     });
   },
-  getItems: function (bankId) {
+  getItems: function () {
     // console.log('getting items');
 
-    var _this = this,
-      params = {
-        path: 'assessment/banks/' + BankMap[bankId] + '/items?page=all'
-      };
-    qbankFetch(params, function (data) {
-      // console.log('fetched items');
+    var _this = this;
+    UserStore.getDepartment()
+      .then((department) => {
+        var departmentCode = GuessDepartmentCode(department),
+          params = {
+            path: 'assessment/banks/' + BankMap[departmentCode] + '/items?page=all'
+          };
 
-      _items = data.data.results;
-      _this.emitChange();
-    });
+        qbankFetch(params, function (data) {
+          // console.log('fetched items');
+
+          _items = data.data.results;
+          _this.emitChange();
+        });
+      });
   }
 });
 

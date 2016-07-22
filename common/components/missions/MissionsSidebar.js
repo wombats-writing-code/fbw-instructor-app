@@ -29,6 +29,7 @@ var GenusTypes = AssessmentConstants.GenusTypes;
 var credentials = require('../../constants/credentials');
 var fbwUtils = require('fbw-utils')(credentials);
 
+var CourseOfferingSelector = require('../courses/CourseOfferingSelector');
 var MissionsList = require('./MissionsList');
 var MissionStatus = fbwUtils.CheckMissionStatus;
 
@@ -75,18 +76,8 @@ class MissionsSidebar extends Component {
     }
     return (
       <View style={styles.container}>
-        <View style={styles.sideBarNav}>
-          <TouchableHighlight onPress={() => this.props.toggleSidebar()}>
-            {toggleIcon}
-          </TouchableHighlight>
-        </View>
-        <View style={styles.subjectWrapper}>
-          <Picker selectedValue={this.state.courseOfferingId}
-                  onValueChange={(courseOfferingId) => this._setCourseOffering(courseOfferingId)}>
-            <Picker.Item label="Select your D2L course" value="-1"/>
-            {this._pickerItems()}
-          </Picker>
-        </View>
+        <CourseOfferingSelector setCourse={this._setCourseOffering}
+                                subjects={this.state.subjects} />
         {missionsNav}
         <View style={styles.sidebarFooter} />
       </View>
@@ -104,13 +95,6 @@ class MissionsSidebar extends Component {
     this.props.selectMission(mission, 'missionEdit');
     this.setState({ selectedId: mission.id });
   }
-  _pickerItems = () => {
-    return _.map(this.state.subjects, function (subject) {
-      return <Picker.Item key={subject.id}
-                          label={subject.displayName}
-                          value={subject.id} />
-    });
-  }
   _setCourseOffering = (courseOfferingId) => {
     if (courseOfferingId != "-1") {
       var subjectName, termName,
@@ -120,6 +104,7 @@ class MissionsSidebar extends Component {
 
       this.setState({ showMissionsNav: true });
       this.setState({ courseOfferingId: courseOfferingId });
+      UserStore.setDepartment(subject.department);
 
       // set the bank alias and update user state ...
       BankDispatcher.dispatch({

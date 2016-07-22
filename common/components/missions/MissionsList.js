@@ -11,6 +11,7 @@ import {
   ScrollView,
   Text,
   Image,
+  StyleSheet,
   TouchableHighlight,
   View
   } from 'react-native';
@@ -18,12 +19,19 @@ import {
 var _ = require('lodash');
 var UserStore = require('../../stores/User');
 
-var styles = require('./MissionsSidebar.styles');
+var styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: 'row'
+  }
+});
 
 
 class MissionsList extends Component {
   constructor(props) {
     super(props);
+
+    console.log(this.props.missions);
 
     this.state = {
       loadingMissions: this.props.missions.length <= 0,
@@ -124,7 +132,7 @@ class MissionsList extends Component {
       return this._returnLoading();
     }
 
-    return ( <View>
+    return ( <View style={styles.container}>
       <View style={styles.sideBarNav}>
         <TouchableHighlight onPress={() => this._addNewMission()}>
           <Image style={styles.addNewMissionButton} source={require('./assets/add-icon.png')} />

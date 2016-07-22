@@ -36,23 +36,17 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
         }
       });
   },
-  getBankId: function (callback) {
-    store.get('bankId')
-      .then(function (bankId) {
-        callback(bankId);
-      });
+  getBankId: function () {
+    return store.get('bankId');
   },
-  getSchool: function (callback) {
-    store.get('school')
-      .then(function (school) {
-        callback(school);
-    });
+  getDepartment: function () {
+    return store.get('department');
   },
-  getUsername: function (callback) {
-    store.get('username')
-    .then(function (username) {
-      callback(username);
-    })
+  getSchool: function () {
+    return store.get('school');
+  },
+  getUsername: function () {
+    return store.get('username');
   },
   hasSession: function (callback) {
     store.get('school')
@@ -75,11 +69,14 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
         }
     });
   },
+  setAuthenticationUrlD2L: function (d2lURL) {
+    D2LMiddlware.setAuthenticationUrl(d2lURL);
+  },
   setBankId: function (payload) {
     store.save('bankId', payload.bankId);
   },
-  setAuthenticationUrlD2L: function (d2lURL) {
-    D2LMiddlware.setAuthenticationUrl(d2lURL);
+  setDepartment: function (department) {
+    store.save('department', department);
   },
   setSchool: function (school) {
     store.save('school', school);

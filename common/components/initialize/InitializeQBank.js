@@ -26,7 +26,7 @@ var styles = StyleSheet.create({
   container: {
     backgroundColor: '#3498DB',
     flex: 1,
-    paddingTop: 100
+    paddingTop: 80
   },
   messageText: {
     color: '#fff',
@@ -66,7 +66,7 @@ class InitializeQBank extends Component {
       </View>
       <View style={styles.messageWrapper}>
         <Text style={styles.messageText}>
-          We will redirect you to Mission Control, shortly.
+          We will redirect you to Mission Control, shortly ...
         </Text>
       </View>
       <ActivityIndicator size="large" />

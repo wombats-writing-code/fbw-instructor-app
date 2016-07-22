@@ -13,6 +13,8 @@ var qbankFetch = fbwUtils.qbankFetch;
 var ActionTypes = AssessmentItemConstants.ActionTypes;
 var CHANGE_EVENT = ActionTypes.CHANGE_EVENT;
 
+var UserStore = require('./User');
+
 var _items = [];
 
 var AssessmentItemStore = _.assign({}, EventEmitter.prototype, {
@@ -30,32 +32,38 @@ var AssessmentItemStore = _.assign({}, EventEmitter.prototype, {
       return item.id == id;
     });
   },
-  getItems: function (bankId, assessmentId) {
-    var _this = this,
-      params = {
-        path: 'assessment/banks/' + bankId + '/assessments/' + assessmentId + '/items?page=all'
-      };
-    qbankFetch(params, function (data) {
-      _items = data.data.results;
-      _this.emitChange();
-    });
+  getItems: function (assessmentId) {
+    var _this = this;
+    UserStore.getBankId()
+      .then((bankId) => {
+        var params = {
+          path: 'assessment/banks/' + bankId + '/assessments/' + assessmentId + '/items?page=all'
+        };
+        qbankFetch(params, function (data) {
+          _items = data.data.results;
+          _this.emitChange();
+        });
+      });
   },
   setItems: function (data) {
-    var _this = this,
-      originalItems = data['items'],
-      params = {
-        data: data,
-        method: 'PUT',
-        path: 'assessment/banks/' + data.bankId + '/assessments/' + data.assessmentId + '/items'
-      };
+    var _this = this;
+    UserStore.getBankId()
+      .then((bankId) => {
+        var originalItems = data['items'],
+          params = {
+            data: data,
+            method: 'PUT',
+            path: 'assessment/banks/' + bankId + '/assessments/' + data.assessmentId + '/items'
+          };
 
-    params.data.itemIds = _.map(originalItems, 'id');
-    _items = originalItems;
-    this.emitChange();
+        params.data.itemIds = _.map(originalItems, 'id');
+        _items = originalItems;
+        this.emitChange();
 
-    qbankFetch(params, function (responseData) {
-      _this.getItems(data.bankId, data.assessmentId);
-    });
+        qbankFetch(params, function (responseData) {
+          _this.getItems(data.assessmentId);
+        });
+      });
   }
 });
 

@@ -143,7 +143,6 @@ class MissionQuestions extends Component {
       type: AssessmentItemConstants.ActionTypes.SET_ITEMS,
       content: {
         assessmentId: this.props.mission.id,
-        bankId: UserStore.getData().bankId,
         items: updatedItems
       }
     });
