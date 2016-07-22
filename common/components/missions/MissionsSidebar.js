@@ -111,6 +111,7 @@ class MissionsSidebar extends Component {
   }
   _setBankId = (bankId) => {
     console.log('here in setbankid: ' + bankId);
+    UserStore.setBankId(bankId);
     this.props.setBankId(bankId);
   }
 }

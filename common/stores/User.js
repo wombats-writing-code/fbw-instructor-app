@@ -72,8 +72,8 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
   setAuthenticationUrlD2L: function (d2lURL) {
     D2LMiddlware.setAuthenticationUrl(d2lURL);
   },
-  setBankId: function (payload) {
-    store.save('bankId', payload.bankId);
+  setBankId: function (bankId) {
+    store.save('bankId', bankId);
   },
   setDepartment: function (department) {
     store.save('department', department);
