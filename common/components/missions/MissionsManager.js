@@ -168,7 +168,7 @@ class MissionsManager extends Component {
   _setBankId = (bankId) => {
     console.log('here in missions manager: ' + bankId);
     this.setState({ bankId: bankId });
-    AssessmentStore.getAssessments(bankId);
+    AssessmentStore.getAssessments();
     ItemStore.getItems();
     ModuleStore.getModules();
   }

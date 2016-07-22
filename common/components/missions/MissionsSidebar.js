@@ -71,7 +71,9 @@ class MissionsSidebar extends Component {
 
     if (this.state.showMissionsNav) {
       missionsNav = ( <View>
-        <MissionsList missions={this.props.missions} />
+        <MissionsList changeContent={this.props.changeContent}
+                      missions={this.props.missions}
+                      selectMission={this.props.selectMission} />
       </View>);
     }
     return (
@@ -82,18 +84,6 @@ class MissionsSidebar extends Component {
         <View style={styles.sidebarFooter} />
       </View>
     );
-  }
-  _addNewMission() {
-    this.props.changeContent('addMission');
-    this.setState({ selectedId: '' });
-  }
-  _deleteMission = (mission) => {
-    this.props.selectMission(mission, 'missionDelete');
-    this.setState({ selectedId: mission.id });
-  }
-  _editMission = (mission) => {
-    this.props.selectMission(mission, 'missionEdit');
-    this.setState({ selectedId: mission.id });
   }
   _setCourseOffering = (courseOfferingId) => {
     if (courseOfferingId != "-1") {
@@ -122,10 +112,6 @@ class MissionsSidebar extends Component {
   _setBankId = (bankId) => {
     console.log('here in setbankid: ' + bankId);
     this.props.setBankId(bankId);
-  }
-  _setMission = (mission) => {
-    this.props.selectMission(mission, 'missionStatus');
-    this.setState({ selectedId: mission.id });
   }
 }
 

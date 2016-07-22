@@ -19,12 +19,7 @@ import {
 var _ = require('lodash');
 var UserStore = require('../../stores/User');
 
-var styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'row'
-  }
-});
+var styles = require('./MissionsList.styles');
 
 
 class MissionsList extends Component {
@@ -34,7 +29,6 @@ class MissionsList extends Component {
     console.log(this.props.missions);
 
     this.state = {
-      loadingMissions: this.props.missions.length <= 0,
       sortedMissions: _.sortBy(this.props.missions, 'displayName.text'), // this should be passed in already sorted by date
     }
   }
@@ -44,7 +38,6 @@ class MissionsList extends Component {
 
   }
   componentWillReceiveProps(nextProps) {
-    this.setState({ loading: this.props.missions.length <= 0 });
     this.setState({ sortedMissions: _.sortBy(nextProps.missions, 'displayName.text') });
   }
   renderRow = (rowData, sectionId, rowId) => {
@@ -128,10 +121,6 @@ class MissionsList extends Component {
                   </View> ),
       missionsNav = <View />;
 
-    if (this.state.loadingMissions) {
-      return this._returnLoading();
-    }
-
     return ( <View style={styles.container}>
       <View style={styles.sideBarNav}>
         <TouchableHighlight onPress={() => this._addNewMission()}>
@@ -145,13 +134,21 @@ class MissionsList extends Component {
       </View>
     </View>);
   }
-  _returnLoading = () => {
-    return (
-      <View style={styles.container}>
-        <Text>Loading missions ...</Text>
-        <ActivityIndicator size="large" />
-      </View>
-    );
+  _addNewMission() {
+    this.props.changeContent('addMission');
+    this.setState({ selectedId: '' });
+  }
+  _deleteMission = (mission) => {
+    this.props.selectMission(mission, 'missionDelete');
+    this.setState({ selectedId: mission.id });
+  }
+  _editMission = (mission) => {
+    this.props.selectMission(mission, 'missionEdit');
+    this.setState({ selectedId: mission.id });
+  }
+  _setMission = (mission) => {
+    this.props.selectMission(mission, 'missionStatus');
+    this.setState({ selectedId: mission.id });
   }
 }
 

@@ -8,9 +8,8 @@ var _lineHeight = 18;
 
 module.exports = StyleSheet.create({
   container: {
+    flex: 1,
     backgroundColor: '#f0f0f0',
-    paddingTop: 10,
-    maxHeight: 100,
   },
   sideBarNav: {
     alignItems: 'center',
@@ -31,10 +30,10 @@ module.exports = StyleSheet.create({
   },
 
   // list of missions
-  courseOfferingsList: {
+  missionsList: {
   },
-  courseOfferingsListWrapper: {
-    maxHeight: 75
+  missionsListWrapper: {
+    flex: 1,
   },
   missionWrapper: {
     borderBottomColor: '#e5e5e5',
@@ -52,8 +51,8 @@ module.exports = StyleSheet.create({
     paddingBottom: _lineHeight / 2,
     paddingTop: _lineHeight / 2
   },
-  courseInformation: {
-    paddingLeft: 10
+  missionInformation: {
+    flex: 1
   },
   missionTypeIcon: {
     flex: 0,

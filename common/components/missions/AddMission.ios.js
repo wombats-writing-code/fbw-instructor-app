@@ -58,7 +58,7 @@ var styles = StyleSheet.create({
   container: {
     flex: 3,
     padding: 5,
-    paddingTop: 30
+    paddingTop: 20
   },
   createButton: {
   },
@@ -222,7 +222,7 @@ class AddMission extends Component {
                 <Text style={styles.buttonText}>Create</Text>
               </View>
             </TouchableHighlight>
-            
+
           </View>
           <ScrollView onScroll={(event) => {console.log('scroll!')}}
                       style={ {height: this.state.height - 50 } }>
