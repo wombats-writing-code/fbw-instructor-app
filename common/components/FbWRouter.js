@@ -26,6 +26,7 @@ var UserStore = require('../stores/User');
 
 var Error = require('./error/Error');
 var InitializeQBank = require('./initialize/InitializeQBank');
+var Loading = require('./loading/Loading');
 var Login = require('./login/D2LLogin');
 var Missions = require('./missions/MissionsManager');
 
@@ -89,8 +90,14 @@ class FbWRouter extends Component {
                  title="Fly-by-Wire Login"
                  titleStyle={loginTitleStyle}
                  navigationBarStyle={loginNavBarStyle} />
-          <Scene component={Missions}
+          <Scene component={Loading}
                  initial={true}
+                 key="loading"
+                 title="Loading ..."
+                 type="reset"
+                 titleStyle={loginTitleStyle}
+                 navigationBarStyle={loginNavBarStyle} />
+          <Scene component={Missions}
                  key="missions"
                  title="Mission Control"
                  type="reset"

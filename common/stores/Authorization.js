@@ -72,7 +72,7 @@ var AuthorizationStore = _.assign({}, EventEmitter.prototype, {
         });
       });
     });
-    console.log(params);
+    
     qbankFetch(params, function (response) {
       callback();
     });

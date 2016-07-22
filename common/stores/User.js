@@ -68,7 +68,7 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
             } else {
               UserStore.clearUserContext(() => {
                 console.log('cleared context')
-                callback(false)
+                callback(false);
               });
             }
           });
@@ -98,13 +98,13 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
                   schoolId: school,
                   username: username
                 };
-                console.log(username);
+
                 AuthorizationStore.hasAuthorizations(payload,
                   function (hasAuthz) {
-                    console.log('checking qbank authz: ' + hasAuthz);
                     if (hasAuthz) {
                       callback();
                     } else {
+                      console.log('initializing qbank');
                       Actions.initializeQbank(
                         {
                           payload: payload,

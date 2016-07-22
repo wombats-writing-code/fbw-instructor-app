@@ -26,13 +26,17 @@ var styles = StyleSheet.create({
   container: {
     backgroundColor: '#3498DB',
     flex: 1,
-    paddingTop: 200
+    paddingTop: 100
   },
   messageText: {
     color: '#fff',
     fontWeight: "300",
     fontSize: 14,
     letterSpacing: 5,
+    textAlign: 'center'
+  },
+  messageWrapper: {
+    margin: 10
   }
 });
 
@@ -45,15 +49,26 @@ class InitializeQBank extends Component {
   }
   componentDidMount() {
     console.log('setting authz');
-    console.log(this.props.payload);
     AuthorizationStore.setAuthorizations(this.props.payload,
       this.props.callback);
   }
   render() {
     return <View style={styles.container}>
-      <Text style={styles.messageText}>
-        Initializing your Fly-by-Wire Account. Please be patient.
-      </Text>
+      <View style={styles.messageWrapper}>
+        <Text style={styles.messageText}>
+          Looks like this is your first time using Fly-by-Wire.
+        </Text>
+      </View>
+      <View style={styles.messageWrapper}>
+        <Text style={styles.messageText}>
+          Please wait while we initialize your account.
+        </Text>
+      </View>
+      <View style={styles.messageWrapper}>
+        <Text style={styles.messageText}>
+          We will redirect you to Mission Control, shortly.
+        </Text>
+      </View>
       <ActivityIndicator size="large" />
     </View>;
   }
