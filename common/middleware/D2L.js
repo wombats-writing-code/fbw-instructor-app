@@ -74,7 +74,6 @@ var D2LMiddleware = _.assign({}, EventEmitter.prototype, {
           callback(false);
         } else {
           _this.whoAmI(function (success) {
-            console.log(success)
             if (!success) {
               callback(false);
             } else {
@@ -90,7 +89,6 @@ var D2LMiddleware = _.assign({}, EventEmitter.prototype, {
   setAuthenticationUrl: function (d2lURL) {
     store.delete('authenticationUrlD2L');
     store.save('authenticationUrlD2L', d2lURL);
-    console.log(d2lURL);
   },
   whoAmI: function (callback) {
     this._fetch('/d2l/api/lp/1.5/users/whoami', 'GET', callback);

@@ -102,7 +102,6 @@ class D2LLogin extends Component {
         if (!supported) {
           console.log('Cannot authenticate to D2L right now.');
         } else {
-          console.log(this.state.authenticationUrlD2L);
           Linking.openURL(this.state.authenticationUrlD2L);
         }
       }).catch(err => console.error('D2L Authentication error: ', err));

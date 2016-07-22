@@ -32,14 +32,14 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
       var params = {
           data: data,
           method: 'POST',
-          path: 'assessment/banks/' + bankId + '/assessments'
+          path: `assessment/banks/${bankId}/assessments`
         };
 
       qbankFetch(params, function (assessmentData) {
         var offeredParams = {
           data: data,
           method: 'POST',
-          path: 'assessment/banks/' + bankId + '/assessments/' + assessmentData.id + '/assessmentsoffered'
+          path: `assessment/banks/${bankId}/assessments/${assessmentData.id}/assessmentsoffered`
         };
 
         // set the Offered params for when solutions can be reviewed
@@ -79,51 +79,53 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
     var _this = this;
     UserStore.getBankId()
       .then((bankId) => {
-        console.log(bankId);
+        if (bankId !== null) {
+          var numObjects = 0,
+            params = {
+              path: `assessment/banks/${bankId}/assessments?page=all`
+            },
+            finalAssessments = [];
 
-        var numObjects = 0,
-          params = {
-            path: 'assessment/banks/' + bankId + '/assessments?page=all'
-          },
-          finalAssessments = [];
+          qbankFetch(params, function (data) {
+            if (data !== null) {
+              var assessments = data.data.results;
 
-        qbankFetch(params, function (data) {
-          var assessments = data.data.results;
+              numObjects = numObjects + assessments.length;
+              if (numObjects != 0) {
+                _.each(assessments, function (assessment) {
+                  var assessmentParams = {
+                    path: `assessment/banks/${bankId}/assessments/${assessment.id}/assessmentsoffered?page=all`
+                  };
+                  qbankFetch(assessmentParams, function (offeredData) {
+                    if (offeredData !== null) {
+                      var mashUp = assessment;
+                      offered = offeredData.data.results[0];
+                      // Assume only one offered per assessment,
+                      //   given how we are authoring them in this app
+                      numObjects++;
 
-          numObjects = numObjects + assessments.length;
-          console.log('assessments: ' + assessments);
-          if (numObjects != 0) {
-            _.each(assessments, function (assessment) {
-              var assessmentParams = {
-                path: 'assessment/banks/' + bankId + '/assessments/' + assessment.id + '/assessmentsoffered?page=all'
-              };
-              console.log('trying to get offered from : ' + assessmentParams.path);
-              qbankFetch(assessmentParams, function (offeredData) {
-                console.log('got an offered! ' + offeredData);
-                var mashUp = assessment;
-                offered = offeredData.data.results[0];  // Assume only one offered per assessment,
-                //   given how we are authoring them in this app
-                numObjects++;
+                      mashUp.startTime = offered.startTime;
+                      mashUp.deadline = offered.deadline;
+                      mashUp.assessmentOfferedId = offered.id;
 
-                mashUp.startTime = offered.startTime;
-                mashUp.deadline = offered.deadline;
-                mashUp.assessmentOfferedId = offered.id;
+                      finalAssessments.push(mashUp);
 
-                finalAssessments.push(mashUp);
-
-                numObjects--;
-                if (numObjects === 0) {
-                  _assessments = finalAssessments;
-                  _this.emitChange();
-                }
-              });
-              numObjects--;
-            });
-          } else {
-            _assessments = [];
-            _this.emitChange();
-          }
-        });
+                      numObjects--;
+                      if (numObjects === 0) {
+                        _assessments = finalAssessments;
+                        _this.emitChange();
+                      }
+                    }
+                  });
+                  numObjects--;
+                });
+              } else {
+                _assessments = [];
+                _this.emitChange();
+              }
+            }
+          });
+        }
       });
   }
 });

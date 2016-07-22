@@ -14,7 +14,7 @@ import {
   Text,
   TouchableHighlight,
   View,
-  } from 'react-native';
+} from 'react-native';
 
 var _ = require('lodash');
 

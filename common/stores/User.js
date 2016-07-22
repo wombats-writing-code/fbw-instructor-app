@@ -56,12 +56,10 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
           Actions.login();
         } else {
           D2LMiddlware.hasSession((hasSession) => {
-            console.log('has session? ' + hasSession);
             if (hasSession) {
               callback(hasSession);
             } else {
               UserStore.clearUserContext(() => {
-                console.log('cleared context')
                 callback(false);
               });
             }

@@ -111,18 +111,10 @@ class MissionsManager extends Component {
     this.setState({ content: mode });
 
     if (this.state.bankId != null) {
-      AssessmentItemStore.getItems(this.state.bankId, mission.id);
+      AssessmentItemStore.getItems(mission.id);
     }
   }
   render() {
-    // if (this.state.loading) {
-    //   return this.renderLoadingView();
-    // }
-
-    if (this.state.loading) {
-      return this.renderLoadingView();
-    }
-
     let questionDrawerViewStyle = [this.state.questionDrawerViewStyle];
     let questionDrawer;
     if (this.state.questionDrawerOpen) {
@@ -146,15 +138,15 @@ class MissionsManager extends Component {
         {questionDrawer}
 
         <MissionsMainContent style={styles.missionsMainContentContainer}
-                              bankId={bankId}
-                               changeContent={this._changeContent}
-                               content={this.state.content}
-                               missionItems={this.state.missionItems}
-                               missions={this.state.missions}
-                               selectedMission={this.state.selectedMission}
-                               sidebarOpen={this.state.drawerOpen}
-                               toggleQuestionDrawer={this._toggleQuestionDrawer}
-                               width={this._mainContentWidth}
+                            bankId={this.state.bankId}
+                            changeContent={this._changeContent}
+                            content={this.state.content}
+                            missionItems={this.state.missionItems}
+                            missions={this.state.missions}
+                            selectedMission={this.state.selectedMission}
+                            sidebarOpen={this.state.drawerOpen}
+                            toggleQuestionDrawer={this._toggleQuestionDrawer}
+                            width={this._mainContentWidth}
            />
       </View>
     )

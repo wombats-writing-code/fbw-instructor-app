@@ -40,7 +40,6 @@ class MissionsSidebar extends Component {
 
     this.state = {
       courseOfferingId: '',
-      loadingMissions: props.bankId === null ? false : true,
       selectedId: '',
       showMissionsNav: props.bankId === null ? false : true,
       sortedMissions: _.sortBy(this.props.missions, 'displayName.text'), // this should be passed in already sorted by date
@@ -50,7 +49,6 @@ class MissionsSidebar extends Component {
   componentWillUnmount() {
   }
   componentDidMount() {
-    console.log('showing sidebar');
     UserStore.enrollments(data => {
       this.setState({ subjects: data });
     });
@@ -107,7 +105,6 @@ class MissionsSidebar extends Component {
     }
   }
   _setBankId = (bankId) => {
-    console.log('here in setbankid: ' + bankId);
     UserStore.setBankId(bankId);
     this.props.setBankId(bankId);
   }
