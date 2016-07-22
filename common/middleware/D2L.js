@@ -9,10 +9,38 @@ var fbwUtils = require('fbw-utils')(credentials);
 var D2L = require('valence');
 var AppContext = new D2L.ApplicationContext(credentials.d2l.appID, credentials.d2l.appKey);
 
-
 var D2LMiddleware = _.assign({}, EventEmitter.prototype, {
   clearUserContext: function () {
     store.delete('authenticationUrlD2L');
+  },
+  createGrade: function (assessmentName) {
+    console.log('in create grade');
+    var _this = this;
+    store.get('lmsCourseId')
+      .then((courseId) => {
+        console.log(courseId);
+        var url = `/d2l/api/le/1.5/${courseId}/grades/`,
+          data = {
+            MaxPoints: 100,
+            CanExceedMaxPoints: false,
+            IsBonus: false,
+            GradeSchemeId: 0,
+            CategoryId: 0,
+            ExcludeFromFinalGradeCalculation: false,
+            Name: assessmentName.substring(0, 128),
+            ShortName: assessmentName.substring(0, 128),
+            GradeType: "Numeric",
+            Description: {
+              "Content": "A Fly-by-Wire Mission",
+              "Type": "Text"
+            },
+          };
+          console.log(data);
+        _this._fetch(url, 'POST', data, function (gradeObject) {
+          console.log('created a grade object!');
+          console.log(gradeObject);
+        });
+      });
   },
   enrollments: function (callback) {
     // need to get all of these, because paginated
@@ -23,7 +51,7 @@ var D2LMiddleware = _.assign({}, EventEmitter.prototype, {
       _this = this;
 
     function getNextPage () {
-      _this._fetch(url + '?bookmark=' + bookmark, 'GET', function (data) {
+      _this._fetch(url + '?bookmark=' + bookmark, 'GET', null, function (data) {
         if (data) {
           hasMoreItems = typeof data.PagingInfo.HasMoreItems !== 'undefined' ? data.PagingInfo.HasMoreItems : false;
           bookmark = typeof data.PagingInfo.Bookmark !== 'undefined' ? data.PagingInfo.Bookmark : '';
@@ -77,7 +105,7 @@ var D2LMiddleware = _.assign({}, EventEmitter.prototype, {
             if (!success) {
               callback(false);
             } else {
-              callback(true);
+              callback(success);
             }
           });
         }
@@ -91,14 +119,21 @@ var D2LMiddleware = _.assign({}, EventEmitter.prototype, {
     store.save('authenticationUrlD2L', d2lURL);
   },
   whoAmI: function (callback) {
-    this._fetch('/d2l/api/lp/1.5/users/whoami', 'GET', callback);
+    this._fetch('/d2l/api/lp/1.5/users/whoami', 'GET', null, callback);
   },
-  _fetch: function (path, method, callback) {
+  _fetch: function (path, method, data, callback) {
     this._getUserContext(userContext => {
       let authenticatedUrl = userContext.createAuthenticatedUrl(path, method),
         params = {};
       if (method != 'GET') {
         params.method = method;
+      }
+      if (data !== null) {
+        params.body = JSON.stringify(data);
+        params.headers = {
+          "accept": "application/json",
+          "content-type": 'application/json'
+        };
       }
       fetch(authenticatedUrl, params)
         .then(function (response) {
@@ -122,7 +157,7 @@ var D2LMiddleware = _.assign({}, EventEmitter.prototype, {
   },
   _getCourseOffering: function (orgUnitId, callback) {
     let offeringUrl = '/d2l/api/lp/1.5/courses/' + orgUnitId;
-    this._fetch(offeringUrl, 'GET', callback);
+    this._fetch(offeringUrl, 'GET', null, callback);
   },
   _getUserContext: function (callback) {
     store.get('authenticationUrlD2L')

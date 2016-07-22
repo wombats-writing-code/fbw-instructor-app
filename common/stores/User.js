@@ -45,6 +45,9 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
   getLMSCourseId: function () {
     return store.get('lmsCourseId');
   },
+  getLMSUserId: function () {
+    return store.get('lmsUserId');
+  },
   getSchool: function () {
     return store.get('school');
   },
@@ -81,6 +84,9 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
   },
   setLMSCourseId: function (courseId) {
     store.save('lmsCourseId', courseId);
+  },
+  setLMSUserId: function (userId) {
+    store.save('lmsUserId', userId);
   },
   setSchool: function (school) {
     store.save('school', school);

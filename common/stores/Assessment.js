@@ -4,6 +4,7 @@ var AssessmentDispatcher = require('../dispatchers/Assessment');
 var AssessmentConstants = require('../constants/Assessment');
 var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
+var store = require('react-native-simple-store');
 
 var credentials = require('../constants/credentials');
 var qbankFetch = require('fbw-utils')(credentials).qbankFetch;
@@ -11,7 +12,7 @@ var qbankFetch = require('fbw-utils')(credentials).qbankFetch;
 var ActionTypes = AssessmentConstants.ActionTypes;
 var CHANGE_EVENT = ActionTypes.CHANGE_EVENT;
 
-var UserStore = require('./User');
+var D2LMiddleware = require('../middleware/D2L');
 
 var _assessments = [];
 
@@ -27,7 +28,7 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
   },
   createAssessment: function (data) {
     var _this = this;
-    UserStore.getBankId()
+    store.get('bankId')
       .then((bankId) => {
       var params = {
           data: data,
@@ -65,6 +66,15 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
           mashUp.assessmentOfferedId = offeredData.id;
 
           _assessments.push(mashUp);
+
+          // also create the grade object for the school
+          store.get('school')
+            .then((school) => {
+              if (school === 'acc') {
+                console.log(assessmentData.displayName.text);
+                D2LMiddleware.createGrade(assessmentData.displayName.text);
+              }
+            });
           _this.emitChange();
         });
       });
@@ -77,7 +87,7 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
   },
   getAssessments: function () {
     var _this = this;
-    UserStore.getBankId()
+    store.get('bankId')
       .then((bankId) => {
         if (bankId !== null) {
           var numObjects = 0,

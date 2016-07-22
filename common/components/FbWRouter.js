@@ -64,6 +64,8 @@ class FbWRouter extends Component {
     UserStore.hasSession(function (hasSession) {
       if (!hasSession) {
         Actions.login();
+      } else {
+        UserStore.setLMSUserId(hasSession.Identifier);
       }
     });
   }

@@ -18,7 +18,7 @@ import {
   TextInput,
   TouchableHighlight,
   View,
-  } from 'react-native';
+} from 'react-native';
 
 var AssessmentConstants = require('../../constants/Assessment');
 
