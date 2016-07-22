@@ -5,9 +5,13 @@ var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
 
 var credentials = require('../constants/credentials');
+<<<<<<< HEAD
 var fbwUtils = require('fbw-utils')(credentials);
 
 var HandcarFetch = fbwUtils.handcarFetch;
+=======
+var handcarFetch = require('fbw-utils')(credentials).handcarFetch;
+>>>>>>> master
 
 var ActionTypes = ModuleConstants.ActionTypes;
 var BankMap = ModuleConstants.BankMap;
@@ -35,6 +39,7 @@ var ModuleStore = _.assign({}, EventEmitter.prototype, {
       return module.id == id;
     });
   },
+<<<<<<< HEAD
   getModules: function () {
     var _this = this;
     UserStore.getDepartment()
@@ -53,6 +58,18 @@ var ModuleStore = _.assign({}, EventEmitter.prototype, {
           });
 
           _this.emitChange();
+=======
+  getModules: function (bankId) {
+    var _this = this,
+      params = {
+        path: '/learning/objectivebanks/' + BankMap[bankId] + '/objectives/roots?descendentlevels=2'
+      };
+    handcarFetch(params, function (data) {
+      _modules = data;
+      _.each(_modules, function (module) {
+        _.each(module.childNodes, function (outcome) {
+          _outcomes[outcome.id] = outcome;
+>>>>>>> master
         });
       });
   },

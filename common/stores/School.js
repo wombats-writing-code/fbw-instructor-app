@@ -7,9 +7,13 @@ var assign = require('object-assign');
 var _ = require('lodash');
 
 var credentials = require('../constants/credentials');
+<<<<<<< HEAD
 var fbwUtils = require('fbw-utils')(credentials);
 
 var qbankFetch = fbwUtils.qbankFetch;
+=======
+var qbankFetch = require('fbw-utils')(credentials).qbankFetch;
+>>>>>>> master
 
 var ActionTypes = AssessmentConstants.ActionTypes;
 var CHANGE_EVENT = ActionTypes.CHANGE_EVENT;

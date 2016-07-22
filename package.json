@@ -15,7 +15,11 @@
     "es6-promise": "^3.2.1",
     "events": "^1.1.0",
     "fbjs": "^0.8.2",
+<<<<<<< HEAD
     "fbw-utils": "^0.1.13",
+=======
+    "fbw-utils": "^0.1.6",
+>>>>>>> master
     "flux": "^2.1.1",
     "jest-cli": "^0.10.2",
     "keymirror": "^0.1.1",

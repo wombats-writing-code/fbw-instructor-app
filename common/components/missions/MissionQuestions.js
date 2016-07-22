@@ -14,6 +14,7 @@ import {
   Text,
   TouchableHighlight,
   View,
+  PanResponder
   } from 'react-native';
 
 var _ = require('lodash');
@@ -25,13 +26,20 @@ var UserStore = require('../../stores/User');
 
 
 var styles = StyleSheet.create({
-  header: {
-    margin: 5
+  container: {
+    position:'relative'
   },
-  headerText: {
-    color: 'gray',
-    fontSize: 10,
-    textAlign: 'center'
+  controls: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end'
+  },
+  draggable: {
+    flex: 2,
+    position: 'absolute',
+  },
+  addQuestionsButton: {
+    color: '#444',
+    textAlign: 'right'
   },
   notification: {
     backgroundColor: '#ff9c9c',
@@ -48,10 +56,29 @@ class MissionQuestions extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      currentQuestionId: null,
+      pan     : new Animated.ValueXY() ,
       allItems: [],
       height: 0,
       opacity: new Animated.Value(0)
     };
+
+
+    // TODO: not done
+    this.panResponder = PanResponder.create({
+      onStartShouldSetPanResponder : () => {
+        console.log('starting pan responder')
+        return true;
+      },
+      onPanResponderMove: Animated.event([ null,
+        {
+          dx : this.state.pan.x,
+          dy : this.state.pan.y
+      }]),
+      onPanResponderRelease: (e, gesture) => {
+        console.log('released pan responder');
+      }
+    });
   }
   componentWillUnmount() {
     Animated.timing(this.state.opacity, {
@@ -65,28 +92,22 @@ class MissionQuestions extends Component {
     this.setState({ height: Dimensions.get('window').height });
   }
   componentDidUpdate() {
-    // issue with styling DatePickerIOS:
-    // https://github.com/facebook/react-native/issues/1587
-//    if (this.refs.startDateDatepicker && this.refs.deadlineDatePicker) {
-//      this.refs.startDateDatepicker.refs.datepicker.setNativeProps({width: Window.width - 500});
-//      this.refs.deadlineDatePicker.refs.datepicker.setNativeProps({width: Window.width - 100});
-//    }
   }
   onLayout = (event) => {
-    // TODO: how to make this height change when device is rotated?
-    // This doesn't get called -- why not??? Docs say it should, on mount and on layout change...
-    console.log('onLayout called');
     this.setState({ height: Dimensions.get('window').height });
   }
   renderItemRow = (rowData, sectionId, rowId) => {
     // rowId is index of the row
-    return <View key={rowData.id}>
-      <QuestionCard index={rowId}
-                    item={rowData}
-                    numItems={this.props.missionItems.length}
-                    removeItem={this._removeItemFromMission}
-                    swapItems={this._swapItems} />
-    </View>
+    return (<Animated.View {...this.panResponder.panHandlers} key={rowData.id}>
+          <QuestionCard index={rowId}
+                        item={rowData}
+                        isActive={this.state.currentQuestionId === rowData.id}
+                        onLongPress={this._setCurrentQuestion}
+
+                        numItems={this.props.missionItems.length}
+                        removeItem={this._removeItemFromMission}
+                        swapItems={this._swapItems} />
+        </Animated.View>)
   }
   render() {
     var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
@@ -99,21 +120,32 @@ class MissionQuestions extends Component {
                          </View> );
     return (
       <View style={styles.container}>
-        <Animated.View style={{opacity: this.state.opacity}}>
-          <TouchableHighlight onPress={() => this.props.toggleQuestionDrawer()}
-                              style={styles.header}>
-            <Text style={styles.headerText}>
-              Tap here to toggle the "Add Question" drawer.
-            </Text>
-          </TouchableHighlight>
-          <ScrollView onScroll={(event) => {console.log('scroll!')}}
-                      style={ {height: this.state.height - 100 } }>
-            {currentItems}
-          </ScrollView>
-        </Animated.View>
+        <View style={styles.controls}>
+          <Animated.View style={{opacity: this.state.opacity}}>
+            <TouchableHighlight onPress={() => this.props.toggleQuestionDrawer()}>
+              <Text style={styles.addQuestionsButton}>
+                Tap here to toggle the "Add Question" drawer.
+              </Text>
+            </TouchableHighlight>
+          </Animated.View>
+        </View>
+
+        {currentItems}
       </View>
     );
   }
+  // <ScrollView scrollEnabled={false} style={ {height: this.state.height - 100 } }>
+  //   {currentItems}
+  // </ScrollView>
+
+  _setCurrentQuestion = (questionId) => {
+    console.log('long pressing now', questionId)
+
+    // this.panResponder.onStartShouldSetPanResponder();
+
+    this.setState({currentQuestionId: questionId});
+  }
+
   _swapItems = (index1, index2) => {
     // semantically, this swaps the items' positions
     // i.e. moving "up" (in the UI) would

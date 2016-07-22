@@ -6,9 +6,7 @@ var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
 
 var credentials = require('../constants/credentials');
-var fbwUtils = require('fbw-utils')(credentials);
-
-var qbankFetch = fbwUtils.qbankFetch;
+var qbankFetch = require('fbw-utils')(credentials).qbankFetch;
 
 var ActionTypes = ItemConstants.ActionTypes;
 var BankMap = ItemConstants.BankMap;

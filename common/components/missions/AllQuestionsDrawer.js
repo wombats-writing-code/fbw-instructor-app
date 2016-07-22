@@ -10,7 +10,6 @@ import {
   Dimensions,
   ListView,
   ScrollView,
-  StyleSheet,
   Switch,
   Text,
   TextInput,
@@ -26,45 +25,14 @@ var ActionTypes = AssessmentConstants.ActionTypes;
 var AssessmentStore = require('../../stores/Assessment');
 var AssessmentItemStore = require('../../stores/AssessmentItem');
 
-var credentials = require('../../constants/credentials');
-var fbwUtils = require('fbw-utils')(credentials);
-
-var DateConvert = fbwUtils.ConvertDateToDictionary;
-
 var Dispatcher = require('../../dispatchers/Assessment');
 var GenusTypes = AssessmentConstants.GenusTypes;
 var QuestionAccordion = require('./QuestionAccordion');
 
-var styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#2B2B2B',
-    flex: 1,
-    opacity: 0.9
-  },
-  header: {
-    padding: 3
-  },
-  headerText: {
-    color: '#C2C2C2',
-    textAlign: 'center'
-  },
-  notification: {
-    backgroundColor: '#ff9c9c',
-    padding: 3
-  },
-  notificationText: {
-    fontSize: 10,
-    padding: 5
-  },
-  separator: {
-    borderColor: '#C2C2C2',
-    borderRadius: 5,
-    borderWidth: 1,
-    marginBottom: 10,
-    marginLeft: 5,
-    marginRight: 5
-  }
-});
+var credentials = require('../../constants/credentials');
+var DateConvert = require('fbw-utils')(credentials).ConvertDateToDictionary;
+
+var styles = require('./AllQuestionsDrawer.styles');
 
 
 class AllQuestionsDrawer extends Component {
@@ -78,12 +46,6 @@ class AllQuestionsDrawer extends Component {
   componentDidMount() {
   }
   componentDidUpdate() {
-    // issue with styling DatePickerIOS:
-    // https://github.com/facebook/react-native/issues/1587
-//    if (this.refs.startDateDatepicker && this.refs.deadlineDatePicker) {
-//      this.refs.startDateDatepicker.refs.datepicker.setNativeProps({width: Window.width - 500});
-//      this.refs.deadlineDatePicker.refs.datepicker.setNativeProps({width: Window.width - 100});
-//    }
   }
   onLayout = (event) => {
     // TODO: how to make this height change when device is rotated?
@@ -95,14 +57,15 @@ class AllQuestionsDrawer extends Component {
     this.setState({ items: items });
   }
   render() {
+
     // TODO: make this a set of collapsible accordions with <ListView> inside of each...
     // TODO: close X button
     var currentItems = _.keys(this.props.items).length > 0 ?
                        ( <QuestionAccordion items={this.props.items}
                                             missionItems={this.props.missionItems}
                                             updateItemsInMission={this.props.updateItemsInMission} /> ) :
-                       ( <View style={styles.notification}>
-                           <Text style={[styles.notificationText]}>No questions</Text>
+                       ( <View style={styles.noQuestionsIndicator}>
+                           <Text style={[styles.noQuestionsIndicatorText]}>No questions</Text>
                          </View> );
     return (
       <View style={styles.container}>

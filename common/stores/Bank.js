@@ -4,6 +4,7 @@ var BankDispatcher = require('../dispatchers/Bank');
 var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
 
+<<<<<<< HEAD
 var ActionTypes = BankConstants.ActionTypes;
 var CHANGE_EVENT = ActionTypes.CHANGE_EVENT;
 var D2LMiddlware = require('../middleware/D2L');
@@ -15,6 +16,10 @@ var ACCId = BankConstants.SchoolBanks.ACC;
 var credentials = require('../constants/credentials');
 var fbwUtils = require('fbw-utils')(credentials);
 var qbankFetch = fbwUtils.qbankFetch;
+=======
+var credentials = require('../constants/credentials');
+var qbankFetch = require('fbw-utils')(credentials).qbankFetch;
+>>>>>>> master
 
 var UserStore = require('../stores/User');
 

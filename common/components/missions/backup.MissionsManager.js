@@ -12,7 +12,6 @@ import {
   View,
   ActivityIndicatorIOS,
   TouchableHighlight,
-  LayoutAnimation,
   StyleSheet
 } from 'react-native';
 
@@ -24,7 +23,6 @@ var AssessmentStore = require('../../stores/Assessment');
 var AssessmentItemConstants = require('../../constants/AssessmentItem');
 var AssessmentItemDispatcher = require('../../dispatchers/AssessmentItem');
 var AssessmentItemStore = require('../../stores/AssessmentItem');
-var BankStore = require('../../stores/Bank');
 var ItemStore = require('../../stores/Item');
 var ModuleStore = require('../../stores/Module');
 var UserStore = require('../../stores/User');
@@ -33,18 +31,13 @@ var MissionsSidebar = require('./MissionsSidebar');
 var MissionsMainContent = require('./MissionsMainContent');
 var QuestionsDrawer = require('./AllQuestionsDrawer');
 
-var SortItemsByModules = require('../../stores/sortItemsByModules');
+var SortItemsByModules = require('../../../utilities/handcar/sortItemsByModules');
 
 var styles = StyleSheet.create({
   container: {
     flex: 1,
+    // width: 600,
     flexDirection: 'row'
-  },
-  missionsSidebarContainer: {
-    flex: 1
-  },
-  missionsMainContentContainer: {
-    flex: 3.2
   },
   questionDrawer: {
     backgroundColor: '#7A7A7A',
@@ -58,7 +51,6 @@ class MissionsManager extends Component {
     super(props);
     this.state = {
       allItems: [],
-      bankId: null,
       content: 'calendar',
       drawerOpen: true,
       loading: true,
@@ -66,10 +58,6 @@ class MissionsManager extends Component {
       missions: [],
       modules: [],
       questionDrawerOpen: false,
-      questionDrawerViewStyle: {
-        height: 0
-      },
-      // questionDrawerOpen: true,     // temporary for dev only
       selectedMission: {},
       sortedItems: {}
     };
@@ -77,8 +65,6 @@ class MissionsManager extends Component {
     AssessmentItemStore.addChangeListener(this._updateMissionItemsFromStore);
     ItemStore.addChangeListener(this._updateItemsFromStore);
     ModuleStore.addChangeListener(this._updateModulesFromStore);
-
-    this._mainContentWidth = .75;
   }
   componentWillUnmount() {
     AssessmentStore.removeChangeListener(this._updateMissionsFromStore);
@@ -87,19 +73,16 @@ class MissionsManager extends Component {
     ModuleStore.removeChangeListener(this._updateModulesFromStore);
   }
   componentDidMount() {
-    var _this = this;
-    UserStore.getBankId()
-    .then((bankId) => {
-      if (bankId !== null) {
-        _this._setBankId(bankId);
-      }
-    });
+    var bankId = UserStore.getData().bankId;
+
+    AssessmentStore.getAssessments(bankId);
+    ItemStore.getItems(bankId);
+    ModuleStore.getModules(bankId);
   }
   setItems(items) {
     this.setState({ allItems: items });
   }
   setMissions(missions) {
-    console.log('setting missions');
     this.setState({ missions: missions });
     this.setState({ loading: false });
   }
@@ -110,53 +93,53 @@ class MissionsManager extends Component {
     this.setState({ selectedMission: mission });
     this.setState({ content: mode });
 
-    if (this.state.bankId != null) {
-      AssessmentItemStore.getItems(this.state.bankId, mission.id);
-    }
+    AssessmentItemStore.getItems(UserStore.getData().bankId, mission.id);
   }
   render() {
-    // if (this.state.loading) {
-    //   return this.renderLoadingView();
-    // }
+    var bankId = UserStore.getData().bankId;
 
     if (this.state.loading) {
       return this.renderLoadingView();
     }
-
-    let questionDrawerViewStyle = [this.state.questionDrawerViewStyle];
-    let questionDrawer;
-    if (this.state.questionDrawerOpen) {
-      questionDrawer = (<QuestionsDrawer style={questionDrawerViewStyle}
-                            items={this.state.sortedItems}
-                            missionItems={this.state.missionItems}
-                            updateItemsInMission={this._updateItemsInMission} />)
-    }
-
+    // set panThreshold to 1.5 because acceptPan doesn't seem to work?
     return (
-      <View style={styles.container}>
-        <MissionsSidebar style={styles.missionsSidebarContainer}
-                         bankId={this.state.bankId}
-                         changeContent={this._changeContent}
-                         missions={this.state.missions}
-                         selectMission={this.setSelectedMission}
-                         setBankId={this._setBankId}
-                         sidebarOpen={this.state.drawerOpen}
-                         toggleSidebar={this._toggleSidebar} />
+      <Drawer acceptPan={true}
+              captureGestures={'open'}
+              content={<MissionsSidebar changeContent={this._changeContent}
+                                        missions={this.state.missions}
+                                        selectMission={this.setSelectedMission}
+                                        sidebarOpen={this.state.drawerOpen}
+                                        toggleSidebar={this._toggleSidebar} />}
+              open={this.state.drawerOpen}
+              openDrawerOffset={0.7}
+              panThreshold={1.5}
+              side='left'
+              style={styles.container}
+              tweenHandler={Drawer.tweenPresets.parallax}>
 
-        {questionDrawer}
-
-        <MissionsMainContent style={styles.missionsMainContentContainer}
-                              bankId={bankId}
-                               changeContent={this._changeContent}
-                               content={this.state.content}
-                               missionItems={this.state.missionItems}
-                               missions={this.state.missions}
-                               selectedMission={this.state.selectedMission}
-                               sidebarOpen={this.state.drawerOpen}
-                               toggleQuestionDrawer={this._toggleQuestionDrawer}
-                               width={this._mainContentWidth}
-           />
-      </View>
+        <Drawer acceptPan={false}
+                captureGestures={false}
+                content={<QuestionsDrawer items={this.state.sortedItems}
+                                          missionItems={this.state.missionItems}
+                                          updateItemsInMission={this._updateItemsInMission} />}
+                open={this.state.questionDrawerOpen}
+                openDrawerOffset={0.5}
+                panThreshold={1.5}
+                side='right'
+                type='overlay'>
+            <View>
+              <MissionsMainContent bankId={bankId}
+                                   changeContent={this._changeContent}
+                                   content={this.state.content}
+                                   missionItems={this.state.missionItems}
+                                   missions={this.state.missions}
+                                   selectedMission={this.state.selectedMission}
+                                   sidebarOpen={this.state.drawerOpen}
+                                   toggleQuestionDrawer={this._toggleQuestionDrawer}
+                                   toggleSidebar={this._toggleSidebar} />
+            </View>
+          </Drawer>
+      </Drawer>
     )
   }
 
@@ -173,24 +156,15 @@ class MissionsManager extends Component {
   _changeContent = (newContent) => {
     this.setState({ content: newContent });
   }
-  _setBankId = (bankId) => {
-    console.log('here in missions manager: ' + bankId);
-    this.setState({ bankId: bankId });
-    AssessmentStore.getAssessments();
-    ItemStore.getItems();
-    ModuleStore.getModules();
-  }
   _toggleQuestionDrawer = () => {
     this.setState({ questionDrawerOpen: !this.state.questionDrawerOpen });
-
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
-    this.setState({
-      questionDrawerViewStyle: {
-        height: 700
-      }
-    });
+    if (this.state.drawerOpen) {
+      this._toggleSidebar();
+    }
   }
-
+  _toggleSidebar = () => {
+    this.setState({ drawerOpen: !this.state.drawerOpen });
+  }
   _updateItemsFromStore = (items) => {
     var alphabeticalItems = _.sortBy(items,
       ['displayName.text']),
@@ -214,6 +188,7 @@ class MissionsManager extends Component {
         type: AssessmentItemConstants.ActionTypes.SET_ITEMS,
         content: {
           assessmentId: this.state.selectedMission.id,
+          bankId: UserStore.getData().bankId,
           items: items
         }
     });

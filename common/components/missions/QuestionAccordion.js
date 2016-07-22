@@ -23,41 +23,7 @@ import Accordion from 'react-native-collapsible/Accordion';
 var _ = require('lodash');
 var Icon = require('react-native-vector-icons/FontAwesome');
 
-var styles = StyleSheet.create({
-  includedItem: {
-    color: '#355e3b',
-    textAlign: 'center'
-  },
-  itemCounter: {
-    color: '#a1a1a1',
-    textAlign: 'right',
-    width: 50
-  },
-  itemDisplayName: {
-    flex: 1,
-    fontSize: 10,
-    color: '#a1a1a1'
-  },
-  itemRow: {
-    flex: 1,
-    flexDirection: 'row',
-    padding: 10
-  },
-  itemState: {
-    width: 25
-  },
-  moduleDisplayName: {
-    flex: 1,
-    fontSize: 14,
-    color: '#a1a1a1'
-  },
-  moduleNameWrapper: {
-    backgroundColor: '#0003c9',
-    flex: 1,
-    flexDirection: 'row',
-    padding: 5
-  }
-});
+var styles = require('./QuestionAccordion.styles');
 
 
 class QuestionAccordion extends Component {
@@ -72,12 +38,6 @@ class QuestionAccordion extends Component {
   componentDidMount() {
   }
   componentDidUpdate() {
-    // issue with styling DatePickerIOS:
-    // https://github.com/facebook/react-native/issues/1587
-//    if (this.refs.startDateDatepicker && this.refs.deadlineDatePicker) {
-//      this.refs.startDateDatepicker.refs.datepicker.setNativeProps({width: Window.width - 500});
-//      this.refs.deadlineDatePicker.refs.datepicker.setNativeProps({width: Window.width - 100});
-//    }
   }
   onLayout = (event) => {
     // TODO: how to make this height change when device is rotated?
@@ -87,12 +47,12 @@ class QuestionAccordion extends Component {
   }
   renderAccordionHeader = (section) => {
     return (
-      <View style={styles.moduleNameWrapper}>
-        <Text style={styles.moduleDisplayName}>
+      <View style={styles.accordionHeader}>
+        <Text style={styles.accordionHeaderText}>
           {section.displayName}
         </Text>
-        <Text style={styles.itemCounter}>
-          {section.items.length}
+        <Text style={styles.accordionHeaderCounter}>
+          ({section.items.length} questions)
         </Text>
       </View>
       );
@@ -128,7 +88,7 @@ class QuestionAccordion extends Component {
             <View style={styles.itemState}>
               {itemIncludedIcon}
             </View>
-            <Text numberOfLines={1}
+            <Text numberOfLines={3}
                   style={styles.itemDisplayName}>
               {rowData.displayName.text}
             </Text>

@@ -6,9 +6,13 @@ var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
 
 var credentials = require('../constants/credentials');
+<<<<<<< HEAD
 var fbwUtils = require('fbw-utils')(credentials);
 
 var qbankFetch = fbwUtils.qbankFetch;
+=======
+var qbankFetch = require('fbw-utils')(credentials).qbankFetch;
+>>>>>>> master
 
 var ActionTypes = AssessmentConstants.ActionTypes;
 var CHANGE_EVENT = ActionTypes.CHANGE_EVENT;
@@ -28,6 +32,7 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
     this.removeListener(CHANGE_EVENT, callback);
   },
   createAssessment: function (data) {
+<<<<<<< HEAD
     var _this = this;
     UserStore.getBankId()
       .then((bankId) => {
@@ -69,6 +74,46 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
           _assessments.push(mashUp);
           _this.emitChange();
         });
+=======
+    var _this = this,
+      params = {
+        data: data,
+        method: 'POST',
+        path: 'assessment/banks/' + data.bankId + '/assessments'
+      };
+
+    qbankFetch(params, function (assessmentData) {
+      var offeredParams = {
+        data: data,
+        method: 'POST',
+        path: 'assessment/banks/' + data.bankId + '/assessments/' + assessmentData.id + '/assessmentsoffered'
+      };
+
+      // set the Offered params for when solutions can be reviewed
+      offeredParams.data['reviewOptions'] = {
+        solution: {
+          duringAttempt: true,
+          afterAttempt: true,
+          beforeDeadline: true,
+          afterDeadline: true
+        },
+        whetherCorrect: {
+          duringAttempt: true,
+          afterAttempt: true,
+          beforeDeadline: true,
+          afterDeadline: true
+        }
+      };
+
+      qbankFetch(offeredParams, function (offeredData) {
+        var mashUp = assessmentData;
+        mashUp.startTime = offeredData.startTime;
+        mashUp.deadline = offeredData.deadline;
+        mashUp.assessmentOfferedId = offeredData.id;
+
+        _assessments.push(mashUp);
+        _this.emitChange();
+>>>>>>> master
       });
     });
   },

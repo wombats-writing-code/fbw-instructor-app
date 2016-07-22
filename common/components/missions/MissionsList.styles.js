@@ -13,20 +13,12 @@ module.exports = StyleSheet.create({
   },
   sideBarNav: {
     alignItems: 'center',
+    flexWrap: 'nowrap',
     flexDirection: 'row',
+    justifyContent: 'space-between',
     paddingBottom: 9,
-    paddingTop: 9
-  },
-  addNewMissionButton: {
-    flex: 0,
-    width: 44,
-    height: 44,
-    padding: 5
-  },
-  toggleCaret: {
-    padding: 5,
-    width: 44,
-    color: '#007AFF'
+    paddingTop: 30,
+    marginBottom: 18
   },
 
   // list of missions
@@ -46,8 +38,6 @@ module.exports = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'flex-start',
-    paddingLeft: 8,
-    paddingRight: 8,
     paddingBottom: _lineHeight / 2,
     paddingTop: _lineHeight / 2
   },
@@ -59,8 +49,7 @@ module.exports = StyleSheet.create({
     width: 30,
     justifyContent: 'center',
     alignSelf: 'flex-start',
-    marginRight: 10,
-    marginRight: 5,
+    marginRight: 10
   },
   missionRightIcon: {
     color: '#656565',

@@ -10,8 +10,10 @@ module.exports = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f0f0f0',
-    // alignItems: 'stretch'
     paddingTop: 60
+    paddingLeft: 9,
+    paddingRight: 9,
+    // alignItems: 'stretch'
   },
   sidebarFooter: {
     height: 10

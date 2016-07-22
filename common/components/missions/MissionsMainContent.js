@@ -18,7 +18,6 @@ import {
   } from 'react-native';
 
 var _ = require('lodash');
-var Icon = require('react-native-vector-icons/FontAwesome');
 
 var AssessmentStore = require('../../stores/Assessment');
 var UserStore = require('../../stores/User');
@@ -30,7 +29,9 @@ var MissionsContentNavbar = require('./MissionsContentNavbar');
 
 var styles = StyleSheet.create({
   container: {
-    flex: 2.5
+    flex: 2.5,
+    paddingLeft: 9,
+    paddingRight: 9,
   }
 });
 
@@ -61,21 +62,19 @@ class MissionsMainContent extends Component {
       wrapperStyle = [styles.container],
       title, subtitle;
 
-    if (this.props.sidebarOpen) {
-      wrapperStyle.push({ width: this.state.width * 0.75 });
-    }
-
     if (this.props.content == 'calendar') {
       content = <MissionsCalendar missions={this.props.missions} />;
       // TODO: this subtitle should reflect the term of the chosen course
       subtitle = 'Spring 2016';
       title = 'Mission Control';
+
     } else if (this.props.content == 'addMission') {
       content = <AddMission bankId={this.props.bankId}
                             closeAdd={this._revertToDefaultContent}
                             sidebarOpen={this.props.sidebarOpen} />;
       subtitle = '';
       title = 'Add New Mission';
+
     } else if (this.props.content == 'missionStatus' ||
       this.props.content == 'missionEdit' ||
       this.props.content == 'missionDelete') {
@@ -100,7 +99,8 @@ class MissionsMainContent extends Component {
                                  sidebarOpen={this.props.sidebarOpen}
                                  subtitle={subtitle}
                                  title={title}
-                                 toggleSidebar={this.props.toggleSidebar} />
+           />
+
           {content}
         </Animated.View>
       </View>
@@ -109,6 +109,7 @@ class MissionsMainContent extends Component {
   _revertToDefaultContent = () => {
     this.props.changeContent('calendar');
   }
+
 }
 
 module.exports = MissionsMainContent;
