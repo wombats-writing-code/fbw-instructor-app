@@ -108,7 +108,6 @@ class MissionsManager extends Component {
     //   return this.renderLoadingView();
     // }
 
-    // set panThreshold to 1.5 because acceptPan doesn't seem to work?
     return (
       <Drawer acceptPan={true}
               captureGestures={'open'}
@@ -121,7 +120,6 @@ class MissionsManager extends Component {
                                         toggleSidebar={this._toggleSidebar} />}
               open={this.state.drawerOpen}
               openDrawerOffset={0.7}
-              panThreshold={1.5}
               side='left'
               style={styles.container}
               tweenHandler={Drawer.tweenPresets.parallax}>

@@ -17,7 +17,15 @@ import {
   } from 'react-native';
 
 var _ = require('lodash');
+var Icon = require('react-native-vector-icons/FontAwesome');
 var UserStore = require('../../stores/User');
+
+var credentials = require('../../constants/credentials');
+var fbwUtils = require('fbw-utils')(credentials);
+var MissionStatus = fbwUtils.CheckMissionStatus;
+
+var AssessmentConstants = require('../../constants/Assessment');
+var GenusTypes = AssessmentConstants.GenusTypes;
 
 var styles = require('./MissionsList.styles');
 

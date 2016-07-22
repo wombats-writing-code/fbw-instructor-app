@@ -81,6 +81,8 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
     var _this = this;
     UserStore.getBankId()
       .then((bankId) => {
+        console.log(bankId);
+
         var numObjects = 0,
           params = {
             path: 'assessment/banks/' + bankId + '/assessments?page=all'
@@ -91,12 +93,15 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
           var assessments = data.data.results;
 
           numObjects = numObjects + assessments.length;
+          console.log('assessments: ' + assessments);
           if (numObjects != 0) {
             _.each(assessments, function (assessment) {
               var assessmentParams = {
                 path: 'assessment/banks/' + bankId + '/assessments/' + assessment.id + '/assessmentsoffered?page=all'
               };
+              console.log('trying to get offered from : ' + assessmentParams.path);
               qbankFetch(assessmentParams, function (offeredData) {
+                console.log('got an offered! ' + offeredData);
                 var mashUp = assessment;
                 offered = offeredData.data.results[0];  // Assume only one offered per assessment,
                 //   given how we are authoring them in this app
