@@ -87,6 +87,7 @@ class MissionsManager extends Component {
     this.setState({ allItems: items });
   }
   setMissions(missions) {
+    console.log('setting missions');
     this.setState({ missions: missions });
     this.setState({ loading: false });
   }
@@ -110,7 +111,7 @@ class MissionsManager extends Component {
     return (
       <Drawer acceptPan={true}
               captureGestures={'open'}
-              content={<MissionsSidebar bankId={this.state.bankId} 
+              content={<MissionsSidebar bankId={this.state.bankId}
                                         changeContent={this._changeContent}
                                         missions={this.state.missions}
                                         selectMission={this.setSelectedMission}
@@ -164,6 +165,7 @@ class MissionsManager extends Component {
     this.setState({ content: newContent });
   }
   _setBankId = (bankId) => {
+    console.log('here in missinos manager: ' + bankId);
     this.setState({ bankId: bankId });
     AssessmentStore.getAssessments(bankId);
     ItemStore.getItems(bankId);

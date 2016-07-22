@@ -70,7 +70,7 @@ class MissionsSidebar extends Component {
 
     if (this.state.showMissionsNav) {
       missionsNav = ( <View>
-        <MissionsList />
+        <MissionsList missions={this.props.missions} />
       </View>);
     }
     return (
@@ -118,6 +118,7 @@ class MissionsSidebar extends Component {
           return subject.id == courseOfferingId;
         })[0];
 
+      this.setState({ showMissionsNav: true });
       this.setState({ courseOfferingId: courseOfferingId });
 
       // set the bank alias and update user state ...
@@ -134,8 +135,7 @@ class MissionsSidebar extends Component {
     }
   }
   _setBankId = (bankId) => {
-    this.setState({ loadingMissions: true });
-    this.setState({ showMissionsNav: true });
+    console.log('here in setbankid: ' + bankId);
     this.props.setBankId(bankId);
   }
   _setMission = (mission) => {

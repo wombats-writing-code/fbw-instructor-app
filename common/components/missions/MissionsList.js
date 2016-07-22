@@ -26,7 +26,7 @@ class MissionsList extends Component {
     super(props);
 
     this.state = {
-      loadingMissions: true,
+      loadingMissions: this.props.missions.length <= 0,
       sortedMissions: _.sortBy(this.props.missions, 'displayName.text'), // this should be passed in already sorted by date
     }
   }
@@ -36,6 +36,7 @@ class MissionsList extends Component {
 
   }
   componentWillReceiveProps(nextProps) {
+    this.setState({ loading: this.props.missions.length <= 0 });
     this.setState({ sortedMissions: _.sortBy(nextProps.missions, 'displayName.text') });
   }
   renderRow = (rowData, sectionId, rowId) => {

@@ -89,20 +89,27 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
       .then(function (school) {
         if (school === 'acc') {
           D2LMiddlware.whoAmI(function (user) {
-            store.save('username', user.UniqueName)
+            var username = user.UniqueName.indexOf('@') >= 0 ? user.UniqueName : `${user.UniqueName}@acc.edu`;
+
+            store.save('username', username)
               .then(function () {
                 // also create the QBank authorizations here
                 var payload = {
                   schoolId: school,
-                  username: user.UniqueName
+                  username: username
                 };
+                console.log(username);
                 AuthorizationStore.hasAuthorizations(payload,
                   function (hasAuthz) {
                     console.log('checking qbank authz: ' + hasAuthz);
                     if (hasAuthz) {
                       callback();
                     } else {
-                      AuthorizationStore.setAuthorizations(payload, callback);
+                      Actions.initializeQbank(
+                        {
+                          payload: payload,
+                          callback: callback
+                        });
                     }
                 });
               });

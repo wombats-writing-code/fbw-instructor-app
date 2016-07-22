@@ -25,6 +25,7 @@ var _ = require('lodash');
 var UserStore = require('../stores/User');
 
 var Error = require('./error/Error');
+var InitializeQBank = require('./initialize/InitializeQBank');
 var Login = require('./login/D2LLogin');
 var Missions = require('./missions/MissionsManager');
 
@@ -95,6 +96,12 @@ class FbWRouter extends Component {
                  type="reset"
                  titleStyle={loginTitleStyle}
                  navigationBarStyle={loginNavBarStyle} />
+          <Scene component={InitializeQBank}
+                key="initializeQbank"
+                title="Initializing"
+                type="reset"
+                titleStyle={loginTitleStyle}
+                navigationBarStyle={loginNavBarStyle} />
         </Scene>
         <Scene key="error" component={Error} title="Error!" />
       </Scene>

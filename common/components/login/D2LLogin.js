@@ -82,7 +82,6 @@ class D2LLogin extends Component {
     </View>;
   }
   _handleLogin = (event) => {
-    console.log('here in _handleLogin');
     if (this.state.school === 'acc') {
       let userContext = AppContext.createUserContext(credentials.d2l.host,
         credentials.d2l.port,
@@ -97,14 +96,12 @@ class D2LLogin extends Component {
     }
   }
   _loginUser = () => {
-    console.log('in _loginUser');
     UserStore.setSchool(this.state.school);
     if (this.state.school === "acc") {
       Linking.canOpenURL(this.state.authenticationUrlD2L).then(supported => {
         if (!supported) {
           console.log('Cannot authenticate to D2L right now.');
         } else {
-          console.log('about to open safari');
           console.log(this.state.authenticationUrlD2L);
           Linking.openURL(this.state.authenticationUrlD2L);
         }
