@@ -661,6 +661,7 @@
 					"-lc++",
 				);
 				PRODUCT_NAME = FbW;
+				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Debug;
 		};
@@ -682,6 +683,7 @@
 					"-lc++",
 				);
 				PRODUCT_NAME = FbW;
+				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Release;
 		};

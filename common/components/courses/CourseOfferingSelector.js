@@ -32,7 +32,11 @@ class CourseOfferingSelector extends Component {
   componentWillUnmount() {
   }
   componentDidMount() {
-
+    var _this = this;
+    UserStore.getLMSCourseId()
+      .then((courseId) => {
+        _this.setState({ selectedId: courseId });
+      });
   }
   componentWillReceiveProps(nextProps) {
   }

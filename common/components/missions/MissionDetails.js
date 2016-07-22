@@ -90,7 +90,6 @@ class MissionDetails extends Component {
   }
   createAssessment() {
     var data = {
-      bankId: this.props.bankId,
       deadline: DateConvert(this.state.missionDeadline),
       description: 'A Fly-by-Wire mission',
       displayName: this.state.missionDisplayName,
@@ -126,8 +125,7 @@ class MissionDetails extends Component {
 
     if (this.state.selectedPane == 'items') {
       questionStyles.push(styles.activeHeaderText);
-      missionContent = <MissionQuestions bankId={this.props.bankId}
-                                         mission={this.props.mission}
+      missionContent = <MissionQuestions mission={this.props.mission}
                                          missionItems={this.props.missionItems}
                                          toggleQuestionDrawer={this.props.toggleQuestionDrawer} />;
     } else {

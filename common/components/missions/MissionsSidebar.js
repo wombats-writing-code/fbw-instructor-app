@@ -90,6 +90,7 @@ class MissionsSidebar extends Component {
       this.setState({ showMissionsNav: true });
       this.setState({ courseOfferingId: courseOfferingId });
       UserStore.setDepartment(subject.department);
+      UserStore.setLMSCourseId(subject.id);
 
       // set the bank alias and update user state ...
       BankDispatcher.dispatch({

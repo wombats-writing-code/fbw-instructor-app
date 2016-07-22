@@ -68,8 +68,7 @@ class MissionsMainContent extends Component {
       title = 'Mission Control';
 
     } else if (this.props.content == 'addMission') {
-      content = <AddMission bankId={this.props.bankId}
-                            closeAdd={this._revertToDefaultContent}
+      content = <AddMission closeAdd={this._revertToDefaultContent}
                             sidebarOpen={this.props.sidebarOpen} />;
       subtitle = '';
       title = 'Add New Mission';
@@ -81,7 +80,6 @@ class MissionsMainContent extends Component {
       // mission results summary component, depending on the
       // deadline of the mission relative to now
       content = <MissionDetails action={this.props.content}
-                                bankId={this.props.bankId}
                                 closeDetails={this._revertToDefaultContent}
                                 mission={this.props.selectedMission}
                                 missionItems={this.props.missionItems}

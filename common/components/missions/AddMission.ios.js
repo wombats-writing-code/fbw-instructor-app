@@ -70,7 +70,6 @@ class AddMission extends Component {
   createAssessment() {
 
     var data = {
-      bankId: this.props.bankId,
       deadline: DateConvert(this.state.missionDeadline),
       description: 'A Fly-by-Wire mission',
       displayName: String(this.state.missionDisplayName),

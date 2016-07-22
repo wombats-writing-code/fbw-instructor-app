@@ -58,7 +58,6 @@ class MissionsManager extends Component {
     super(props);
     this.state = {
       allItems: [],
-      bankId: null,
       content: 'calendar',
       drawerOpen: true,
       loading: true,
@@ -99,7 +98,6 @@ class MissionsManager extends Component {
     this.setState({ allItems: items });
   }
   setMissions(missions) {
-    console.log('setting missions');
     this.setState({ missions: missions });
     this.setState({ loading: false });
   }
@@ -110,9 +108,7 @@ class MissionsManager extends Component {
     this.setState({ selectedMission: mission });
     this.setState({ content: mode });
 
-    if (this.state.bankId != null) {
-      AssessmentItemStore.getItems(mission.id);
-    }
+    AssessmentItemStore.getItems(mission.id);
   }
   render() {
     let questionDrawerViewStyle = [this.state.questionDrawerViewStyle];
@@ -127,7 +123,6 @@ class MissionsManager extends Component {
     return (
       <View style={styles.container}>
         <MissionsSidebar style={styles.missionsSidebarContainer}
-                         bankId={this.state.bankId}
                          changeContent={this._changeContent}
                          missions={this.state.missions}
                          selectMission={this.setSelectedMission}
@@ -138,15 +133,14 @@ class MissionsManager extends Component {
         {questionDrawer}
 
         <MissionsMainContent style={styles.missionsMainContentContainer}
-                            bankId={this.state.bankId}
-                            changeContent={this._changeContent}
-                            content={this.state.content}
-                            missionItems={this.state.missionItems}
-                            missions={this.state.missions}
-                            selectedMission={this.state.selectedMission}
-                            sidebarOpen={this.state.drawerOpen}
-                            toggleQuestionDrawer={this._toggleQuestionDrawer}
-                            width={this._mainContentWidth}
+                             changeContent={this._changeContent}
+                             content={this.state.content}
+                             missionItems={this.state.missionItems}
+                             missions={this.state.missions}
+                             selectedMission={this.state.selectedMission}
+                             sidebarOpen={this.state.drawerOpen}
+                             toggleQuestionDrawer={this._toggleQuestionDrawer}
+                             width={this._mainContentWidth}
            />
       </View>
     )
