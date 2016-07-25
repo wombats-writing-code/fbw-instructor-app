@@ -19,15 +19,15 @@ import {
   View,
   } from 'react-native';
 
-var AssessmentConstants = require('../../constants/Assessment');
+var AssessmentConstants = require('../../../constants/Assessment');
 
 var ActionTypes = AssessmentConstants.ActionTypes;
-var AssessmentStore = require('../../stores/Assessment');
-var Dispatcher = require('../../dispatchers/Assessment');
+var AssessmentStore = require('../../../stores/Assessment');
+var Dispatcher = require('../../../dispatchers/Assessment');
 var GenusTypes = AssessmentConstants.GenusTypes;
 var MissionQuestions = require('./MissionQuestions');
 
-var credentials = require('../../constants/credentials');
+var credentials = require('../../../constants/credentials');
 var fbwUtils = require('fbw-utils')(credentials);
 var DateConvert = fbwUtils.ConvertDateToDictionary;
 var MissionStatus = fbwUtils.CheckMissionStatus;
@@ -58,7 +58,7 @@ var styles = StyleSheet.create({
 });
 
 
-class MissionDetails extends Component {
+class EditMission extends Component {
   constructor(props) {
     super(props);
     var missionStatus = MissionStatus(this.props.mission);
@@ -80,14 +80,7 @@ class MissionDetails extends Component {
       toValue: 1
     }).start();
   }
-  componentDidUpdate() {
-    // issue with styling DatePickerIOS:
-    // https://github.com/facebook/react-native/issues/1587
-//    if (this.refs.startDateDatepicker && this.refs.deadlineDatePicker) {
-//      this.refs.startDateDatepicker.refs.datepicker.setNativeProps({width: Window.width - 500});
-//      this.refs.deadlineDatePicker.refs.datepicker.setNativeProps({width: Window.width - 100});
-//    }
-  }
+
   createAssessment() {
     var data = {
       deadline: DateConvert(this.state.missionDeadline),
@@ -134,6 +127,7 @@ class MissionDetails extends Component {
 
     return (
       <View style={styles.container}>
+
         <Animated.View style={{opacity: this.state.opacity}}>
           <View style={styles.header}>
             <TouchableOpacity onPress={() => this._changeContent('items') }
@@ -150,10 +144,9 @@ class MissionDetails extends Component {
             </TouchableOpacity>
           </View>
         </Animated.View>
+
         <Animated.View style={{opacity: this.state.contentOpacity}}>
-          <View>
             {missionContent}
-          </View>
         </Animated.View>
       </View>
     );
@@ -163,4 +156,4 @@ class MissionDetails extends Component {
   }
 }
 
-module.exports = MissionDetails;
+module.exports = EditMission;

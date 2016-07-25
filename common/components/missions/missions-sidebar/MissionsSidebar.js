@@ -19,15 +19,15 @@ import {
 
 var _ = require('lodash');
 var Icon = require('react-native-vector-icons/FontAwesome');
-var UserStore = require('../../stores/User');
+var UserStore = require('../../../stores/User');
 
-var AssessmentConstants = require('../../constants/Assessment');
-var BankConstants = require('../../constants/Bank');
-var BankDispatcher = require('../../dispatchers/Bank');
+var AssessmentConstants = require('../../../constants/Assessment');
+var BankConstants = require('../../../constants/Bank');
+var BankDispatcher = require('../../../dispatchers/Bank');
 var GenusTypes = AssessmentConstants.GenusTypes;
 
-var credentials = require('../../constants/credentials');
-var CourseOfferingSelector = require('../courses/CourseOfferingSelector');
+var credentials = require('../../../constants/credentials');
+var CourseOfferingSelector = require('../../courses/CourseOfferingSelector');
 var MissionsList = require('./MissionsList');
 var MissionStatus = require('fbw-utils')(credentials).CheckMissionStatus;
 
@@ -80,6 +80,7 @@ class MissionsSidebar extends Component {
       </View>
     );
   }
+
   _setCourseOffering = (courseOfferingId) => {
     if (courseOfferingId != "-1") {
       var subjectName, termName,

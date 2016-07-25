@@ -19,10 +19,10 @@ import {
 
 var _ = require('lodash');
 
-var AssessmentItemConstants = require('../../constants/AssessmentItem');
-var AssessmentItemDispatcher = require('../../dispatchers/AssessmentItem');
-var QuestionCard = require('./QuestionCard');
-var UserStore = require('../../stores/User');
+var AssessmentItemConstants = require('../../../constants/AssessmentItem');
+var AssessmentItemDispatcher = require('../../../dispatchers/AssessmentItem');
+var QuestionCard = require('../../questions/QuestionCard');
+var UserStore = require('../../../stores/User');
 
 
 var styles = StyleSheet.create({

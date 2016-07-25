@@ -20,14 +20,14 @@ import {
   View,
 } from 'react-native';
 
-var AssessmentConstants = require('../../constants/Assessment');
+var AssessmentConstants = require('../../../constants/Assessment');
 
 var ActionTypes = AssessmentConstants.ActionTypes;
-var AssessmentStore = require('../../stores/Assessment');
+var AssessmentStore = require('../../../stores/Assessment');
 
-var credentials = require('../../constants/credentials');
+var credentials = require('../../../constants/credentials');
 var DateConvert = require('fbw-utils')(credentials).ConvertDateToDictionary;
-var Dispatcher = require('../../dispatchers/Assessment');
+var Dispatcher = require('../../../dispatchers/Assessment');
 var GenusTypes = AssessmentConstants.GenusTypes;
 
 var styles = require('./AddMission.ios.styles');
@@ -128,13 +128,13 @@ class AddMission extends Component {
               <View style={styles.missionTypeSelector}>
                 <TouchableHighlight onPress={() => this._onSelectMissionType('homework')}>
                   <Image
-                    source={require('./assets/mission-selector-icon--homework.png')}
+                    source={require('../../../assets/mission-selector-icon--homework.png')}
                     style={[styles.missionTypeSelectorIcon, !this.state.inClass && styles.active]}
                   />
                 </TouchableHighlight>
                 <TouchableHighlight onPress={() => this._onSelectMissionType('in-class')}>
                   <Image
-                    source={require('./assets/mission-selector-icon--in-class.png')}
+                    source={require('../../../assets/mission-selector-icon--in-class.png')}
                     style={[styles.missionTypeSelectorIcon, this.state.inClass && styles.active]}
                   />
                 </TouchableHighlight>

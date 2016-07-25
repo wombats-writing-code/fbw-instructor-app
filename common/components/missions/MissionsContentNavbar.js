@@ -43,7 +43,7 @@ class MissionsContentNavbar extends Component {
         <TouchableHighlight onPress={() => this.props.toggleSidebar()}
                               >
             <Image
-              source={require('./assets/menu-icon.png')}
+              source={require('../../assets/menu-icon.png')}
             />
       </TouchableHighlight> );
     }

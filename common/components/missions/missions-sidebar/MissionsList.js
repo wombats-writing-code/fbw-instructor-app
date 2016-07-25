@@ -18,13 +18,13 @@ import {
 
 var _ = require('lodash');
 var Icon = require('react-native-vector-icons/FontAwesome');
-var UserStore = require('../../stores/User');
+var UserStore = require('../../../stores/User');
 
-var credentials = require('../../constants/credentials');
+var credentials = require('../../../constants/credentials');
 var fbwUtils = require('fbw-utils')(credentials);
 var MissionStatus = fbwUtils.CheckMissionStatus;
 
-var AssessmentConstants = require('../../constants/Assessment');
+var AssessmentConstants = require('../../../constants/Assessment');
 var GenusTypes = AssessmentConstants.GenusTypes;
 
 var styles = require('./MissionsList.styles');
@@ -70,16 +70,19 @@ class MissionsList extends Component {
 
     // chooses mission icon depending on mission type and status of mission
     if (rowData.genusTypeId == GenusTypes.IN_CLASS && missionStatus == 'over') {
-      missionTypeIcon = require('./assets/mission-type--complete-in-class.png');
+      missionTypeIcon = require('../../../assets/mission-type--complete-in-class.png');
 
-    } else if (rowData.genusTypeId == GenusTypes.IN_CLASS && missionStatus == 'pending') {
-      missionTypeIcon = require('./assets/mission-type--pending-in-class.png');
+    } else if (rowData.genusTypeId == GenusTypes.IN_CLASS && (missionStatus == 'pending' || missionStatus == 'future')) {
+      missionTypeIcon = require('../../../assets/mission-type--pending-in-class.png');
 
     } else if (rowData.genusTypeId == GenusTypes.HOMEWORK && missionStatus == 'over') {
-      missionTypeIcon = require('./assets/mission-type--complete-out-class.png');
+      missionTypeIcon = require('../../../assets/mission-type--complete-out-class.png');
 
-    } else if (rowData.genusTypeId == GenusTypes.HOMEWORK && missionStatus == 'pending') {
-      missionTypeIcon = require('./assets/mission-type--pending-out-class.png');
+    } else if (rowData.genusTypeId == GenusTypes.HOMEWORK && (missionStatus == 'pending' || missionStatus == 'future')) {
+      missionTypeIcon = require('../../../assets/mission-type--pending-out-class.png');
+
+    } else {
+      console.warn('mission type not recognized, icon not fetched', rowData.genusTypeId, missionStatus);
     }
 
     return ( // TODO: Change this onPress call depending on what is swiped / touched
@@ -129,18 +132,20 @@ class MissionsList extends Component {
                   </View> ),
       missionsNav = <View />;
 
-    return ( <View style={styles.container}>
-      <View style={styles.sideBarNav}>
-        <TouchableHighlight onPress={() => this._addNewMission()}>
-          <Image style={styles.addNewMissionButton} source={require('./assets/add-icon.png')} />
-        </TouchableHighlight>
+    return (
+      <View style={styles.container}>
+        <View style={styles.sideBarNav}>
+          <TouchableHighlight onPress={() => this._addNewMission()}>
+            <Image style={styles.addNewMissionButton} source={require('../../../assets/add-icon.png')} />
+          </TouchableHighlight>
+        </View>
+        <View style={[styles.missionsListWrapper]}>
+          <ScrollView style={styles.missionsList}>
+            {currentMissions}
+          </ScrollView>
+        </View>
       </View>
-      <View style={[styles.missionsListWrapper]}>
-        <ScrollView style={styles.missionsList}>
-          {currentMissions}
-        </ScrollView>
-      </View>
-    </View>);
+    );
   }
   _addNewMission() {
     this.props.changeContent('addMission');

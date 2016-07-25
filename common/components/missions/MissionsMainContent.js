@@ -21,9 +21,9 @@ var _ = require('lodash');
 var AssessmentStore = require('../../stores/Assessment');
 var UserStore = require('../../stores/User');
 
-var AddMission = require('./AddMission');
-var MissionDetails = require('./MissionDetails');
-var MissionsCalendar = require('./MissionsCalendar');
+var Dashboard = require('./Dashboard');
+var AddMission = require('./add-mission/AddMission');
+var EditMission = require('./edit-mission/EditMission');
 var MissionsContentNavbar = require('./MissionsContentNavbar');
 
 var styles = StyleSheet.create({
@@ -61,11 +61,8 @@ class MissionsMainContent extends Component {
       wrapperStyle = [styles.container],
       title, subtitle;
 
-    if (this.props.content == 'calendar') {
-      content = <MissionsCalendar missions={this.props.missions} />;
-      // TODO: this subtitle should reflect the term of the chosen course
-      subtitle = 'Spring 2016';
-      title = 'Mission Control';
+    if (this.props.content == 'dashboard') {
+      content = <Dashboard mission={this.props.selectedMission} />;
 
     } else if (this.props.content == 'addMission') {
       content = <AddMission closeAdd={this._revertToDefaultContent}
@@ -73,13 +70,11 @@ class MissionsMainContent extends Component {
       subtitle = '';
       title = 'Add New Mission';
 
-    } else if (this.props.content == 'missionStatus' ||
-      this.props.content == 'missionEdit' ||
-      this.props.content == 'missionDelete') {
+    } else if (this.props.content == 'missionEdit') {
       // either show a mission config component, or a
       // mission results summary component, depending on the
       // deadline of the mission relative to now
-      content = <MissionDetails action={this.props.content}
+      content = <EditMission action={this.props.content}
                                 closeDetails={this._revertToDefaultContent}
                                 mission={this.props.selectedMission}
                                 missionItems={this.props.missionItems}
@@ -104,7 +99,7 @@ class MissionsMainContent extends Component {
     );
   }
   _revertToDefaultContent = () => {
-    this.props.changeContent('calendar');
+    this.props.changeContent('dashboard');
   }
 
 }

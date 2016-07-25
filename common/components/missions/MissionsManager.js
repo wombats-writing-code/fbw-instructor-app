@@ -28,12 +28,12 @@ var BankStore = require('../../stores/Bank');
 var ItemStore = require('../../stores/Item');
 var ModuleStore = require('../../stores/Module');
 var UserStore = require('../../stores/User');
-
-var MissionsSidebar = require('./MissionsSidebar');
-var MissionsMainContent = require('./MissionsMainContent');
-var QuestionsDrawer = require('./AllQuestionsDrawer');
-
 var SortItemsByModules = require('../../stores/sortItemsByModules');
+
+var MissionsSidebar = require('./missions-sidebar/MissionsSidebar');
+var MissionsMainContent = require('./MissionsMainContent');
+var QuestionsDrawer = require('../questions/AllQuestionsDrawer');
+
 
 var styles = StyleSheet.create({
   container: {
@@ -58,7 +58,7 @@ class MissionsManager extends Component {
     super(props);
     this.state = {
       allItems: [],
-      content: 'calendar',
+      content: 'dashboard',
       drawerOpen: true,
       loading: true,
       missionItems: [],

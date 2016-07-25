@@ -22,7 +22,7 @@ var styles = StyleSheet.create({
 });
 
 
-class MissionsCalendar extends Component {
+class Dashboard extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -44,7 +44,7 @@ class MissionsCalendar extends Component {
       <View style={styles.container}>
         <Animated.View style={{opacity: this.state.opacity}}>
           <ScrollView>
-            <Text> Now a calendar. will become a dashboard</Text>
+            <Text>Dashboard</Text>
           </ScrollView>
         </Animated.View>
       </View>
@@ -52,4 +52,4 @@ class MissionsCalendar extends Component {
   }
 }
 
-module.exports = MissionsCalendar;
+module.exports = Dashboard;
