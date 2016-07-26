@@ -96,8 +96,6 @@ class MissionsMainContent extends Component {
       </View>
     );
   }
-
-
   _revertToDefaultContent = () => {
     this.props.changeContent('dashboard');
   }

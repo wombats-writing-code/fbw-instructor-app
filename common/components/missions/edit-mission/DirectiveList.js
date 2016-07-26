@@ -19,16 +19,27 @@ var _ = require('lodash');
 
 let styles = StyleSheet.create({
   cell: {
+    flexDirection: 'row',
     paddingLeft: 10.5,
+    paddingRight: 10.5,
     paddingTop: 21,
     paddingBottom: 21,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc'
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 3,
+  },
+  cellInfoWrapper: {
+    flex: 9,
   },
   cellTitle: {
     fontSize: 18,
     color: '#333',
     fontWeight: "300"
+  },
+  countIndicator: {
+    fontSize: 18,
+    color: '#96CEB4',
+    flex: 1
   }
 });
 
@@ -37,18 +48,28 @@ class DirectiveList extends Component {
   constructor(props) {
     super(props)
 
+    console.log('in DirectiveList', props);
+
     this.state = {
-      ds: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2})
+      ds: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
     }
   }
 
-  renderRow(directive) {
-    console.log(directive);
+  renderRow = (directive) => {
 
     return (
-      <TouchableHighlight key={directive.id}>
+      <TouchableHighlight style={{marginBottom: 21}} key={directive.id} onPress={() => this.props.onSelectDirective(directive)}>
         <View style={styles.cell}>
-          <Text style={styles.cellTitle}>{directive.displayName}</Text>
+          <View style={styles.cellInfoWrapper}>
+            <Text style={styles.cellTitle}>{directive.displayName}</Text>
+            {_.map(this.props.itemsByDirectiveId[directive.id], (item) => {
+              console.log('item', item);
+              return (
+                <Text style={styles.cellSubTitle}>{item.question.displayName.text}</Text>
+              )
+            })}
+          </View>
+          <Text style={styles.countIndicator}>{this.props.kByDirectiveId[directive.id]} of {this.props.itemsByDirectiveId[directive.id].length}</Text>
         </View>
       </TouchableHighlight>
     )
@@ -56,7 +77,8 @@ class DirectiveList extends Component {
 
   render() {
     return (
-      <ListView dataSource={this.state.ds.cloneWithRows(this.props.directives)}
+      <ListView style={[styles.listView, this.props.style]}
+              dataSource={this.state.ds.cloneWithRows(this.props.directives)}
               renderRow={this.renderRow}>
       </ListView>
     )

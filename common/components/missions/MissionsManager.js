@@ -33,6 +33,7 @@ var SortItemsByModules = require('../../stores/sortItemsByModules');
 var MissionsSidebar = require('./missions-sidebar/MissionsSidebar');
 var MissionsMainContent = require('./MissionsMainContent');
 var QuestionsDrawer = require('../questions/AllQuestionsDrawer');
+var EditDirective = require('./edit-mission/EditDirective')
 
 
 var styles = StyleSheet.create({
@@ -120,6 +121,15 @@ class MissionsManager extends Component {
                             updateItemsInMission={this._updateItemsInMission} />)
     }
 
+
+    // let editDirective;
+    // if (this.state.shouldShowEditDirective) {
+    //   editDirective = <EditDirective directive={this.state.shouldShowEditDirective}
+    //                                   onClose={() => this.setState({shouldShowEditDirective: null})}
+    //     />
+    // }
+
+
     return (
       <View style={styles.container}>
         <MissionsSidebar style={styles.missionsSidebarContainer}
@@ -142,6 +152,8 @@ class MissionsManager extends Component {
                              toggleQuestionDrawer={this._toggleQuestionDrawer}
                              width={this._mainContentWidth}
            />
+
+         {editDirective}
       </View>
     )
   }

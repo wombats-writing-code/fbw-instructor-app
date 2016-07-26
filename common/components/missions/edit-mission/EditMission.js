@@ -12,7 +12,7 @@ import {
   ListView, ScrollView,
   StyleSheet,
   Switch,
-  Text,TextInput, View,
+  Text,TextInput, Image, View,
   TouchableOpacity, TouchableHighlight,
   } from 'react-native';
 
@@ -31,65 +31,13 @@ var fbwUtils = require('fbw-utils')(credentials);
 var DateConvert = fbwUtils.ConvertDateToDictionary;
 var MissionStatus = fbwUtils.CheckMissionStatus;
 
+var EditMissionMetaData = require('./EditMissionMetaData');
 var DirectiveList = require('./DirectiveList');
+var EditDirective = require('./EditDirective');
 var MissionQuestions = require('./MissionQuestions');
 
 var styles = StyleSheet.create({
-  activeHeaderText: {
-    color: '#2A47C9',
-    textDecorationLine: 'underline'
-  },
   container: {
-    flex: 1
-  },
-  missionNameSection: {
-    paddingLeft: 10.5,
-    paddingTop: 21,
-    paddingBottom: 21,
-  },
-  missionName: {
-    fontSize: 21,
-    fontWeight: "700",
-    color: '#46B29D',
-  },
-  missionNameBorderContainer: {
-    width: 70,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    marginLeft: 10.5,
-    marginBottom: 21
-  },
-  section: {
-    paddingLeft: 10.5,
-    paddingRight: 10.5,
-    paddingTop: 21,
-    paddingBottom: 21,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc'
-  },
-  sectionWrapper: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  sectionInfoWrapper: {
-    flex: 9
-  },
-  sectionTitle: {
-    fontSize: 18,
-    color: '#333',
-    fontWeight: "300",
-    marginBottom: 8,
-  },
-  sectionSubTitle: {
-    fontSize: 14,
-    color: '#333',
-    fontWeight: "300",
-  },
-  sectionChangeIndicator: {
-    fontSize: 18,
-    color: '#96CEB4',
-    flex: 1
   },
   muted: {
     color: '#888'
@@ -98,7 +46,6 @@ var styles = StyleSheet.create({
     fontWeight: "600"
   },
   addDirectiveButton: {
-    marginTop: 21,
     paddingTop: 21,
     paddingBottom: 21,
     paddingLeft: 10.5,
@@ -107,9 +54,17 @@ var styles = StyleSheet.create({
     borderColor: '#aaa',
     borderStyle: 'dotted'
   },
+  addDirectiveButtonWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
   addDirectiveButtonText: {
     fontSize: 18,
     color: '#999',
+    marginLeft: 5,
+  },
+  directives: {
+    marginTop: 42
   }
 });
 
@@ -128,14 +83,19 @@ class EditMission extends Component {
       }
     ];
 
-    var missionStatus = MissionStatus(this.props.mission);
-
     this.state = {
       loadingItems: true,
-      missionStatus: missionStatus,
       opacity: new Animated.Value(0),
-      selectedPane: 'items',
       selectedDirectives: replaceMeWithRealDirectives,
+      itemsByDirectiveId: _.reduce(replaceMeWithRealDirectives, (result, item) => {
+        result[item.id] = this.props.missionItems;
+        return result;
+      }, {}),
+      kByDirectiveId: _.reduce(replaceMeWithRealDirectives, (result, item) => {
+        result[item.id] = 0;
+        return result;
+      }, {}),
+      shouldShowEditDirective: null
     };
   }
   componentWillUnmount() {
@@ -170,71 +130,46 @@ class EditMission extends Component {
 
     this.props.closeAdd();
   }
-  onLayout = (event) => {
-    // TODO: how to make this height change when device is rotated?
-    // This doesn't get called -- why not??? Docs say it should, on mount and on layout change...
-    console.log('onLayout called');
-    this.setState({ height: Dimensions.get('window').height });
-  }
 
   render() {
-    var missionContent = <View />;
-    console.log(this.props.mission);
+    // console.log(this.props.mission, 'mission items', this.props.missionItems);
 
     return (
       <View style={styles.container}>
 
-        <Animated.View style={{opacity: this.state.opacity}}>
-          <TouchableHighlight style={[styles.missionNameSection]}>
-            <TextInput style={[styles.sectionTitle, styles.missionName]}
-                      value={this.props.mission.displayName.text}
-                      onChange={_.noop}
-            />
-          </TouchableHighlight>
-          <View style={styles.missionNameBorderContainer}></View>
+        <EditMissionMetaData mission={this.props.mission}/>
 
-          <TouchableHighlight style={[styles.section]}>
-            <View style={styles.sectionWrapper}>
-              <View style={styles.sectionInfoWrapper}>
-                <Text style={[styles.sectionTitle]}>Dates</Text>
-                <Text style={[styles.sectionSubTitle]}>
-                  <Text style={styles.muted}>Start </Text><Text>{moment(this.props.mission.displayName.startTime).format('ddd, hA')}</Text>
-                  <Text style={styles.muted}>   Deadline </Text><Text >{moment(this.props.mission.displayName.deadline).format('ddd, hA')}</Text>
-                </Text>
-              </View>
-              <Text style={styles.sectionChangeIndicator}>Change</Text>
-            </View>
-          </TouchableHighlight>
+        <DirectiveList style={styles.directives}
+                      directives={this.state.selectedDirectives}
+                      kByDirectiveId={this.state.kByDirectiveId}
+                      itemsByDirectiveId={this.state.itemsByDirectiveId}
+                      onSelectDirective={this.handleSelectDirective}
+        />
 
-          <TouchableHighlight style={styles.section}>
-            <View style={styles.sectionWrapper}>
-              <View style={styles.sectionInfoWrapper}>
-                <Text style={[styles.sectionTitle]}>Type</Text>
-                <Text style={styles.sectionSubTitle}>{this.props.mission.genusTypeId}</Text>
-              </View>
-              <Text style={styles.sectionChangeIndicator}>Change</Text>
-            </View>
-          </TouchableHighlight>
-
-        </Animated.View>
-
-        <DirectiveList directives={this.state.selectedDirectives}/>
         <TouchableHighlight style={styles.addDirectiveButton}>
-          <Text style={styles.addDirectiveButtonText}>Add a directive</Text>
+          <View style={styles.addDirectiveButtonWrapper}>
+            <Image source={require('../../../assets/add--dark.png')}/>
+            <Text style={styles.addDirectiveButtonText}>Add a directive</Text>
+          </View>
         </TouchableHighlight>
 
-        <Animated.View style={{opacity: this.state.contentOpacity}}>
-          {/*<MissionQuestions mission={this.props.mission}
+        {/*<Animated.View style={{opacity: this.state.contentOpacity}}>
+          <MissionQuestions mission={this.props.mission}
              missionItems={this.props.missionItems}
-             toggleQuestionDrawer={this.props.toggleQuestionDrawer} />;*/}
-
+             toggleQuestionDrawer={this.props.toggleQuestionDrawer} />;
         </Animated.View>
+        */}
       </View>
     );
   }
-  _changeContent = (newContent) => {
-    this.setState({ selectedPane: newContent });
+
+  handleSelectDirective = (directive) => {
+    this.setState({
+      shouldShowEditDirective: directive
+    });
   }
+
+
 }
 
 module.exports = EditMission;
