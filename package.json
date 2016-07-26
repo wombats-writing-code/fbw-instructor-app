@@ -20,6 +20,7 @@
     "jest-cli": "^0.10.2",
     "keymirror": "^0.1.1",
     "lodash": "^4.12.0",
+    "moment": "^2.14.1",
     "react": "^15.2.1",
     "react-native": "^0.29.2",
     "react-native-collapsible": "^0.6.0",
