@@ -75,6 +75,10 @@ let styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  kControlText: {
+    color: '#eee',
+    marginRight: 21
+  },
   addKButton: {
     width: 40,
     height: 40,
@@ -160,20 +164,21 @@ class EditDirective extends Component {
               })}
           </View>
 
-          {/*<ListView style={[styles.searchResultsList]}
-                  dataSource={this.state.searchResultsDS.cloneWithRows(this.state.searchResults)}
-                  renderRow={this.renderRow}>
-          </ListView>*/}
-
           <View style={styles.kControl}>
+            <Text style={styles.kControlText}>Required</Text>
             <TouchableHighlight style={styles.minusKButton} onPress={this.handleMinusK}>
-              <Text>-</Text>
+              <Image source={require('../../../assets/minus--light.png')}/>
             </TouchableHighlight>
 
             <TouchableHighlight style={styles.addKButton} onPress={this.handleAddK}>
               <Text style={styles.addKButtonText}>{this.props.mission.k}</Text>
             </TouchableHighlight>
           </View>
+
+          <ListView style={[styles.searchResultsList]}
+                  dataSource={this.state.searchResultsDS.cloneWithRows(this.state.searchResults)}
+                  renderRow={this.renderRow}>
+          </ListView>
 
 
       </Animated.View>
