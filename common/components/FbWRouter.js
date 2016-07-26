@@ -102,7 +102,8 @@ class FbWRouter extends Component {
                  title="Mission Control"
                  type="reset"
                  titleStyle={loginTitleStyle}
-                 navigationBarStyle={loginNavBarStyle} />
+                 navigationBarStyle={loginNavBarStyle}
+                 hideNavBar={true} />
           <Scene component={InitializeQBank}
                 key="initializeQbank"
                 title="Initializing"

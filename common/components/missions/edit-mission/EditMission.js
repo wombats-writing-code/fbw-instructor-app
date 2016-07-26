@@ -33,7 +33,6 @@ var MissionStatus = fbwUtils.CheckMissionStatus;
 
 var EditMissionMetaData = require('./EditMissionMetaData');
 var DirectiveList = require('./DirectiveList');
-var EditDirective = require('./EditDirective');
 var MissionQuestions = require('./MissionQuestions');
 
 var styles = StyleSheet.create({
@@ -163,11 +162,7 @@ class EditMission extends Component {
     );
   }
 
-  handleSelectDirective = (directive) => {
-    this.setState({
-      shouldShowEditDirective: directive
-    });
-  }
+
 
 
 }

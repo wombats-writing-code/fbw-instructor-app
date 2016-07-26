@@ -31,17 +31,13 @@ var UserStore = require('../../stores/User');
 var SortItemsByModules = require('../../stores/sortItemsByModules');
 
 var MissionsSidebar = require('./missions-sidebar/MissionsSidebar');
+var MissionsMainContent = require('./MissionsMainContent');
+var QuestionsDrawer = require('../questions/AllQuestionsDrawer');
 var EditDirective = require('./edit-mission/EditDirective')
-var Dashboard = require('./Dashboard');
-var AddMission = require('./add-mission/AddMission');
-var EditMission = require('./edit-mission/EditMission');
 
 
 var styles = StyleSheet.create({
   container: {
-
-  },
-  splitView: {
     flex: 1,
     flexDirection: 'row'
   },
@@ -76,7 +72,7 @@ class MissionsManager extends Component {
       // questionDrawerOpen: true,     // temporary for dev only
       selectedMission: {},
       sortedItems: {},
-      shouldShowEditDirective: true
+      shouldShowEditDirective: null
     };
     AssessmentStore.addChangeListener(this._updateMissionsFromStore);
     AssessmentItemStore.addChangeListener(this._updateMissionItemsFromStore);
@@ -117,34 +113,37 @@ class MissionsManager extends Component {
     AssessmentItemStore.getItems(mission.id);
   }
   render() {
+    let questionDrawerViewStyle = [this.state.questionDrawerViewStyle];
+    let questionDrawer;
+    if (this.state.questionDrawerOpen) {
+      questionDrawer = (<QuestionsDrawer style={questionDrawerViewStyle}
+                            items={this.state.sortedItems}
+                            missionItems={this.state.missionItems}
+                            updateItemsInMission={this._updateItemsInMission} />)
+    }
+
+
     let editDirective;
     if (this.state.shouldShowEditDirective) {
       editDirective = <EditDirective directive={this.state.shouldShowEditDirective}
-                                    mission={{k: 2}}
-                                    outcomes={this.state.outcomes || []}
-                                    modules={this.state.modules}
-                                    onClose={() => this.setState({shouldShowEditDirective: null})}
+                                      onClose={() => this.setState({shouldShowEditDirective: null})}
         />
     }
 
+
     return (
       <View style={styles.container}>
-        <View style={styles.splitView}>
-          <MissionsSidebar style={styles.missionsSidebarContainer}
-                           changeContent={this._changeContent}
-                           missions={this.state.missions}
-                           selectMission={this.setSelectedMission}
-                           setBankId={this._setBankId}
-                           sidebarOpen={this.state.drawerOpen}
-                           toggleSidebar={this._toggleSidebar} />
+        <MissionsSidebar style={styles.missionsSidebarContainer}
+                         changeContent={this._changeContent}
+                         missions={this.state.missions}
+                         selectMission={this.setSelectedMission}
+                         setBankId={this._setBankId}
+                         sidebarOpen={this.state.drawerOpen}
+                         toggleSidebar={this._toggleSidebar} />
 
+        {questionDrawer}
 
-           {/*<Dashboard/>
-           <AddMission/>
-           <EditMission/>*/}
-        </View>
-
-        {/*<MissionsMainContent style={styles.missionsMainContentContainer}
+        <MissionsMainContent style={styles.missionsMainContentContainer}
                              changeContent={this._changeContent}
                              content={this.state.content}
                              missionItems={this.state.missionItems}
@@ -153,7 +152,7 @@ class MissionsManager extends Component {
                              sidebarOpen={this.state.drawerOpen}
                              toggleQuestionDrawer={this._toggleQuestionDrawer}
                              width={this._mainContentWidth}
-           />*/}
+           />
 
          {editDirective}
       </View>
