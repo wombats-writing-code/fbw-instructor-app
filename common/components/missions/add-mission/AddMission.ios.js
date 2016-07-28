@@ -67,8 +67,8 @@ class AddMission extends Component {
 //      this.refs.deadlineDatePicker.refs.datepicker.setNativeProps({width: Window.width - 100});
 //    }
   }
-  createAssessment() {
 
+  createAssessment() {
     var data = {
       deadline: DateConvert(this.state.missionDeadline),
       description: 'A Fly-by-Wire mission',
@@ -87,8 +87,9 @@ class AddMission extends Component {
         content: data
     });
 
-    this.props.closeAdd();
+    this.props.onClose();
   }
+
   onLayout = (event) => {
     // TODO: how to make this height change when device is rotated?
     // This doesn't get called -- why not??? Docs say it should, on mount and on layout change...
@@ -111,8 +112,16 @@ class AddMission extends Component {
       <View style={styles.container}>
         <Animated.View style={{opacity: this.state.opacity}}>
 
+
+
+          <TextInput maxLength={255}
+                     onChangeText={(text) => this.setState({missionDisplayName: text})}
+                     placeholder="A name for this mission"
+                     style={styles.missionNameInput}
+                     value={this.state.missionDisplayName} />
+
           <View style={styles.buttons}>
-            <TouchableHighlight onPress={() => this.props.closeAdd()}>
+            <TouchableHighlight onPress={() => this.props.onClose()}>
                 <Text style={styles.button}>Cancel</Text>
             </TouchableHighlight>
 
@@ -122,9 +131,7 @@ class AddMission extends Component {
             </TouchableHighlight>
           </View>
 
-          <ScrollView onScroll={(event) => {console.log('scroll!')}}
-                      style={ {height: this.state.height - 50 } }>
-
+          <ScrollView style={ {height:   this.state.height - 50 } }>
               <View style={styles.missionTypeSelector}>
                 <TouchableHighlight onPress={() => this._onSelectMissionType('homework')}>
                   <Image
@@ -139,12 +146,6 @@ class AddMission extends Component {
                   />
                 </TouchableHighlight>
               </View>
-
-              <TextInput maxLength={255}
-                         onChangeText={(text) => this.setState({missionDisplayName: text})}
-                         placeholder="A name for this mission"
-                         style={styles.missionNameInput}
-                         value={this.state.missionDisplayName} />
 
            <View styles={styles.startDateWrapper}>
               <Text style={styles.inputLabel}>Start Date</Text>

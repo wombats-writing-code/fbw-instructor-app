@@ -89,6 +89,7 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
     var _this = this;
     store.get('bankId')
       .then((bankId) => {
+
         if (bankId !== null) {
           var numObjects = 0,
             params = {
@@ -96,7 +97,11 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
             },
             finalAssessments = [];
 
+            console.log('about to fetch with params  of', params);
+
           qbankFetch(params, function (data) {
+            console.log('fetched assessments', data);
+
             if (data !== null) {
               var assessments = data.data.results;
 
@@ -134,6 +139,8 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
                 _this.emitChange();
               }
             }
+          }, (err) => {
+            console.error('error', err);
           });
         }
       });

@@ -5,14 +5,21 @@ import {
 
 module.exports = StyleSheet.create({
   container: {
-    padding: 9,
+    paddingLeft: 21,
+    paddingRight: 21,
+    paddingTop: 60,
     justifyContent: 'space-between'
+  },
+  missionNameInput: {
+    backgroundColor: '#eee',
+    height: 45,
+    padding: 9,
+    marginBottom: 18
   },
   buttons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: 400,
-    marginBottom: 18
+    marginBottom: 21
   },
   button: {
     borderColor: 'white',
@@ -32,13 +39,6 @@ module.exports = StyleSheet.create({
   },
   activeIcon: {
     opacity: 1
-  },
-  missionNameInput: {
-    backgroundColor: '#eeddff',
-    height: 45,
-    width: 400,
-    padding: 9,
-    marginBottom: 18
   },
   addItemText: {
     padding: 5,

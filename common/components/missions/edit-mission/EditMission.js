@@ -67,34 +67,37 @@ var styles = StyleSheet.create({
   }
 });
 
+// a mock to sub in for this.props.mission.directives
+let replaceMeWithRealDirectives = [
+  {
+    id: '1',
+    displayName: 'Solve absolute value inequality'
+  },
+  {
+    id: '2',
+    displayName: 'Find roots of polynomials'
+  }
+];
+
+// a mock for this.props.mission.[however Cole is going to do it or whatever]
+// probably need to build out a selector for this
+let kByDirectiveId = _.reduce(replaceMeWithRealDirectives, (result, item) => {
+  result[item.id] = 0;
+  return result;
+}, {});
+
+let itemsByDirectiveId = _.reduce(replaceMeWithRealDirectives, (result, item) => {
+  result[item.id] = {id: '1', question: {text: 'blah'}};
+  return result;
+}, {});
+
 class EditMission extends Component {
   constructor(props) {
     super(props);
 
-    let replaceMeWithRealDirectives = [
-      {
-        id: '1',
-        displayName: 'Solve absolute value inequality'
-      },
-      {
-        id: '2',
-        displayName: 'Find roots of polynomials'
-      }
-    ];
-
     this.state = {
       loadingItems: true,
       opacity: new Animated.Value(0),
-      selectedDirectives: replaceMeWithRealDirectives,
-      itemsByDirectiveId: _.reduce(replaceMeWithRealDirectives, (result, item) => {
-        result[item.id] = this.props.missionItems;
-        return result;
-      }, {}),
-      kByDirectiveId: _.reduce(replaceMeWithRealDirectives, (result, item) => {
-        result[item.id] = 0;
-        return result;
-      }, {}),
-      shouldShowEditDirective: null
     };
   }
   componentWillUnmount() {
@@ -131,7 +134,7 @@ class EditMission extends Component {
   }
 
   render() {
-    // console.log(this.props.mission, 'mission items', this.props.missionItems);
+    console.log('EditMission render():', this.props.mission, 'mission items', this.props.missionItems);
 
     return (
       <View style={styles.container}>
@@ -139,10 +142,10 @@ class EditMission extends Component {
         <EditMissionMetaData mission={this.props.mission}/>
 
         <DirectiveList style={styles.directives}
-                      directives={this.state.selectedDirectives}
-                      kByDirectiveId={this.state.kByDirectiveId}
-                      itemsByDirectiveId={this.state.itemsByDirectiveId}
-                      onSelectDirective={this.handleSelectDirective}
+                      directives={this.props.mission.directives || replaceMeWithRealDirectives}
+                      requiredNumberByDirectiveId={this.props.requiredNumberByDirectiveId}
+                      itemsByDirectiveId={this.props.itemsByDirectiveId}
+                      onSelectDirective={this.props.onSelectDirective}
         />
 
         <TouchableHighlight style={styles.addDirectiveButton}>
@@ -152,12 +155,6 @@ class EditMission extends Component {
           </View>
         </TouchableHighlight>
 
-        {/*<Animated.View style={{opacity: this.state.contentOpacity}}>
-          <MissionQuestions mission={this.props.mission}
-             missionItems={this.props.missionItems}
-             toggleQuestionDrawer={this.props.toggleQuestionDrawer} />;
-        </Animated.View>
-        */}
       </View>
     );
   }

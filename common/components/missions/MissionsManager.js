@@ -73,24 +73,24 @@ class MissionsManager extends Component {
       questionDrawerViewStyle: {
         height: 0
       },
-      // questionDrawerOpen: true,     // temporary for dev only
-      selectedMission: {},
-      sortedItems: {},
-      shouldShowEditDirective: true
+
+      selectedMission: null,
+      selectedDirective: null,
+
     };
     AssessmentStore.addChangeListener(this._updateMissionsFromStore);
     AssessmentItemStore.addChangeListener(this._updateMissionItemsFromStore);
-    ItemStore.addChangeListener(this._updateItemsFromStore);
+    ItemStore.addChangeListener(this._handleItemsChanged);
     ModuleStore.addChangeListener(this._updateModulesFromStore);
-
-    this._mainContentWidth = .75;
   }
+
   componentWillUnmount() {
     AssessmentStore.removeChangeListener(this._updateMissionsFromStore);
     AssessmentItemStore.removeChangeListener(this._updateMissionItemsFromStore);
-    ItemStore.removeChangeListener(this._updateItemsFromStore);
+    ItemStore.removeChangeListener(this._handleItemsChanged);
     ModuleStore.removeChangeListener(this._updateModulesFromStore);
   }
+
   componentDidMount() {
     var _this = this;
     UserStore.getBankId()
@@ -100,14 +100,8 @@ class MissionsManager extends Component {
       }
     });
   }
-  setItems(items) {
-    this.setState({ allItems: items });
-  }
-  setMissions(missions) {
-    this.setState({ missions: missions });
-    this.setState({ loading: false });
-  }
-  setSelectedMission = (mission, mode) => {
+
+  handleSelectMission = (mission, mode) => {
     if (typeof mode === 'undefined') {
       mode = 'missionStatus'
     }
@@ -116,65 +110,11 @@ class MissionsManager extends Component {
 
     AssessmentItemStore.getItems(mission.id);
   }
-  render() {
-    let editDirective;
-    if (this.state.shouldShowEditDirective) {
-      editDirective = <EditDirective directive={this.state.shouldShowEditDirective}
-                                    mission={{k: 2}}
-                                    outcomes={this.state.outcomes || []}
-                                    modules={this.state.modules}
-                                    onClose={() => this.setState({shouldShowEditDirective: null})}
-        />
-    }
-
-    return (
-      <View style={styles.container}>
-        <View style={styles.splitView}>
-          <MissionsSidebar style={styles.missionsSidebarContainer}
-                           changeContent={this._changeContent}
-                           missions={this.state.missions}
-                           selectMission={this.setSelectedMission}
-                           setBankId={this._setBankId}
-                           sidebarOpen={this.state.drawerOpen}
-                           toggleSidebar={this._toggleSidebar} />
-
-
-           {/*<Dashboard/>
-           <AddMission/>
-           <EditMission/>*/}
-        </View>
-
-        {/*<MissionsMainContent style={styles.missionsMainContentContainer}
-                             changeContent={this._changeContent}
-                             content={this.state.content}
-                             missionItems={this.state.missionItems}
-                             missions={this.state.missions}
-                             selectedMission={this.state.selectedMission}
-                             sidebarOpen={this.state.drawerOpen}
-                             toggleQuestionDrawer={this._toggleQuestionDrawer}
-                             width={this._mainContentWidth}
-           />*/}
-
-         {editDirective}
-      </View>
-    )
-  }
 
   handleSelectDirective = (directive) => {
     this.setState({
-      shouldShowEditDirective: directive
+      selectedDirective: directive
     });
-  }
-
-  renderLoadingView() {
-    return ( <View>
-      <Text>
-        Loading your missions ...
-      </Text>
-      <ActivityIndicator
-        hidden='true'
-        size='large'/>
-    </View> );
   }
 
   _changeContent = (newContent) => {
@@ -188,64 +128,95 @@ class MissionsManager extends Component {
     ItemStore.getItems();
     ModuleStore.getModules();
   }
-  _toggleQuestionDrawer = () => {
-    this.setState({ questionDrawerOpen: !this.state.questionDrawerOpen });
 
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+  _handleItemsChanged = (items) => {
+    console.log('items changed', items);
     this.setState({
-      questionDrawerViewStyle: {
-        height: 700
-      }
-    });
+      allItems: allItems
+    })
   }
 
-  _updateItemsFromStore = (items) => {
-    var alphabeticalItems = _.sortBy(items,
-      ['displayName.text']),
-      moduleItems = {};
-
-    this.setItems(alphabeticalItems);
-
-    if (this.state.modules.length === 0) {
-      moduleItems.none = {
-          displayName: 'No module',
-          items: alphabeticalItems
-        };
-
-      this.setState({ sortedItems: moduleItems });
-    } else {
-      this.setState({ sortedItems: SortItemsByModules(this.state.modules, alphabeticalItems) });
-    }
-  }
-  _updateItemsInMission = (items) => {
-    AssessmentItemDispatcher.dispatch({
-        type: AssessmentItemConstants.ActionTypes.SET_ITEMS,
-        content: {
-          assessmentId: this.state.selectedMission.id,
-          items: items
-        }
-    });
-  }
   _updateMissionItemsFromStore = (items) => {
     this.setState({ missionItems: items });
   }
+
   _updateMissionsFromStore = (missions) => {
+    console.log('missions changed', missions);
+
     // sort missions by startTime first
-    this.setMissions(_.sortBy(missions,
+    let sorted = _.sortBy(missions,
       ['startTime.year', 'startTime.month', 'startTime.day',
        'deadline.year', 'deadline.month', 'deadline.day',
-       'displayName.text']));
-  }
-  _updateModulesFromStore = (modules) => {
+       'displayName.text']);
 
-    this.setState({ modules: modules }, function () {
-      if (this.state.allItems.length === 0) {
-        this.setState({ sortedItems: SortItemsByModules(this.state.modules, []) });
-      } else {
-        this.setState({ sortedItems: SortItemsByModules(this.state.modules, this.state.allItems) });
-      }
+    this.setState({
+      missions: sorted,
+      loading: false
+    })
+  }
+
+  _updateModulesFromStore = (modules) => {
+    this.setState({
+      modules: modules,
+      sortedItems: SortItemsByModules(modules, this.state.allItems)
     });
   }
+
+  render() {
+    let editDirective;
+    if (this.state.selectedDirective) {
+      editDirective = <EditDirective directive={this.state.selectedDirective}
+                                    onSelectQuestion={this.handleSelectQuestion}
+                                    onChangeRequiredNumber={this.handleChangeRequiredNumber}
+                                    outcomes={this.state.outcomes}
+                                    modules={this.state.modules}
+                                    onClose={() => this.setState({selectedDirective: null})}
+        />
+    }
+
+    let addMission;
+    if (this.state.content === 'addMission') {
+      addMission = <AddMission onClose={() => this.setState({content: 'dashboard'})}
+                  />
+    }
+
+    let editMission;
+    if (this.state.selectedMission) {
+      editMission = <EditMission mission={this.state.selectedMission}
+                          missionItems={this.state.missionItems}
+                          onSelectDirective={this.handleSelectDirective}
+                          requiredNumberByDirectiveId={{}}
+      />
+    }
+
+    return (
+      <View style={styles.container}>
+        <View style={styles.splitView}>
+          <MissionsSidebar style={styles.missionsSidebarContainer}
+                           changeContent={this._changeContent}
+                           missions={this.state.missions}
+                           selectMission={this.handleSelectMission}
+                           setBankId={this._setBankId}
+                           sidebarOpen={this.state.drawerOpen}
+                           toggleSidebar={this._toggleSidebar} />
+
+
+           {/*<Dashboard/>*/}
+
+          <View style={styles.missionsMainContentContainer}>
+            {addMission}
+
+            {editMission}
+          </View>
+
+        </View>
+
+
+         {editDirective}
+      </View>
+    )
+  }
+
 }
 
 module.exports = MissionsManager;
