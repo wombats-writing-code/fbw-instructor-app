@@ -42,9 +42,10 @@ var ItemStore = _.assign({}, EventEmitter.prototype, {
           params = {
             path: 'assessment/banks/' + BankMap[departmentCode] + '/items?page=all'
           };
-
+        console.log('getting items: ' + params.path);
         qbankFetch(params, function (data) {
-          // console.log('fetched items');
+          console.log('fetched items');
+          console.log(data);
 
           _items = data.data.results;
           _this.emitChange();
