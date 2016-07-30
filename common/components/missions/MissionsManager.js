@@ -92,11 +92,15 @@ class MissionsManager extends Component {
   }
 
   componentDidMount() {
-    var _this = this;
+
+    console.log('MissionsManager componentDidMount')
+
     UserStore.getBankId()
     .then((bankId) => {
+      console.log('bankId', bankId);
+
       if (bankId !== null) {
-        _this._setBankId(bankId);
+        this._setBankId(bankId);
       }
     });
   }
