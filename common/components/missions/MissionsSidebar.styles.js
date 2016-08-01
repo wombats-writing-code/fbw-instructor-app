@@ -15,6 +15,9 @@ module.exports = StyleSheet.create({
     paddingRight: 9,
     // alignItems: 'stretch'
   },
+  loadingMissions: {
+    paddingTop: 30,
+  },
   sidebarFooter: {
     height: 10
   },

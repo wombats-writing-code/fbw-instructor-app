@@ -34,8 +34,6 @@ class MissionsList extends Component {
   constructor(props) {
     super(props);
 
-    console.log(this.props.missions);
-
     this.state = {
       sortedMissions: _.sortBy(this.props.missions, 'displayName.text'), // this should be passed in already sorted by date
     }

@@ -124,6 +124,7 @@ class MissionsManager extends Component {
       <View style={styles.container}>
         <MissionsSidebar style={styles.missionsSidebarContainer}
                          changeContent={this._changeContent}
+                         loadingMissions={this.state.loading}
                          missions={this.state.missions}
                          selectMission={this.setSelectedMission}
                          setBankId={this._setBankId}
@@ -160,7 +161,6 @@ class MissionsManager extends Component {
     this.setState({ content: newContent });
   }
   _setBankId = (bankId) => {
-    console.log('here in missions manager: ' + bankId);
     this.setState({ bankId: bankId });
     AssessmentStore.getAssessments();
     ItemStore.getItems();

@@ -50,7 +50,6 @@ class AllQuestionsDrawer extends Component {
   onLayout = (event) => {
     // TODO: how to make this height change when device is rotated?
     // This doesn't get called -- why not??? Docs say it should, on mount and on layout change...
-    console.log('onLayout called');
     this.setState({ height: Dimensions.get('window').height });
   }
   setItems(items) {
