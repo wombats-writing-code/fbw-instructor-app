@@ -26,17 +26,11 @@ class CourseOfferingSelector extends Component {
     super(props);
 
     this.state = {
-      selectedId: ''
     }
   }
   componentWillUnmount() {
   }
   componentDidMount() {
-    var _this = this;
-    UserStore.getLMSCourseId()
-      .then((courseId) => {
-        _this.setState({ selectedId: courseId });
-      });
   }
   componentWillReceiveProps(nextProps) {
   }
@@ -54,8 +48,7 @@ class CourseOfferingSelector extends Component {
         backgroundColor: 'red',
         onPress: () => {this._deleteMission(rowData)}
       }];
-
-    if (rowData.id == this.state.selectedId) {
+    if (rowData.id == this.props.courseOfferingId) {
       rowStyles.push(styles.missionWrapperSelected);
     }
 
@@ -106,7 +99,6 @@ class CourseOfferingSelector extends Component {
   }
   _setCourse = (courseId) => {
     this.props.setCourse(courseId);
-    this.setState({ selectedId: courseId });
   }
 }
 

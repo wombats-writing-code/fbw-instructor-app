@@ -68,13 +68,13 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
           _assessments.push(mashUp);
 
           // also create the grade object for the school
-          store.get('school')
-            .then((school) => {
-              if (school === 'acc') {
-                console.log(assessmentData.displayName.text);
-                D2LMiddleware.createGrade(assessmentData.displayName.text);
-              }
-            });
+          // store.get('school')
+          //   .then((school) => {
+          //     if (school === 'acc') {
+          //       console.log(assessmentData.displayName.text);
+          //       D2LMiddleware.createGrade(assessmentData.displayName.text);
+          //     }
+          //   });
           _this.emitChange();
         });
       });

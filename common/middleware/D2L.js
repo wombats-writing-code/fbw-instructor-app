@@ -35,7 +35,6 @@ var D2LMiddleware = _.assign({}, EventEmitter.prototype, {
               "Type": "Text"
             },
           };
-          console.log(data);
         _this._fetch(url, 'POST', data, function (gradeObject) {
           console.log('created a grade object!');
           console.log(gradeObject);

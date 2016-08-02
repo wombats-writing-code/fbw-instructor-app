@@ -67,7 +67,6 @@ class MissionQuestions extends Component {
     // TODO: not done
     this.panResponder = PanResponder.create({
       onStartShouldSetPanResponder : () => {
-        console.log('starting pan responder')
         return true;
       },
       onPanResponderMove: Animated.event([ null,
@@ -76,7 +75,7 @@ class MissionQuestions extends Component {
           dy : this.state.pan.y
       }]),
       onPanResponderRelease: (e, gesture) => {
-        console.log('released pan responder');
+
       }
     });
   }
@@ -139,8 +138,6 @@ class MissionQuestions extends Component {
   // </ScrollView>
 
   _setCurrentQuestion = (questionId) => {
-    console.log('long pressing now', questionId)
-
     // this.panResponder.onStartShouldSetPanResponder();
 
     this.setState({currentQuestionId: questionId});
