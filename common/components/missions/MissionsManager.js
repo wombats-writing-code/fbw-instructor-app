@@ -94,9 +94,6 @@ class MissionsManager extends Component {
   }
 
   componentDidMount() {
-
-    console.log('MissionsManager componentDidMount')
-
     UserStore.getBankId()
     .then((bankId) => {
       if (bankId !== null) {
@@ -133,7 +130,6 @@ class MissionsManager extends Component {
   }
 
   _handleItemsChanged = (items) => {
-    console.log('items changed', items);
     this.setState({
       allItems: allItems
     })
@@ -144,8 +140,6 @@ class MissionsManager extends Component {
   }
 
   _updateMissionsFromStore = (missions) => {
-    console.log('missions changed', missions);
-
     // sort missions by startTime first
     let sorted = _.sortBy(missions,
       ['startTime.year', 'startTime.month', 'startTime.day',
@@ -200,6 +194,7 @@ class MissionsManager extends Component {
         <View style={styles.splitView}>
           <MissionsSidebar style={styles.missionsSidebarContainer}
                            changeContent={this._changeContent}
+                           loadingMissions={this.state.loading}
                            missions={this.state.missions}
                            selectMission={this.handleSelectMission}
                            setBankId={this._setBankId}
