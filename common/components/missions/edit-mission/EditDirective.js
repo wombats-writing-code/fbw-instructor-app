@@ -25,17 +25,27 @@ let styles = StyleSheet.create({
     right: 0,
     width: width,
     height: height,
-    paddingTop: 84,
+    paddingTop: 105,
+    paddingLeft: 42,
+    paddingRight: 42,
     backgroundColor: '#96CEB4',
     flex: 1,
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center'
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between'
   },
   closeButton: {
     position: 'absolute',
     top: 31,
     left: 21
+  },
+  searchDirectiveWrapper: {
+
+  },
+  searchQuestionsWrapper: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   searchWrapper: {
     flexDirection: 'row',
@@ -98,16 +108,19 @@ let styles = StyleSheet.create({
   }
 });
 
+
 class EditDirective extends Component {
 
   constructor(props) {
     super(props);
 
     this.state = {
+      query: '',
       fadeInAnimation: new Animated.Value(0),
       moveUpAnimation: new Animated.Value(0),
       searchResults: [],
       searchResultsDS: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
+      questionsDS: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
     };
   }
 
@@ -127,16 +140,26 @@ class EditDirective extends Component {
     .start();
   }
 
-  renderRow() {
+  renderOutcomeRow(outcome) {
     return (
-      <TouchableOpacity>
+      <TouchableOpacity key={outcome.id}>
+        <Text>Outcome that matches search results</Text>
+      </TouchableOpacity>
+    )
+  }
 
+  renderQuestionRow(question) {
+    return (
+      <TouchableOpacity key={question.id}>
+        <Text>Question that matches the selected directive</Text>
       </TouchableOpacity>
     )
   }
 
   render() {
-    let directiveName = this.props.directive ? this.props.directive.displayName : 'The selected outcome name';
+    let directiveName = this.props.directive ? this.props.directive.displayName.text : 'The selected outcome name';
+
+    console.log('EditDirective', this.props.directive);
 
     return (
       <Animated.View style={[styles.container, {opacity: this.state.fadeInAnimation, top: this.state.moveUpAnimation}]}>
@@ -144,57 +167,78 @@ class EditDirective extends Component {
           <Image source={require('../../../assets/cancel--light.png')}/>
         </TouchableOpacity>
 
+        <View style={styles.searchDirectiveWrapper}>
           <View style={styles.searchWrapper}>
             <Image source={require('../../../assets/search--light.png')}/>
             <TextInput style={styles.searchInput}
                       value={directiveName}
                       defaultValue="My outcome value passed down"
-                      onChangeText={_.noop}/>
+                      onChange={this.onChange}/>
           </View>
 
           <View style={styles.filters}>
             <Text style={styles.filterText}>Filter by</Text>
               {_.map(this.props.modules, (module, idx) => {
-                console.log(module);
                 return (
-                  <TouchableOpacity onPress={() => this._onToggleFilter(module)} style={styles.filterButton}>
+                  <TouchableOpacity key={module.id} onPress={() => this._onToggleFilter(module)} style={styles.filterButton}>
                     <Text style={styles.filterButtonText}>{module.displayName.text}</Text>
                   </TouchableOpacity>
                 )
               })}
           </View>
 
+          <ListView style={[styles.searchResultsList]}
+                  dataSource={this.state.searchResultsDS.cloneWithRows(this.state.searchResults)}
+                  renderRow={this.renderOutcomeRow}>
+
+            <Text>Outcomes that match search results should appear here. </Text>
+          </ListView>
+        </View>
+
+        <View style={styles.searchQuestionsWrapper}>
           <View style={styles.kControl}>
             <Text style={styles.kControlText}>Required</Text>
-            <TouchableHighlight style={styles.minusKButton} onPress={this.handleMinusK}>
+            <TouchableHighlight style={styles.minusKButton} onPress={this.onMinusK}>
               <Image source={require('../../../assets/minus--light.png')}/>
             </TouchableHighlight>
 
-            <TouchableHighlight style={styles.addKButton} onPress={this.handleAddK}>
-              <Text style={styles.addKButtonText}>{this.props.mission.k}</Text>
+            <TouchableHighlight style={styles.addKButton} onPress={this.onAddK}>
+              <Text style={styles.addKButtonText}>{this.props.requiredNumberByDirectiveId[this.props.directive.id]}</Text>
             </TouchableHighlight>
           </View>
 
-          <ListView style={[styles.searchResultsList]}
-                  dataSource={this.state.searchResultsDS.cloneWithRows(this.state.searchResults)}
-                  renderRow={this.renderRow}>
+          <ListView dataSource={this.state.questionsDS.cloneWithRows(this.visibleQuestions(this.props.directive.id))}
+                    renderRow={this.renderQuestionRow}>
           </ListView>
-
+        </View>
 
       </Animated.View>
     )
   }
 
-  handleMinusK() {
+
+  visibleQuestions(directiveId) {
+    return [];
+  }
+
+  onMinusK() {
     this.setState({
       k: this.props.mission.k - 1
     })
   }
 
-  handleAddK() {
+  onAddK() {
     this.setState({
       k: this.props.mission.k + 1
     });
+  }
+
+  onChange = (event) => {
+    // search against outcomes and update search results
+    this.setState({
+      query: event.target.value,
+      searchResults: []
+    })
   }
 
   _onToggleFilter(module) {

@@ -49,7 +49,9 @@ var styles = StyleSheet.create({
     flex: 1
   },
   missionsMainContentContainer: {
-    flex: 3.2
+    flex: 3.2,
+    paddingLeft: 21,
+    paddingRight: 21
   },
   questionDrawer: {
     backgroundColor: '#7A7A7A',
@@ -170,6 +172,7 @@ class MissionsManager extends Component {
     let editDirective;
     if (this.state.selectedDirective) {
       editDirective = <EditDirective directive={this.state.selectedDirective}
+                                    requiredNumberByDirectiveId={{1: 2, 2: 1, 3: 2}}
                                     onSelectQuestion={this.handleSelectQuestion}
                                     onChangeRequiredNumber={this.handleChangeRequiredNumber}
                                     outcomes={this.state.outcomes}

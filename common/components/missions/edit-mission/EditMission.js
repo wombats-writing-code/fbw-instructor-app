@@ -68,7 +68,7 @@ var styles = StyleSheet.create({
 });
 
 // a mock to sub in for this.props.mission.directives
-let replaceMeWithRealDirectives = [
+let directives = [
   {
     id: '1',
     displayName: 'Solve absolute value inequality'
@@ -81,13 +81,13 @@ let replaceMeWithRealDirectives = [
 
 // a mock for this.props.mission.[however Cole is going to do it or whatever]
 // probably need to build out a selector for this
-let kByDirectiveId = _.reduce(replaceMeWithRealDirectives, (result, item) => {
-  result[item.id] = 0;
+let kByDirectiveId = _.reduce(directives, (result, item) => {
+  result[item.id] = 2;
   return result;
 }, {});
 
-let itemsByDirectiveId = _.reduce(replaceMeWithRealDirectives, (result, item) => {
-  result[item.id] = {id: '1', question: {text: 'blah'}};
+let itemsByDirectiveId = _.reduce(directives, (result, item, idx) => {
+  result[item.id] = {id: idx, question: {text: 'blah'}};
   return result;
 }, {});
 
@@ -142,9 +142,9 @@ class EditMission extends Component {
         <EditMissionMetaData mission={this.props.mission}/>
 
         <DirectiveList style={styles.directives}
-                      directives={this.props.mission.directives || replaceMeWithRealDirectives}
-                      requiredNumberByDirectiveId={this.props.requiredNumberByDirectiveId}
-                      itemsByDirectiveId={this.props.itemsByDirectiveId}
+                      directives={directives}
+                      requiredNumberByDirectiveId={kByDirectiveId}
+                      itemsByDirectiveId={itemsByDirectiveId}
                       onSelectDirective={this.props.onSelectDirective}
         />
 

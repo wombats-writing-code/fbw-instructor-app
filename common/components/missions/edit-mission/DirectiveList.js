@@ -63,13 +63,13 @@ class DirectiveList extends Component {
           <View style={styles.cellInfoWrapper}>
             <Text style={styles.cellTitle}>{directive.displayName}</Text>
             {_.map(this.props.itemsByDirectiveId[directive.id], (item) => {
-              console.log('item', item);
               return (
-                <Text style={styles.cellSubTitle}>{item.question.displayName.text}</Text>
+                <Text style={styles.cellSubTitle}>Item name goes here item.question.text.text</Text>
               )
             })}
           </View>
-          <Text style={styles.countIndicator}>{this.props.kByDirectiveId[directive.id]} of {this.props.itemsByDirectiveId[directive.id].length}</Text>
+          <Text style={styles.countIndicator}>{1} of {3}</Text>
+
         </View>
       </TouchableHighlight>
     )
@@ -83,6 +83,7 @@ class DirectiveList extends Component {
       </ListView>
     )
   }
+
 
 }
 
