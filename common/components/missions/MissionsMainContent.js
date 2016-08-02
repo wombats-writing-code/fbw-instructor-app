@@ -28,6 +28,7 @@ var MissionsContentNavbar = require('./MissionsContentNavbar');
 
 var styles = StyleSheet.create({
   container: {
+    paddingTop: 105,
     paddingLeft: 10.5,
     paddingRight: 10.5,
   }

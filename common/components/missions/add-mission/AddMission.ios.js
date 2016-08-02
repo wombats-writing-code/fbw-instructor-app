@@ -112,7 +112,14 @@ class AddMission extends Component {
       <View style={styles.container}>
         <Animated.View style={{opacity: this.state.opacity}}>
 
-
+          <View style={styles.navBar}>
+            <TouchableHighlight onPress={() => this.props.onClose()}>
+                <Text style={styles.button}>Cancel</Text>
+            </TouchableHighlight>
+            <TouchableHighlight onPress={() => this.createAssessment()}>
+                <Text style={styles.button}>Create</Text>
+            </TouchableHighlight>
+          </View>
 
           <TextInput maxLength={255}
                      onChangeText={(text) => this.setState({missionDisplayName: text})}
@@ -120,19 +127,9 @@ class AddMission extends Component {
                      style={styles.missionNameInput}
                      value={this.state.missionDisplayName} />
 
-          <View style={styles.buttons}>
-            <TouchableHighlight onPress={() => this.props.onClose()}>
-                <Text style={styles.button}>Cancel</Text>
-            </TouchableHighlight>
-
-            <TouchableHighlight onPress={() => this.createAssessment()}
-                                style={styles.createButtonWrapper}>
-                <Text style={styles.button}>Create</Text>
-            </TouchableHighlight>
-          </View>
-
           <ScrollView style={ {height:   this.state.height - 50 } }>
               <View style={styles.missionTypeSelector}>
+                <Text style={styles.inputLabel}>Mission type</Text>
                 <TouchableHighlight onPress={() => this._onSelectMissionType('homework')}>
                   <Image
                     source={require('../../../assets/mission-selector-icon--homework.png')}
@@ -168,6 +165,7 @@ class AddMission extends Component {
                              timeZoneOffsetInMinutes={this.state.timeZoneOffsetInHours * 60}/>
             </View>
           </ScrollView>
+
         </Animated.View>
       </View>
     );

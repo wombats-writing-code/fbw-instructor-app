@@ -99,8 +99,6 @@ class MissionsManager extends Component {
 
     UserStore.getBankId()
     .then((bankId) => {
-      console.log('bankId', bankId);
-
       if (bankId !== null) {
         this._setBankId(bankId);
       }
@@ -187,6 +185,8 @@ class MissionsManager extends Component {
                   />
     }
 
+    // TODO: plug in the required number by directive if it's something that qbank returns,
+    // if it can be computed from existing info, let's make it a selector
     let editMission;
     if (this.state.selectedMission) {
       editMission = <EditMission mission={this.state.selectedMission}
@@ -212,12 +212,14 @@ class MissionsManager extends Component {
 
           <View style={styles.missionsMainContentContainer}>
             {addMission}
-
             {editMission}
           </View>
-
         </View>
 
+        {/*the reason it's here instead of nested within EditMission is because i cannot for the life of me
+        get it to grow beyond the size of its parent bounds when it pops up.
+        if you have another way, feel free to change it. 
+        */}
 
          {editDirective}
       </View>

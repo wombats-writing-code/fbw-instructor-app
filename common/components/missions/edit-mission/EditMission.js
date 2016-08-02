@@ -143,7 +143,7 @@ class EditMission extends Component {
 
         <DirectiveList style={styles.directives}
                       directives={directives}
-                      requiredNumberByDirectiveId={kByDirectiveId}
+                      requiredNumberByDirectiveId={kByDirectiveId}      
                       itemsByDirectiveId={itemsByDirectiveId}
                       onSelectDirective={this.props.onSelectDirective}
         />

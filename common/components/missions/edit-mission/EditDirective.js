@@ -151,7 +151,7 @@ class EditDirective extends Component {
   renderQuestionRow(question) {
     return (
       <TouchableOpacity key={question.id}>
-        <Text>Question that matches the selected directive</Text>
+        <Text>Question that matches the selected directive (outcome)</Text>
       </TouchableOpacity>
     )
   }
@@ -172,12 +172,14 @@ class EditDirective extends Component {
             <Image source={require('../../../assets/search--light.png')}/>
             <TextInput style={styles.searchInput}
                       value={directiveName}
-                      defaultValue="My outcome value passed down"
+                      defaultValue="My outcome value passed down. outcome.displayName.text"
                       onChange={this.onChange}/>
           </View>
 
           <View style={styles.filters}>
             <Text style={styles.filterText}>Filter by</Text>
+              {/*the one selected on default should be the module of the current outcome */}
+
               {_.map(this.props.modules, (module, idx) => {
                 return (
                   <TouchableOpacity key={module.id} onPress={() => this._onToggleFilter(module)} style={styles.filterButton}>
@@ -216,8 +218,9 @@ class EditDirective extends Component {
     )
   }
 
-
   visibleQuestions(directiveId) {
+    // returns the items that pertain to a given directive (outcome) id 
+    // might be good to pull this into a selector.
     return [];
   }
 

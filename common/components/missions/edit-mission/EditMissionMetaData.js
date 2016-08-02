@@ -64,7 +64,8 @@ var styles = StyleSheet.create({
   },
   sectionChangeIndicator: {
     fontSize: 18,
-    color: '#96CEB4',
+    fontWeight: "300",
+    color: '#46B29D',
     flex: 1
   },
   muted: {
@@ -76,15 +77,28 @@ var styles = StyleSheet.create({
 })
 
 class EditMissionMetaData extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      missionName: this.props.mission.displayName.text
+    }
+  }
+
+
   render() {
+    // console.log(this.state.missionName);
+
     return (
       <View>
-        <TouchableHighlight style={[styles.missionNameSection]}>
-          <TextInput style={[styles.sectionTitle, styles.missionName]}
-                    value={this.props.mission.displayName.text}
-                    onChange={_.noop}
-          />
-        </TouchableHighlight>
+        {/*<TouchableHighlight></TouchableHighlight>*/}
+
+        <TextInput maxLength={255}
+                   onChangeText={(text) => this.setState({missionName: text})}
+                   selectionColor="#46B29D"
+                   style={styles.missionName}
+                   value={this.state.missionName} />
+
         <View style={styles.missionNameBorderContainer}></View>
 
         <TouchableHighlight style={[styles.section]}>
@@ -111,7 +125,12 @@ class EditMissionMetaData extends Component {
         </TouchableHighlight>
       </View>
     )
+  }
 
+  onChangeName = (event) => {
+    this.setState({
+      missionName: event.target.value
+    })
   }
 
 }

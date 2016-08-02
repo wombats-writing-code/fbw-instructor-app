@@ -5,18 +5,16 @@ import {
 
 module.exports = StyleSheet.create({
   container: {
-    paddingLeft: 21,
-    paddingRight: 21,
-    paddingTop: 60,
     justifyContent: 'space-between'
   },
   missionNameInput: {
     backgroundColor: '#eee',
     height: 45,
-    padding: 9,
-    marginBottom: 18
+    paddingLeft: 10.5,
+    marginBottom: 21
   },
-  buttons: {
+  navBar: {
+    paddingTop: 31.5,
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 21
@@ -55,12 +53,6 @@ module.exports = StyleSheet.create({
     color: '#444',
   },
   cancelButton: {
-  },
-  createButton: {
-  },
-  createButtonWrapper: {
-    position: 'absolute',
-    right: 0
   },
   itemLabel: {
     fontSize: 10

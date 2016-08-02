@@ -24,9 +24,6 @@ let styles = StyleSheet.create({
     paddingRight: 10.5,
     paddingTop: 21,
     paddingBottom: 21,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 3,
   },
   cellInfoWrapper: {
     flex: 9,
@@ -36,9 +33,27 @@ let styles = StyleSheet.create({
     color: '#333',
     fontWeight: "300"
   },
+  directiveContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 21
+  },
+  itemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10.5
+  },
+  directiveIcon: {
+    marginRight: 10.5
+  },
+  itemIcon: {
+    marginLeft: 6,
+    marginRight: 20
+  },
   countIndicator: {
     fontSize: 18,
-    color: '#96CEB4',
+    fontWeight: "300",
+    color: '#46B29D',
     flex: 1
   }
 });
@@ -55,20 +70,40 @@ class DirectiveList extends Component {
     }
   }
 
+  renderDirective = (directive) => {
+    return (
+      <View key={directive.id} style={styles.directiveContainer}>
+        <Image style={styles.directiveIcon} source={require('../../../assets/directive.png')} />
+        <Text style={styles.cellTitle}>Outcome name goes here. outcome.displayName.text</Text>
+      </View>
+    )
+  }
+
+  renderItem = (item, idx) => {
+    return (
+      <View key={item.id} style={styles.itemContainer}>
+        <Image style={styles.itemIcon} source={require('../../../assets/target-question--correct.png')} />
+        <Text key={idx} style={styles.cellSubTitle}>Item name goes here item.question.text.text</Text>
+      </View>
+    )
+  }
+
   renderRow = (directive) => {
 
     return (
       <TouchableHighlight style={{marginBottom: 21}} key={directive.id} onPress={() => this.props.onSelectDirective(directive)}>
         <View style={styles.cell}>
           <View style={styles.cellInfoWrapper}>
-            <Text style={styles.cellTitle}>{directive.displayName}</Text>
-            {_.map(this.props.itemsByDirectiveId[directive.id], (item) => {
-              return (
-                <Text style={styles.cellSubTitle}>Item name goes here item.question.text.text</Text>
-              )
-            })}
+            {this.renderDirective(directive)}
+
+            {_.map(this.props.itemsByDirectiveId[directive.id], this.renderItem)}
+
           </View>
-          <Text style={styles.countIndicator}>{1} of {3}</Text>
+
+          {/*hook into this.requiredNumberByDirectiveId and this.props.itemsByDirectiveId.length.
+            feel free to rename and / or make a selector out of it
+            */}
+          <Text style={styles.countIndicator}>{1} of {2}</Text>
 
         </View>
       </TouchableHighlight>
