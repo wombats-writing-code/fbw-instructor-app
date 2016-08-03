@@ -62,11 +62,8 @@ class DirectiveList extends Component {
 
   constructor(props) {
     super(props)
-
-    console.log('in DirectiveList', props);
-
     this.state = {
-      ds: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
+      ds: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2})
     }
   }
 
@@ -91,7 +88,9 @@ class DirectiveList extends Component {
   renderRow = (directive) => {
 
     return (
-      <TouchableHighlight style={{marginBottom: 21}} key={directive.id} onPress={() => this.props.onSelectDirective(directive)}>
+      <TouchableHighlight style={{marginBottom: 21}}
+                          key={directive.id}
+                          onPress={() => this.props.onSelectDirective(directive)}>
         <View style={styles.cell}>
           <View style={styles.cellInfoWrapper}>
             {this.renderDirective(directive)}

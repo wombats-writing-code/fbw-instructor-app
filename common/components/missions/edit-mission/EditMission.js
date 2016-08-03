@@ -134,21 +134,20 @@ class EditMission extends Component {
   }
 
   render() {
-    console.log('EditMission render():', this.props.mission, 'mission items', this.props.missionItems);
-
     return (
       <View style={styles.container}>
 
         <EditMissionMetaData mission={this.props.mission}/>
 
         <DirectiveList style={styles.directives}
-                      directives={directives}
-                      requiredNumberByDirectiveId={kByDirectiveId}      
-                      itemsByDirectiveId={itemsByDirectiveId}
-                      onSelectDirective={this.props.onSelectDirective}
+                       directives={directives}
+                       requiredNumberByDirectiveId={kByDirectiveId}
+                       itemsByDirectiveId={itemsByDirectiveId}
+                       onSelectDirective={this.props.onSelectDirective}
         />
 
-        <TouchableHighlight style={styles.addDirectiveButton}>
+        <TouchableHighlight style={styles.addDirectiveButton}
+                            onPress={this.props.handleAddDirective}>
           <View style={styles.addDirectiveButtonWrapper}>
             <Image source={require('../../../assets/add--dark.png')}/>
             <Text style={styles.addDirectiveButtonText}>Add a directive</Text>

@@ -11,9 +11,9 @@ module.exports = {
         CREATE_ASSESSMENT_OFFERED: null,
         DELETE_ASSESSMENT_OFFERED: null,
         UPDATE_ASSESSMENT_OFFERED: null,
-        CREATE_ASSESSMENT_TAKEN: null,
-        DELETE_ASSESSMENT_TAKEN: null,
-        UPDATE_ASSESSMENT_TAKEN: null
+        CREATE_ASSESSMENT_PART: null,
+        DELETE_ASSESSMENT_PART: null,
+        UPDATE_ASSESSMENT_PART: null,
     }),
     GenusTypes: {
       HOMEWORK: 'assessment-genus%3Afbw-homework-mission%40ODL.MIT.EDU',

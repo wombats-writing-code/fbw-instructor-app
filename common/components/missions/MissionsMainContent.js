@@ -74,10 +74,10 @@ class MissionsMainContent extends Component {
       // mission results summary component, depending on the
       // deadline of the mission relative to now
       content = <EditMission action={this.props.content}
-                                closeDetails={this._revertToDefaultContent}
-                                mission={this.props.selectedMission}
-                                missionItems={this.props.missionItems}
-                                toggleQuestionDrawer={this.props.toggleQuestionDrawer} />;
+                             closeDetails={this._revertToDefaultContent}
+                             mission={this.props.selectedMission}
+                             missionItems={this.props.missionItems}
+                             toggleQuestionDrawer={this.props.toggleQuestionDrawer} />;
       subtitle = this.props.selectedMission.displayName.text;
       title = 'Editing Mission';
     }
