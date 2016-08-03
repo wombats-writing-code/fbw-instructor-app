@@ -120,7 +120,7 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
         if (bankId !== null) {
           var numObjects = 0,
             params = {
-              path: `assessment/banks/${bankId}/assessments?page=all`
+              path: `assessment/banks/${bankId}/assessments?sections&page=all`
             },
             finalAssessments = [];
           qbankFetch(params, function (data) {

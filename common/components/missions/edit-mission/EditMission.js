@@ -140,7 +140,7 @@ class EditMission extends Component {
         <EditMissionMetaData mission={this.props.mission}/>
 
         <DirectiveList style={styles.directives}
-                       directives={directives}
+                       directives={this.props.mission.sections}
                        requiredNumberByDirectiveId={kByDirectiveId}
                        itemsByDirectiveId={itemsByDirectiveId}
                        onSelectDirective={this.props.onSelectDirective}
