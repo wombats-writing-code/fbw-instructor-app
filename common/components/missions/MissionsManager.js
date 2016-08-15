@@ -126,7 +126,6 @@ class MissionsManager extends Component {
   }
 
   _setBankId = (bankId) => {
-    console.log('here in missions manager: ' + bankId);
     this.setState({ bankId: bankId });
     AssessmentStore.getAssessments();
     ItemStore.getItems();
@@ -218,7 +217,7 @@ class MissionsManager extends Component {
 
         {/*the reason it's here instead of nested within EditMission is because i cannot for the life of me
         get it to grow beyond the size of its parent bounds when it pops up.
-        if you have another way, feel free to change it. 
+        if you have another way, feel free to change it.
         */}
 
          {editDirective}

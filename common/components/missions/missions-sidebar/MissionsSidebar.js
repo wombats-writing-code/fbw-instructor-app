@@ -6,6 +6,7 @@ import React, {
 } from 'react';
 
 import {
+  ActivityIndicator,
   ListView,
   Picker,
   ScrollView,
@@ -40,8 +41,7 @@ class MissionsSidebar extends Component {
 
     this.state = {
       courseOfferingId: '',
-      selectedId: '',
-      showMissionsNav: props.bankId === null ? false : true,
+      showMissionsNav: false,
       sortedMissions: _.sortBy(this.props.missions, 'displayName.text'), // this should be passed in already sorted by date
       subjects: []
     }
@@ -49,8 +49,14 @@ class MissionsSidebar extends Component {
   componentWillUnmount() {
   }
   componentDidMount() {
+    var _this = this;
     UserStore.enrollments(data => {
-      this.setState({ subjects: data });
+      this.setState({ subjects: data }, () => {
+        UserStore.getLMSCourseId()
+          .then((courseId) => {
+            _this._setCourseOffering(courseId);
+          });
+      });
     });
   }
   componentWillReceiveProps(nextProps) {
@@ -65,15 +71,22 @@ class MissionsSidebar extends Component {
     }
 
     if (this.state.showMissionsNav) {
-      missionsNav = ( <View>
-        <MissionsList changeContent={this.props.changeContent}
-                      missions={this.props.missions}
-                      selectMission={this.props.selectMission} />
-      </View>);
+      if (this.props.loadingMissions) {
+        missionsNav = ( <View style={styles.loadingMissions}>
+          <ActivityIndicator size="large" />
+        </View>);
+      } else {
+        missionsNav = ( <View>
+          <MissionsList changeContent={this.props.changeContent}
+                        missions={this.props.missions}
+                        selectMission={this.props.selectMission} />
+        </View>);
+      }
     }
     return (
       <View style={styles.container}>
-        <CourseOfferingSelector setCourse={this._setCourseOffering}
+        <CourseOfferingSelector courseOfferingId={this.state.courseOfferingId}
+                                setCourse={this._setCourseOffering}
                                 subjects={this.state.subjects} />
         {missionsNav}
         <View style={styles.sidebarFooter} />
@@ -87,7 +100,6 @@ class MissionsSidebar extends Component {
         subject = _.filter(this.state.subjects, function (subject) {
           return subject.id == courseOfferingId;
         })[0];
-
       this.setState({ showMissionsNav: true });
       this.setState({ courseOfferingId: courseOfferingId });
       UserStore.setDepartment(subject.department);

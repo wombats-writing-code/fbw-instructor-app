@@ -89,7 +89,7 @@ class D2LLogin extends Component {
       );
       UserStore.setAuthenticationUrlD2L(event.url);
       UserStore.setUsername(() => {
-          Actions.missions({
+          Actions.loading({
           });
         }
       );
