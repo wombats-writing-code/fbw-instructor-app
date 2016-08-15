@@ -54,7 +54,9 @@ class MissionsSidebar extends Component {
       this.setState({ subjects: data }, () => {
         UserStore.getLMSCourseId()
           .then((courseId) => {
-            _this._setCourseOffering(courseId);
+            if (courseId !== null) {
+              _this._setCourseOffering(courseId);
+            }
           });
       });
     });
