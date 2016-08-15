@@ -15,6 +15,8 @@ import {
 
 var _ = require('lodash');
 
+var ModuleStore = require('../../../stores/Module');
+
 let {width, height} = Dimensions.get('window');
 
 let styles = StyleSheet.create({
@@ -75,6 +77,9 @@ let styles = StyleSheet.create({
     marginLeft: 10.5,
     marginRight: 10.5
   },
+  filterButtonSelected: {
+    backgroundColor: 'blue'
+  },
   filterButtonText: {
     color: '#eee'
   },
@@ -113,11 +118,11 @@ class EditDirective extends Component {
 
   constructor(props) {
     super(props);
-
     this.state = {
       query: '',
       fadeInAnimation: new Animated.Value(0),
       moveUpAnimation: new Animated.Value(0),
+      outcomes: ModuleStore.getOutcomes(),
       searchResults: [],
       searchResultsDS: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
       questionsDS: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
@@ -125,8 +130,6 @@ class EditDirective extends Component {
   }
 
   componentDidMount() {
-    console.log('EditDirective did mount');
-
     Animated.parallel([
       Animated.timing(this.state.fadeInAnimation, {
         toValue: 1,
@@ -140,12 +143,26 @@ class EditDirective extends Component {
     .start();
   }
 
+  closeAndSave() {
+
+    this.props.onClose();
+  }
+
   renderOutcomeRow(outcome) {
     return (
-      <TouchableOpacity key={outcome.id}>
-        <Text>Outcome that matches search results</Text>
+      <TouchableOpacity key={outcome.id}
+                        onPress={() => this.setDirective(outcome)}>
+        <Text>{outcome.displayName.text}</Text>
       </TouchableOpacity>
     )
+  }
+
+  setDirective = (outcome) => {
+    this.setState({
+      directiveId: outcome.id,
+      directiveName: outcome.displayName.text,
+      searchResults: []
+    });
   }
 
   renderQuestionRow(question) {
@@ -157,13 +174,11 @@ class EditDirective extends Component {
   }
 
   render() {
-    let directiveName = this.props.directive ? this.props.directive.displayName.text : 'The selected outcome name';
-
-    console.log('EditDirective', this.props.directive);
-
+    let directiveId = this.props.directive !== '' ? this.props.directive.id : '',
+      directiveName = directiveId !== '' ? ModuleStore.getOutcome(directiveId).displayName.text : '';
     return (
       <Animated.View style={[styles.container, {opacity: this.state.fadeInAnimation, top: this.state.moveUpAnimation}]}>
-        <TouchableOpacity onPress={this.props.onClose} style={styles.closeButton}>
+        <TouchableOpacity onPress={this.closeAndSave} style={styles.closeButton}>
           <Image source={require('../../../assets/cancel--light.png')}/>
         </TouchableOpacity>
 
@@ -171,9 +186,9 @@ class EditDirective extends Component {
           <View style={styles.searchWrapper}>
             <Image source={require('../../../assets/search--light.png')}/>
             <TextInput style={styles.searchInput}
-                      value={directiveName}
-                      defaultValue="My outcome value passed down. outcome.displayName.text"
-                      onChange={this.onChange}/>
+                       value={directiveName}
+                       defaultValue="Search for directives ..."
+                       onChange={this.onChange}/>
           </View>
 
           <View style={styles.filters}>
@@ -181,8 +196,14 @@ class EditDirective extends Component {
               {/*the one selected on default should be the module of the current outcome */}
 
               {_.map(this.props.modules, (module, idx) => {
+                let buttonStyles = [styles.filterButton];
+                if (module.childNodes.indexOf(this.props.directive.id) >= 0) {
+                  buttonStyles.push(styles.filterButtonSelected);
+                }
                 return (
-                  <TouchableOpacity key={module.id} onPress={() => this._onToggleFilter(module)} style={styles.filterButton}>
+                  <TouchableOpacity key={module.id}
+                                    onPress={() => this._onToggleFilter(module)}
+                                    style={buttonStyles}>
                     <Text style={styles.filterButtonText}>{module.displayName.text}</Text>
                   </TouchableOpacity>
                 )
@@ -192,8 +213,6 @@ class EditDirective extends Component {
           <ListView style={[styles.searchResultsList]}
                   dataSource={this.state.searchResultsDS.cloneWithRows(this.state.searchResults)}
                   renderRow={this.renderOutcomeRow}>
-
-            <Text>Outcomes that match search results should appear here. </Text>
           </ListView>
         </View>
 
@@ -205,7 +224,7 @@ class EditDirective extends Component {
             </TouchableHighlight>
 
             <TouchableHighlight style={styles.addKButton} onPress={this.onAddK}>
-              <Text style={styles.addKButtonText}>{this.props.requiredNumberByDirectiveId[this.props.directive.id]}</Text>
+              <Text style={styles.addKButtonText}>{this.props.directive.minimumProficiency}</Text>
             </TouchableHighlight>
           </View>
 
@@ -219,7 +238,7 @@ class EditDirective extends Component {
   }
 
   visibleQuestions(directiveId) {
-    // returns the items that pertain to a given directive (outcome) id 
+    // returns the items that pertain to a given directive (outcome) id
     // might be good to pull this into a selector.
     return [];
   }
@@ -238,9 +257,13 @@ class EditDirective extends Component {
 
   onChange = (event) => {
     // search against outcomes and update search results
+    let query = event.nativeEvent.text.toLowerCase();
     this.setState({
-      query: event.target.value,
-      searchResults: []
+      query: query,
+      searchResults: _.filter(this.state.outcomes, (outcome, outcomeId) => {
+        return (outcome.displayName.text.toLowerCase().indexOf(query) >= 0 ||
+                outcome.description.text.toLowerCase().indexOf(query) >= 0);
+      })
     })
   }
 

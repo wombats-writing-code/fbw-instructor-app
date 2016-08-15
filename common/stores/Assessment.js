@@ -80,6 +80,33 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
       });
     });
   },
+  createAssessmentPart: function (data) {
+    var _this = this;
+    store.get('bankId')
+      .then((bankId) => {
+      var getCurrentSectionsParams = {
+          path: `assessment/banks/${bankId}/assessments/${data.assessmentId}`
+        },
+        createSectionParams = {
+          data: {
+            sections: {
+              newSections: [{}]
+            }
+          },
+          method: 'PUT',
+          path: `assessment/banks/${bankId}/assessments/${data.assessmentId}`
+        };
+
+      qbankFetch(getCurrentSectionsParams, function (assessmentDetails) {
+        let currentSectionIds = _.map(assessmentDetails.sections, 'id');
+        qbankFetch(createSectionParams, function (updatedAssessment) {
+
+        });
+        // have to return the ID / section of the newly created section here ...
+        data.callback(partData);
+      });
+    });
+  },
   getAssessment: function (id) {
     return _.find(_assessments, function (assessment) {
       return assessment.id == id;
@@ -93,15 +120,10 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
         if (bankId !== null) {
           var numObjects = 0,
             params = {
-              path: `assessment/banks/${bankId}/assessments?page=all`
+              path: `assessment/banks/${bankId}/assessments?sections&page=all`
             },
             finalAssessments = [];
-
-            console.log('about to fetch with params  of', params);
-
           qbankFetch(params, function (data) {
-            console.log('fetched assessments', data);
-
             if (data !== null) {
               var assessments = data.data.results;
 
@@ -157,6 +179,9 @@ AssessmentStore.dispatchToken = AssessmentDispatcher.register(function (action) 
             break;
         case ActionTypes.DELETE_ASSESSMENT:
             AssessmentStore.deleteAssessment(action.content);
+            break;
+        case ActionTypes.CREATE_ASSESSMENT_PART:
+            AssessmentStore.createAssessmentPart(action.content);
             break;
     }
 });

@@ -94,15 +94,19 @@ class MissionsManager extends Component {
   }
 
   componentDidMount() {
-
-    console.log('MissionsManager componentDidMount')
-
     UserStore.getBankId()
     .then((bankId) => {
       if (bankId !== null) {
-        this._setBankId(bankId);
+        AssessmentStore.getAssessments();
+        ItemStore.getItems();
+        ModuleStore.getModules();
       }
     });
+  }
+
+  handleAddDirective = () => {
+    // create a new assessment part; bring up the EditDirective window view
+    // but with no Outcome assigned yet
   }
 
   handleSelectMission = (mission, mode) => {
@@ -121,19 +125,31 @@ class MissionsManager extends Component {
     });
   }
 
+  handleSetDirectiveLO = (directiveId, outcomeId) => {
+
+  }
+
+  handleDeleteDirective = (directiveId) => {
+
+  }
+
   _changeContent = (newContent) => {
     this.setState({ content: newContent });
   }
 
   _setBankId = (bankId) => {
-    this.setState({ bankId: bankId });
-    AssessmentStore.getAssessments();
-    ItemStore.getItems();
-    ModuleStore.getModules();
+    UserStore.getBankId()
+      .then((previousBankId) => {
+        if (previousBankId !== bankId) {
+          UserStore.setBankId(bankId);
+          AssessmentStore.getAssessments();
+          ItemStore.getItems();
+          ModuleStore.getModules();
+        }
+      });
   }
 
   _handleItemsChanged = (items) => {
-    console.log('items changed', items);
     this.setState({
       allItems: allItems
     })
@@ -144,8 +160,6 @@ class MissionsManager extends Component {
   }
 
   _updateMissionsFromStore = (missions) => {
-    console.log('missions changed', missions);
-
     // sort missions by startTime first
     let sorted = _.sortBy(missions,
       ['startTime.year', 'startTime.month', 'startTime.day',
@@ -169,12 +183,12 @@ class MissionsManager extends Component {
     let editDirective;
     if (this.state.selectedDirective) {
       editDirective = <EditDirective directive={this.state.selectedDirective}
-                                    requiredNumberByDirectiveId={{1: 2, 2: 1, 3: 2}}
-                                    onSelectQuestion={this.handleSelectQuestion}
-                                    onChangeRequiredNumber={this.handleChangeRequiredNumber}
-                                    outcomes={this.state.outcomes}
-                                    modules={this.state.modules}
-                                    onClose={() => this.setState({selectedDirective: null})}
+                                     onSetDirectiveOutcome={this.handleSetDirectiveLO}
+                                     onSelectQuestion={this.handleSelectQuestion}
+                                     onChangeRequiredNumber={this.handleChangeRequiredNumber}
+                                     mission={this.state.selectedMission}
+                                     modules={this.state.modules}
+                                     onClose={() => this.setState({selectedDirective: null})}
         />
     }
 
@@ -189,9 +203,10 @@ class MissionsManager extends Component {
     let editMission;
     if (this.state.selectedMission) {
       editMission = <EditMission mission={this.state.selectedMission}
-                          missionItems={this.state.missionItems}
-                          onSelectDirective={this.handleSelectDirective}
-                          requiredNumberByDirectiveId={{}}
+                                 missionItems={this.state.missionItems}
+                                 onAddDirective={this.handleAddDirective}
+                                 onSelectDirective={this.handleSelectDirective}
+                                 requiredNumberByDirectiveId={{}}
       />
     }
 
@@ -200,6 +215,7 @@ class MissionsManager extends Component {
         <View style={styles.splitView}>
           <MissionsSidebar style={styles.missionsSidebarContainer}
                            changeContent={this._changeContent}
+                           loadingMissions={this.state.loading}
                            missions={this.state.missions}
                            selectMission={this.handleSelectMission}
                            setBankId={this._setBankId}

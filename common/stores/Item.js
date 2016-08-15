@@ -33,18 +33,18 @@ var ItemStore = _.assign({}, EventEmitter.prototype, {
     });
   },
   getItems: function () {
-    // console.log('getting items');
-
     var _this = this;
     UserStore.getDepartment()
       .then((department) => {
         var departmentCode = GuessDepartmentCode(department),
           params = {
-            path: 'assessment/banks/' + BankMap[departmentCode] + '/items?page=all'
+            path: `assessment/banks/${BankMap[departmentCode]}/items?page=all`
           };
         qbankFetch(params, function (data) {
-          _items = data.data.results;
-          _this.emitChange();
+          if (typeof data !== 'undefined') {
+            _items = data.data.results;
+            _this.emitChange();
+          }
         });
       });
   }

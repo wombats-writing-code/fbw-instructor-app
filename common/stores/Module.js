@@ -64,6 +64,9 @@ var ModuleStore = _.assign({}, EventEmitter.prototype, {
         }
       }
     }
+  },
+  getOutcomes: function () {
+    return _outcomes;
   }
 });
 

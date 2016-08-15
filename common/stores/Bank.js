@@ -41,7 +41,6 @@ var BankStore = _.assign({}, EventEmitter.prototype, {
   },
   getOrCreateChildNode: function (parentId, nodeName, nodeGenus, callback) {
     // don't need to proxy users when creating banks
-    console.log(`creating ${parentId}, ${nodeName}, ${nodeGenus}`);
     var getBankParams = {
       path: `assessment/banks?genus_type_id=${nodeGenus}&display_name=${nodeName}`
     };
@@ -88,7 +87,6 @@ var BankStore = _.assign({}, EventEmitter.prototype, {
   },
   setBankAlias: function (data, callback) {
     // try to GET the alias first, to see if it already exists
-    console.log('setting aliases');
     var params = {
         path: 'assessment/banks/' + D2LMiddlware.id(data.aliasId)
       },

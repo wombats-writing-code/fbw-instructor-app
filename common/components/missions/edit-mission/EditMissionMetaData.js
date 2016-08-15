@@ -15,6 +15,7 @@ import {
   } from 'react-native';
 
 var moment = require('moment');
+require('moment-timezone');
 var _ = require('lodash');
 
 var styles = StyleSheet.create({
@@ -79,7 +80,7 @@ var styles = StyleSheet.create({
 class EditMissionMetaData extends Component {
   constructor(props) {
     super(props);
-
+    console.log(props);
     this.state = {
       missionName: this.props.mission.displayName.text
     }
@@ -87,7 +88,15 @@ class EditMissionMetaData extends Component {
 
 
   render() {
-    // console.log(this.state.missionName);
+    let nativeStartTime = _.assign({}, this.props.mission.startTime),
+      nativeDeadline = _.assign({}, this.props.mission.deadline),
+      timezone = moment.tz.guess();
+
+    nativeStartTime.month = nativeStartTime.month - 1;
+    nativeDeadline.month = nativeDeadline.month - 1;
+
+    nativeStartTime = moment.tz(nativeStartTime, "Europe/London").clone().tz(timezone).format();
+    nativeDeadline = moment.tz(nativeDeadline, "Europe/London").clone().tz(timezone).format();
 
     return (
       <View>
@@ -106,8 +115,8 @@ class EditMissionMetaData extends Component {
             <View style={styles.sectionInfoWrapper}>
               <Text style={[styles.sectionTitle]}>Dates</Text>
               <Text style={[styles.sectionSubTitle]}>
-                <Text style={styles.muted}>Start </Text><Text>{moment(this.props.mission.displayName.startTime).format('ddd, hA')}</Text>
-                <Text style={styles.muted}>   Deadline </Text><Text >{moment(this.props.mission.displayName.deadline).format('ddd, hA')}</Text>
+                <Text style={styles.muted}>Start </Text><Text>{moment.tz(nativeStartTime, timezone).format('ddd, h:mA MMM D')}</Text>
+                <Text style={styles.muted}>   Deadline </Text><Text >{moment.tz(nativeDeadline, timezone).format('ddd, h:mA MMM D')}</Text>
               </Text>
             </View>
             <Text style={styles.sectionChangeIndicator}>Change</Text>
