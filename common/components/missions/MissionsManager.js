@@ -107,6 +107,7 @@ class MissionsManager extends Component {
   handleAddDirective = () => {
     // create a new assessment part; bring up the EditDirective window view
     // but with no Outcome assigned yet
+
   }
 
   handleSelectMission = (mission, mode) => {

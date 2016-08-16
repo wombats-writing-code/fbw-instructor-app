@@ -110,12 +110,16 @@ class DirectiveList extends Component {
   }
 
   render() {
-    return (
-      <ListView style={[styles.listView, this.props.style]}
-              dataSource={this.state.ds.cloneWithRows(this.props.directives)}
-              renderRow={this.renderRow}>
-      </ListView>
-    )
+    if (this.props.directives.length === 0) {
+      return <View />
+    } else {
+      return (
+        <ListView style={[styles.listView, this.props.style]}
+                dataSource={this.state.ds.cloneWithRows(this.props.directives)}
+                renderRow={this.renderRow}>
+        </ListView>
+      )
+    }
   }
 
 

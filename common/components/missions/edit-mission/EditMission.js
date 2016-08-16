@@ -140,14 +140,14 @@ class EditMission extends Component {
         <EditMissionMetaData mission={this.props.mission}/>
 
         <DirectiveList style={styles.directives}
-                       directives={this.props.mission.sections}
+                       directives={this.props.mission.sections || []}
                        requiredNumberByDirectiveId={kByDirectiveId}
                        itemsByDirectiveId={itemsByDirectiveId}
                        onSelectDirective={this.props.onSelectDirective}
         />
 
         <TouchableHighlight style={styles.addDirectiveButton}
-                            onPress={this.props.handleAddDirective}>
+                            onPress={this.props.onAddDirective}>
           <View style={styles.addDirectiveButtonWrapper}>
             <Image source={require('../../../assets/add--dark.png')}/>
             <Text style={styles.addDirectiveButtonText}>Add a directive</Text>
