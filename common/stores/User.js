@@ -111,7 +111,6 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
                     if (hasAuthz) {
                       callback();
                     } else {
-                      console.log('initializing qbank');
                       Actions.initializeQbank(
                         {
                           payload: payload,

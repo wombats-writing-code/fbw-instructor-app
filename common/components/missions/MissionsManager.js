@@ -176,7 +176,7 @@ class MissionsManager extends Component {
 
   _handleItemsChanged = (items) => {
     this.setState({
-      allItems: allItems
+      allItems: items
     })
   }
 
@@ -214,11 +214,13 @@ class MissionsManager extends Component {
   render() {
     let editDirective;
     if (this.state.selectedDirective) {
-      editDirective = <EditDirective directive={this.state.selectedDirective}
+      editDirective = <EditDirective allItems={this.state.allItems}
+                                     directive={this.state.selectedDirective}
                                      onSetDirectiveOutcome={this.handleSetDirectiveLO}
                                      onSelectQuestion={this.handleSelectQuestion}
                                      onChangeRequiredNumber={this.handleChangeRequiredNumber}
                                      mission={this.state.selectedMission}
+                                     missionItems={this.state.missionItems}
                                      modules={this.state.modules}
                                      onClose={() => this.setState({selectedDirective: null})}
         />

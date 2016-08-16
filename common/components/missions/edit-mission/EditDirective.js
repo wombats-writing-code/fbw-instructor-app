@@ -15,6 +15,8 @@ import {
 
 var _ = require('lodash');
 
+import {filterItemsByOutcome} from '../../../selectors/selectors';
+
 var ModuleStore = require('../../../stores/Module');
 
 let {width, height} = Dimensions.get('window');
@@ -121,6 +123,9 @@ class EditDirective extends Component {
     this.state = {
       query: '',
       fadeInAnimation: new Animated.Value(0),
+      minimumRequired: props.directive.minimumProficiency !== '' ?
+                       props.directive.minimumProficiency :
+                       0,
       moveUpAnimation: new Animated.Value(0),
       outcomes: ModuleStore.getOutcomes(),
       searchResults: [],
@@ -144,7 +149,6 @@ class EditDirective extends Component {
   }
 
   closeAndSave = () => {
-
     this.props.onClose();
   }
 
@@ -160,7 +164,7 @@ class EditDirective extends Component {
   renderQuestionRow(question) {
     return (
       <TouchableOpacity key={question.id}>
-        <Text>Question that matches the selected directive (outcome)</Text>
+        <Text>{question.displayName.text}</Text>
       </TouchableOpacity>
     )
   }
@@ -173,6 +177,7 @@ class EditDirective extends Component {
     if (directiveName === '' || directiveName === 'Unknown LO') {
       directiveName = 'Search for directives ...';
     }
+
     return (
       <Animated.View style={[styles.container, {opacity: this.state.fadeInAnimation, top: this.state.moveUpAnimation}]}>
         <TouchableOpacity onPress={this.closeAndSave}
@@ -221,11 +226,12 @@ class EditDirective extends Component {
             </TouchableHighlight>
 
             <TouchableHighlight style={styles.addKButton} onPress={this.onAddK}>
-              <Text style={styles.addKButtonText}>{this.props.directive.minimumProficiency}</Text>
+              <Text style={styles.addKButtonText}>{this.state.minimumRequired}</Text>
             </TouchableHighlight>
           </View>
 
-          <ListView dataSource={this.state.questionsDS.cloneWithRows(this.visibleQuestions(this.props.directive.id))}
+          <ListView dataSource={this.state.questionsDS.cloneWithRows(
+                                filterItemsByOutcome(this.props.directive.learningObjectiveId, this.props.allItems))}
                     renderRow={this.renderQuestionRow}>
           </ListView>
         </View>
@@ -234,21 +240,19 @@ class EditDirective extends Component {
     )
   }
 
-  visibleQuestions(directiveId) {
-    // returns the items that pertain to a given directive (outcome) id
-    // might be good to pull this into a selector.
-    return [];
-  }
-
-  onMinusK() {
+  onMinusK = () => {
     this.setState({
-      k: this.props.mission.k - 1
+      minimumRequired: Math.max(this.state.minimumRequired - 1, 0)
     })
   }
 
-  onAddK() {
+  onAddK = () => {
+    let maximumPossible = 0;
+    // need to update maximumPossible to reflect the number of questions in
+    // the section
     this.setState({
-      k: this.props.mission.k + 1
+      minimumRequired: Math.min(this.state.minimumRequired + 1,
+        maximumPossible)
     });
   }
 

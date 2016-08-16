@@ -98,7 +98,6 @@ var BankStore = _.assign({}, EventEmitter.prototype, {
       // bank does not exist, create it -- first see if the
       // name exists, then we're just missing term.
       // Otherwise, create both bank and term.
-      console.log("Let's create the bank ... check if the department exists, first.");
       _this.getOrCreateChildNode(ACCId, data.departmentName, DepartmentGenus, function (departmentData) {
         _this.getOrCreateChildNode(departmentData.id, data.subjectName, SubjectGenus, function (subjectData) {
           _this.getOrCreateChildNode(subjectData.id, data.termName, TermGenus, function (termData) {

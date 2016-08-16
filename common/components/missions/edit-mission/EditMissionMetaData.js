@@ -80,7 +80,6 @@ var styles = StyleSheet.create({
 class EditMissionMetaData extends Component {
   constructor(props) {
     super(props);
-    console.log(props);
     this.state = {
       missionName: this.props.mission.displayName.text
     }
