@@ -240,7 +240,6 @@ class MissionsManager extends Component {
                                  missionItems={this.state.missionItems}
                                  onAddDirective={this.handleAddDirective}
                                  onSelectDirective={this.handleSelectDirective}
-                                 requiredNumberByDirectiveId={{}}
       />
     }
 

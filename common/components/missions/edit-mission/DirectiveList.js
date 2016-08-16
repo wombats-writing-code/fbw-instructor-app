@@ -17,6 +17,8 @@ import {
 
 var _ = require('lodash');
 
+import {getItemsByDirective} from '../../../selectors/selectors';
+
 var ModuleStore = require('../../../stores/Module');
 
 let styles = StyleSheet.create({
@@ -91,6 +93,10 @@ class DirectiveList extends Component {
   }
 
   renderRow = (directive) => {
+    let minimumRequired = directive.minimumProficiency !== '' ?
+                          directive.minimumProficiency :
+                          0,
+      directiveItems = getItemsByDirective(this.props.missionItems, directive);
 
     return (
       <TouchableHighlight style={{marginBottom: 21}}
@@ -100,14 +106,14 @@ class DirectiveList extends Component {
           <View style={styles.cellInfoWrapper}>
             {this.renderDirective(directive)}
 
-            {_.map(this.props.itemsByDirectiveId[directive.id], this.renderItem)}
+            {_.map(directiveItems, this.renderItem)}
 
           </View>
 
           {/*hook into this.requiredNumberByDirectiveId and this.props.itemsByDirectiveId.length.
             feel free to rename and / or make a selector out of it
             */}
-          <Text style={styles.countIndicator}>{1} of {2}</Text>
+          <Text style={styles.countIndicator}>{minimumRequired} of {directiveItems.length}</Text>
 
         </View>
       </TouchableHighlight>
