@@ -143,26 +143,18 @@ class EditDirective extends Component {
     .start();
   }
 
-  closeAndSave() {
+  closeAndSave = () => {
 
     this.props.onClose();
   }
 
-  renderOutcomeRow(outcome) {
+  renderOutcomeRow = (outcome) => {
     return (
       <TouchableOpacity key={outcome.id}
-                        onPress={() => this.setDirective(outcome)}>
+                        onPress={() => this._onSetDirectiveLO(outcome)}>
         <Text>{outcome.displayName.text}</Text>
       </TouchableOpacity>
     )
-  }
-
-  setDirective = (outcome) => {
-    this.setState({
-      directiveId: outcome.id,
-      directiveName: outcome.displayName.text,
-      searchResults: []
-    });
   }
 
   renderQuestionRow(question) {
@@ -175,10 +167,16 @@ class EditDirective extends Component {
 
   render() {
     let directiveId = this.props.directive !== '' ? this.props.directive.id : '',
-      directiveName = directiveId !== '' ? ModuleStore.getOutcome(directiveId).displayName.text : '';
+      directiveName = directiveId !== '' ? ModuleStore.getOutcome(
+        this.props.directive.learningObjectiveId).displayName.text : '';
+
+    if (directiveName === '' || directiveName === 'Unknown LO') {
+      directiveName = 'Search for directives ...';
+    }
     return (
       <Animated.View style={[styles.container, {opacity: this.state.fadeInAnimation, top: this.state.moveUpAnimation}]}>
-        <TouchableOpacity onPress={this.closeAndSave} style={styles.closeButton}>
+        <TouchableOpacity onPress={this.closeAndSave}
+                          style={styles.closeButton}>
           <Image source={require('../../../assets/cancel--light.png')}/>
         </TouchableOpacity>
 
@@ -186,8 +184,7 @@ class EditDirective extends Component {
           <View style={styles.searchWrapper}>
             <Image source={require('../../../assets/search--light.png')}/>
             <TextInput style={styles.searchInput}
-                       value={directiveName}
-                       defaultValue="Search for directives ..."
+                       defaultValue={directiveName}
                        onChange={this.onChange}/>
           </View>
 
@@ -265,6 +262,11 @@ class EditDirective extends Component {
                 outcome.description.text.toLowerCase().indexOf(query) >= 0);
       })
     })
+  }
+
+  _onSetDirectiveLO = (outcome) => {
+    this.props.onSetDirectiveOutcome(outcome);
+    this.setState({ searchResults: [] });
   }
 
   _onToggleFilter(module) {

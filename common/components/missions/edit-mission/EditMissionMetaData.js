@@ -110,12 +110,6 @@ class EditMissionMetaData extends Component {
     nativeStartTime = moment.tz(nativeStartTime, "Europe/London").clone().tz(timezone).format();
     nativeDeadline = moment.tz(nativeDeadline, "Europe/London").clone().tz(timezone).format();
 
-    // nativeStartTime = moment.tz(nativeStartTime, "Europe/London");
-    // if (moment(nativeStartTime).isDST()) {
-    //   nativeStartTime =
-    // }
-    // nativeDeadline = moment.tz(nativeDeadline, "Europe/London").clone().tz(timezone).format();
-
     return (
       <View>
         {/*<TouchableHighlight></TouchableHighlight>*/}

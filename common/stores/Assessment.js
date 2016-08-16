@@ -84,26 +84,22 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
     var _this = this;
     store.get('bankId')
       .then((bankId) => {
-      var getCurrentSectionsParams = {
-          path: `assessment/banks/${bankId}/assessments/${data.assessmentId}`
+      var createSectionParams = {
+        data: {
+          sections: {
+            newSections: [{
+              scaffold: true
+            }]
+          }
         },
-        createSectionParams = {
-          data: {
-            sections: {
-              newSections: [{}]
-            }
-          },
-          method: 'PUT',
-          path: `assessment/banks/${bankId}/assessments/${data.assessmentId}`
-        };
+        method: 'PUT',
+        path: `assessment/banks/${bankId}/assessments/${data.assessmentId}`
+      };
 
-      qbankFetch(getCurrentSectionsParams, function (assessmentDetails) {
-        let currentSectionIds = _.map(assessmentDetails.sections, 'id');
-        qbankFetch(createSectionParams, function (updatedAssessment) {
-
-        });
+      qbankFetch(createSectionParams, function (updatedAssessment) {
         // have to return the ID / section of the newly created section here ...
-        data.callback(partData);
+        // it should be the last section (appended)
+        data.callback(_.last(updatedAssessment.sections));
       });
     });
   },
@@ -166,7 +162,31 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
           });
         }
       });
-  }
+  },
+  updateAssessmentPart: function (data) {
+    var _this = this;
+    store.get('bankId')
+      .then((bankId) => {
+      var updateSectionParams = {
+        data: {
+          sections: {
+            updatedSections: [{
+              scaffold: true
+            }]
+          }
+        },
+        method: 'PUT',
+        path: `assessment/banks/${bankId}/assessments/${data.assessmentId}`
+      };
+      _.assign(updateSectionParams.data.sections.updatedSections[0], data.params);
+      qbankFetch(updateSectionParams, function (updatedAssessment) {
+        // return the newly updated section
+        let updatedSection = _.find(updatedAssessment.sections, {id: data.params.id});
+        _this.getAssessments();
+        data.callback(updatedSection);
+      });
+    });
+  },
 });
 
 AssessmentStore.dispatchToken = AssessmentDispatcher.register(function (action) {
@@ -182,6 +202,9 @@ AssessmentStore.dispatchToken = AssessmentDispatcher.register(function (action) 
             break;
         case ActionTypes.CREATE_ASSESSMENT_PART:
             AssessmentStore.createAssessmentPart(action.content);
+            break;
+        case ActionTypes.UPDATE_ASSESSMENT_PART:
+            AssessmentStore.updateAssessmentPart(action.content);
             break;
     }
 });

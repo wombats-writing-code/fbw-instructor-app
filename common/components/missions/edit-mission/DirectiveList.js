@@ -17,6 +17,8 @@ import {
 
 var _ = require('lodash');
 
+var ModuleStore = require('../../../stores/Module');
+
 let styles = StyleSheet.create({
   cell: {
     flexDirection: 'row',
@@ -68,10 +70,13 @@ class DirectiveList extends Component {
   }
 
   renderDirective = (directive) => {
+    let outcomeName = directive.learningObjectiveId !== '' ?
+      ModuleStore.getOutcome(directive.learningObjectiveId).displayName.text :
+      'No learning outcome assigned yet';
     return (
       <View key={directive.id} style={styles.directiveContainer}>
         <Image style={styles.directiveIcon} source={require('../../../assets/directive.png')} />
-        <Text style={styles.cellTitle}>Outcome name goes here. outcome.displayName.text</Text>
+        <Text style={styles.cellTitle}>{outcomeName}</Text>
       </View>
     )
   }
