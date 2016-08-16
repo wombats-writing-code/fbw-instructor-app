@@ -35,7 +35,7 @@ var AssessmentItemStore = _.assign({}, EventEmitter.prototype, {
     UserStore.getBankId()
       .then((bankId) => {
         var params = {
-          path: 'assessment/banks/' + bankId + '/assessments/' + assessmentId + '/items?page=all'
+          path: 'assessment/banks/' + bankId + '/assessments/' + assessmentId + '/items?page=all&sections'
         };
         qbankFetch(params, function (data) {
           _items = data.data.results;
