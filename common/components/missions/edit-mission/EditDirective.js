@@ -199,7 +199,6 @@ class EditDirective extends Component {
               renderRow={this.renderOutcomeRow}>
       </ListView>);
     }
-
     return (
       <Animated.View style={[styles.container, {opacity: this.state.fadeInAnimation, top: this.state.moveUpAnimation}]}>
         <TouchableOpacity onPress={this.closeAndSave}
@@ -220,8 +219,9 @@ class EditDirective extends Component {
               {/*the one selected on default should be the module of the current outcome */}
 
               {_.map(this.props.modules, (module, idx) => {
-                let buttonStyles = [styles.filterButton];
-                if (module.childNodes.indexOf(this.props.directive.id) >= 0) {
+                let buttonStyles = [styles.filterButton],
+                  childIndices = _.map(module.childNodes, 'id');
+                if (childIndices.indexOf(this.props.directive.learningObjectiveId) >= 0) {
                   buttonStyles.push(styles.filterButtonSelected);
                 }
                 return (
@@ -266,7 +266,7 @@ class EditDirective extends Component {
 
   onAddK = () => {
     let maximumPossible = 9;  // for testing
-    // need to update maximumPossible to reflect the number of questions in
+    // TODO: need to update maximumPossible to reflect the number of questions in
     // the section
     this.setState({
       minimumRequired: Math.min(this.state.minimumRequired + 1,

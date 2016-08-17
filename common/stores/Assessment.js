@@ -179,7 +179,7 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
         path: `assessment/banks/${bankId}/assessments/${data.assessmentId}`
       };
       _.assign(updateSectionParams.data.sections.updatedSections[0], data.params);
-      console.log(updateSectionParams);
+      
       qbankFetch(updateSectionParams, function (updatedAssessment) {
         // return the newly updated section
         let updatedSection = _.find(updatedAssessment.sections, {id: data.params.id});

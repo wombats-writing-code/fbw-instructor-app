@@ -168,7 +168,6 @@ class MissionsManager extends Component {
   }
 
   handleChangeRequiredNumber = (minimumRequired) => {
-    console.log('changing minimum required: ' + minimumRequired);
     var data = {
       assessmentId: this.state.selectedMission.id,
       params: {
