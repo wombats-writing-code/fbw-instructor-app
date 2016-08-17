@@ -131,8 +131,8 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
                   };
                   qbankFetch(assessmentParams, function (offeredData) {
                     if (offeredData !== null) {
-                      var mashUp = assessment;
-                      offered = offeredData.data.results[0];
+                      var mashUp = assessment,
+                        offered = offeredData.data.results[0];
                       // Assume only one offered per assessment,
                       //   given how we are authoring them in this app
                       numObjects++;
@@ -179,6 +179,7 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
         path: `assessment/banks/${bankId}/assessments/${data.assessmentId}`
       };
       _.assign(updateSectionParams.data.sections.updatedSections[0], data.params);
+      console.log(updateSectionParams);
       qbankFetch(updateSectionParams, function (updatedAssessment) {
         // return the newly updated section
         let updatedSection = _.find(updatedAssessment.sections, {id: data.params.id});

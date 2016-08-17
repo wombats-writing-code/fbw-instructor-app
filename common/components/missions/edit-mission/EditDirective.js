@@ -14,8 +14,12 @@ import {
   } from 'react-native';
 
 var _ = require('lodash');
+var Icon = require('react-native-vector-icons/FontAwesome');
 
-import {filterItemsByOutcome} from '../../../selectors/selectors';
+import {
+  getItemsByDirective,
+  filterItemsByOutcome
+} from '../../../selectors/selectors';
 
 var ModuleStore = require('../../../stores/Module');
 
@@ -122,6 +126,7 @@ class EditDirective extends Component {
     super(props);
     this.state = {
       query: '',
+      directiveItemIds: _.map(getItemsByDirective(props.missionItems, props.directive), 'id'),
       fadeInAnimation: new Animated.Value(0),
       minimumRequired: props.directive.minimumProficiency !== '' ?
                        props.directive.minimumProficiency :
@@ -161,10 +166,19 @@ class EditDirective extends Component {
     )
   }
 
-  renderQuestionRow(question) {
+  renderQuestionRow = (question) => {
+    let selectedIcon = <View />;
+
+    if (this.state.directiveItemIds.indexOf(question.id) >= 0) {
+      selectedIcon = <Icon name="check" />;
+    }
     return (
-      <TouchableOpacity key={question.id}>
-        <Text>{question.displayName.text}</Text>
+      <TouchableOpacity key={question.id}
+                        onPress={() => this._updateDirectiveItemIds(question.id)}>
+        <View>
+          {selectedIcon}
+          <Text>{question.displayName.text}</Text>
+        </View>
       </TouchableOpacity>
     )
   }
@@ -172,10 +186,18 @@ class EditDirective extends Component {
   render() {
     let directiveId = this.props.directive !== '' ? this.props.directive.id : '',
       directiveName = directiveId !== '' ? ModuleStore.getOutcome(
-        this.props.directive.learningObjectiveId).displayName.text : '';
+        this.props.directive.learningObjectiveId).displayName.text : '',
+      searchResults = <View />;
 
     if (directiveName === '' || directiveName === 'Unknown LO') {
       directiveName = 'Search for directives ...';
+    }
+
+    if (this.state.searchResults.length > 0) {
+      searchResults = (<ListView style={[styles.searchResultsList]}
+              dataSource={this.state.searchResultsDS.cloneWithRows(this.state.searchResults)}
+              renderRow={this.renderOutcomeRow}>
+      </ListView>);
     }
 
     return (
@@ -211,11 +233,7 @@ class EditDirective extends Component {
                 )
               })}
           </View>
-
-          <ListView style={[styles.searchResultsList]}
-                  dataSource={this.state.searchResultsDS.cloneWithRows(this.state.searchResults)}
-                  renderRow={this.renderOutcomeRow}>
-          </ListView>
+          {searchResults}
         </View>
 
         <View style={styles.searchQuestionsWrapper}>
@@ -243,17 +261,17 @@ class EditDirective extends Component {
   onMinusK = () => {
     this.setState({
       minimumRequired: Math.max(this.state.minimumRequired - 1, 0)
-    })
+    }, () => this.props.onChangeRequiredNumber(this.state.minimumRequired));
   }
 
   onAddK = () => {
-    let maximumPossible = 0;
+    let maximumPossible = 9;  // for testing
     // need to update maximumPossible to reflect the number of questions in
     // the section
     this.setState({
       minimumRequired: Math.min(this.state.minimumRequired + 1,
         maximumPossible)
-    });
+    }, () => this.props.onChangeRequiredNumber(this.state.minimumRequired));
   }
 
   onChange = (event) => {
@@ -281,6 +299,19 @@ class EditDirective extends Component {
       selectedFilters: [],
       searchResults: newSearchResults
     })
+  }
+
+  _updateDirectiveItemIds = (questionId) => {
+    let updatedItemIds = this.state.directiveItemIds,
+      _this = this;
+    if (this.state.directiveItemIds.indexOf(questionId) < 0) {
+      updatedItemIds.push(questionId);
+    } else {
+      _.remove(updatedItemIds, (id) => {return id == questionId;});
+    }
+    this.setState({ directiveItemIds: updatedItemIds }, () => {
+      _this.props.onUpdateQuestions(_this.state.directiveItemIds);
+    });
   }
 }
 

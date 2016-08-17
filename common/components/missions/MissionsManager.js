@@ -150,8 +150,37 @@ class MissionsManager extends Component {
         type: ActionTypes.UPDATE_ASSESSMENT_PART,
         content: data
     });
+  }
 
-    // close the search box!
+  handleSetDirectiveItems = (itemIds) => {
+    var data = {
+      assessmentId: this.state.selectedMission.id,
+      params: {
+        id: this.state.selectedDirective.id,
+        itemIds: itemIds
+      },
+      callback: this.handleSelectDirective
+    };
+    AssessmentDispatcher.dispatch({
+        type: ActionTypes.UPDATE_ASSESSMENT_PART,
+        content: data
+    });
+  }
+
+  handleChangeRequiredNumber = (minimumRequired) => {
+    console.log('changing minimum required: ' + minimumRequired);
+    var data = {
+      assessmentId: this.state.selectedMission.id,
+      params: {
+        id: this.state.selectedDirective.id,
+        minimumProficiency: minimumRequired.toString()  // qbank expects a string here, not an int
+      },
+      callback: this.handleSelectDirective
+    };
+    AssessmentDispatcher.dispatch({
+        type: ActionTypes.UPDATE_ASSESSMENT_PART,
+        content: data
+    });
   }
 
   handleDeleteDirective = (directiveId) => {
@@ -182,6 +211,8 @@ class MissionsManager extends Component {
 
   _updateMissionItemsFromStore = (items) => {
     this.setState({ missionItems: items });
+    console.log(items);
+    console.log('those were the mission items');
   }
 
   _updateMissionsFromStore = (missions) => {
@@ -217,7 +248,7 @@ class MissionsManager extends Component {
       editDirective = <EditDirective allItems={this.state.allItems}
                                      directive={this.state.selectedDirective}
                                      onSetDirectiveOutcome={this.handleSetDirectiveLO}
-                                     onSelectQuestion={this.handleSelectQuestion}
+                                     onUpdateQuestions={this.handleSetDirectiveItems}
                                      onChangeRequiredNumber={this.handleChangeRequiredNumber}
                                      mission={this.state.selectedMission}
                                      missionItems={this.state.missionItems}
