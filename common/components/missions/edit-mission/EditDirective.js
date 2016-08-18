@@ -190,10 +190,18 @@ class EditDirective extends Component {
       directiveName = directiveId !== '' ? ModuleStore.getOutcome(
         this.props.directive.learningObjectiveId).displayName.text : '',
       searchResults = <View />,
-      directiveModuleId = this.state.selectedFilters.length > 0 ? this.state.selectedFilters[0].id : '';
+      directiveModuleId = this.state.selectedFilters.length > 0 ? this.state.selectedFilters[0].id : '',
+      itemsList = <View />,
+      items = filterItemsByOutcome(this.props.directive.learningObjectiveId, this.props.allItems);
 
     if (directiveName === '' || directiveName === 'Unknown LO') {
       directiveName = 'Search for directives ...';
+    }
+
+    if (items.length > 0) {
+      itemsList = (<ListView dataSource={this.state.questionsDS.cloneWithRows(items)}
+                renderRow={this.renderQuestionRow}>
+      </ListView>);
     }
 
     if (this.state.searchResults.length > 0) {
@@ -250,10 +258,7 @@ class EditDirective extends Component {
             </TouchableHighlight>
           </View>
 
-          <ListView dataSource={this.state.questionsDS.cloneWithRows(
-                                filterItemsByOutcome(this.props.directive.learningObjectiveId, this.props.allItems))}
-                    renderRow={this.renderQuestionRow}>
-          </ListView>
+          {itemsList}
         </View>
 
       </Animated.View>
