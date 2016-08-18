@@ -101,7 +101,8 @@ class MissionsSidebar extends Component {
       var subjectName, termName,
         subject = _.filter(this.state.subjects, function (subject) {
           return subject.id == courseOfferingId;
-        })[0];
+        })[0],
+        _this = this;
       this.setState({ showMissionsNav: true });
       this.setState({ courseOfferingId: courseOfferingId });
       UserStore.setDepartment(subject.department);
@@ -116,11 +117,12 @@ class MissionsSidebar extends Component {
           subjectName: subject.name,
           termName: subject.term
         },
-        callback: this._setBankId
+        callback: _this._setBankId
       });
     }
   }
   _setBankId = (bankId) => {
+    console.log('setting bank id');
     this.props.setBankId(bankId);
   }
 }

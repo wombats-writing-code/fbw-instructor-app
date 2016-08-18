@@ -299,6 +299,7 @@ class EditDirective extends Component {
   }
 
   _onToggleFilter = (module) => {
+    
     // apply filter to select outcomes that belong in this module
     this.setState({
       searchResults: _.find(this.props.modules, {id: module.id}).childNodes

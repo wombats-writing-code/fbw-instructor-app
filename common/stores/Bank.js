@@ -50,15 +50,15 @@ var BankStore = _.assign({}, EventEmitter.prototype, {
       })
       .done();
   },
-  getOrCreateChildNode: function (parentId, nodeName, nodeGenus, callback) {
+  getOrCreateChildNode: function (parentId, nodeName, nodeGenus) {
     // don't need to proxy users when creating banks
     let getBankParams = {
       path: `assessment/banks?genus_type_id=${nodeGenus}&display_name=${nodeName}`
     },
     newBank = {};
-    return Q.all([qbankFetch(getBankParams)])
+    return Q(qbankFetch(getBankParams))
       .then((res) => {
-        return res[0].json;
+        return Q(res.json());
       })
       .then((bankData) => {
         if (bankData.data.count === 0) {
@@ -72,13 +72,14 @@ var BankStore = _.assign({}, EventEmitter.prototype, {
               description: "FbW node"
             }
           };
-          return qbankFetch(createParams);
+          return Q(qbankFetch(createParams));
         } else {
-          return Q.reject(bankData.data.results[0]);
+          newBank = bankData.data.results[0];
+          return Q.reject(newBank);
         }
       })
       .then((res) => {
-        return res.json;
+        return Q(res.json());
       })
       .then((newBankData) => {
         // add as a hierarchy child
@@ -86,10 +87,10 @@ var BankStore = _.assign({}, EventEmitter.prototype, {
           path: `assessment/hierarchies/nodes/${parentId}/children`
         };
         newBank = newBankData;
-        return qbankFetch(hierarchyParams);
+        return Q(qbankFetch(hierarchyParams));
       })
       .then((res) => {
-        return res.json;
+        return Q(res.json());
       })
       .then((currentChildrenData) => {
         var currentChildrenIds = _.map(currentChildrenData.data.results, 'id'),
@@ -101,13 +102,18 @@ var BankStore = _.assign({}, EventEmitter.prototype, {
           };
         currentChildrenIds.push(newBank.id);
         addChildParams.data.ids = currentChildrenIds;
-        return qbankFetch(addChildParams);
+        return Q(qbankFetch(addChildParams));
+      })
+      .then(() => {
+        return newBank;
+      }, (err) => {
+        // from http://stackoverflow.com/questions/29499582/how-to-properly-break-out-of-a-promise-chain#29505206
+        if (err == newBank) {
+          return newBank;
+        }
       })
       .catch((error) => {
         console.log('error creating a child node');
-      })
-      .done(() => {
-        return newBank;
       });
   },
   setBankAlias: function (data, callback) {
@@ -117,31 +123,32 @@ var BankStore = _.assign({}, EventEmitter.prototype, {
       },
       _this = this,
       newTermId = '';
-    return Q.all([qbankFetch(params)])
+    Q(qbankFetch(params))
       .then((res) => {
-        return res[0].json;
+        return Q(res.json());
       })
       .then((bankData) => {
         // the bank already exists, so return it
-        return bankData.id;
+        console.log(bankData);
+        callback(bankData.id);
       })
       .catch((error) => {
         // bank does not exist, create it -- first see if the
         // name exists, then we're just missing term.
         // Otherwise, create both bank and term.
-        return _this.getOrCreateChildNode(ACCId, data.departmentName, DepartmentGenus)
+        Q.when(_this.getOrCreateChildNode(ACCId, data.departmentName, DepartmentGenus))
           .then((departmentData) => {
-            return _this.getOrCreateChildNode(departmentData.id, data.subjectName, SubjectGenus);
+            return Q(_this.getOrCreateChildNode(departmentData.id, data.subjectName, SubjectGenus));
           })
           .then((subjectData) => {
-            return _this.getOrCreateChildNode(subjectData.id, data.termName, TermGenus);
+            return Q(_this.getOrCreateChildNode(subjectData.id, data.termName, TermGenus));
           })
           .then((termData) => {
             newTermId = termData.id;
-            return _this.aliasTerm(termData.id, data.aliasId);
+            return Q(_this.aliasTerm(termData.id, data.aliasId));
           })
           .then(() => {
-            return newTermId;
+            callback(newTermId);
           })
           .done();
       })

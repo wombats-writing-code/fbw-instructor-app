@@ -38,9 +38,9 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
             path: `assessment/banks/${bankId}/assessments`
           };
 
-        Q.all([qbankFetch(params)])
+        Q(qbankFetch(params))
           .then((res) => {
-            return Q([res[0].json()]);
+            return Q(res.json());
           })
           .then((assessmentData) => {
             let offeredParams = {
@@ -67,10 +67,10 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
               }
             };
 
-            return QqbankFetch(offeredParams);
+            return Q(qbankFetch(offeredParams));
           })
           .then((res) => {
-            return res.json;
+            return Q(res.json());
           })
           .then((offeredData) => {
             var mashUp = newAssessment;
@@ -112,9 +112,9 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
         path: `assessment/banks/${bankId}/assessments/${data.assessmentId}`
       };
 
-      Q.all([qbankFetch(createSectionParams)])
+      Q(qbankFetch(createSectionParams))
         .then((res) => {
-          return res[0].json;
+          return Q(res.json());
         })
         .then((updatedAssessment) => {
           // have to return the ID / section of the newly created section here ...
@@ -142,9 +142,9 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
               path: `assessment/banks/${bankId}/assessments?sections&page=all`
             },
             finalAssessments = [];
-          Q.all([qbankFetch(params)])
+          Q(qbankFetch(params))
             .then((res) => {
-              return Q(res[0].json());
+              return Q(res.json());
             })
             .then((data) => {
               if (data !== null) {
@@ -161,8 +161,7 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
                   return Q.all(offeredPromises);
                 } else {
                   _assessments = [];
-                  _this.emitChange();
-                  return Q.reject();
+                  return Q.reject('done');
                 }
               }
             })
@@ -180,6 +179,11 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
                 _assessment.assessmentOfferedId = data[index].data.results[0].id;
               });
               _this.emitChange();
+            })
+            .then(null, (err) => {
+              if (err == 'done') {
+                _this.emitChange();
+              }
             })
             .catch((error) => {
               console.log('error getting assessments + offered data');

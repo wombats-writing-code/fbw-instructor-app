@@ -18,24 +18,16 @@ var InstructorAuthorizationFunctions = AuthorizationConstants.InstructorAuthoriz
 var _data = {};
 
 var AuthorizationStore = _.assign({}, EventEmitter.prototype, {
-  hasAuthorizations: function (data, callback) {
+  hasAuthorizations: function (data) {
     // data should include username and the schoolId (acc or qcc)
     var url = 'assessment/banks/' + credentials.qbank.SchoolNodes[data.schoolId] + '/items',
       params = {
         path: url,
         proxy: data.username
       };
-
-    Q.all([qbankFetch(params)])
-      .then((response) => {
-        return true;
-      })
-      .catch((error) => {
-        return false;
-      })
-      .done();
+    return Q(qbankFetch(params));
   },
-  setAuthorizations: function (data, callback) {
+  setAuthorizations: function (data) {
     // data should include username and the schoolId (acc or qcc)
     var qualifierIds = BaseBanks,
       schoolNodeId = credentials.qbank.SchoolNodes[data.schoolId],
@@ -75,16 +67,8 @@ var AuthorizationStore = _.assign({}, EventEmitter.prototype, {
         });
       });
     });
-
-    Q.all([qbankFetch(params)])
-      .then((response) => {
-        return true;
-      })
-      .catch((error) => {
-        console.log('error setting authorizations');
-        return false;
-      })
-      .done();
+    console.log('setting authz');
+    return Q(qbankFetch(params));
   }
 });
 
