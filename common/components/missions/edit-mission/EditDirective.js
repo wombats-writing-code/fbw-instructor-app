@@ -261,19 +261,21 @@ class EditDirective extends Component {
   }
 
   onMinusK = () => {
-    this.setState({
-      minimumRequired: Math.max(this.state.minimumRequired - 1, 0)
-    }, () => this.props.onChangeRequiredNumber(this.state.minimumRequired));
+    if (this.state.minimumRequired !== 0) {
+      this.setState({
+        minimumRequired: Math.max(this.state.minimumRequired - 1, 0)
+      }, () => this.props.onChangeRequiredNumber(this.state.minimumRequired));
+    }
   }
 
   onAddK = () => {
-    let maximumPossible = 9;  // for testing
-    // TODO: need to update maximumPossible to reflect the number of questions in
-    // the section
-    this.setState({
-      minimumRequired: Math.min(this.state.minimumRequired + 1,
-        maximumPossible)
-    }, () => this.props.onChangeRequiredNumber(this.state.minimumRequired));
+    let maximumPossible = getItemsByDirective(this.props.missionItems, this.props.directive).length;
+    if (this.state.minimumRequired !== maximumPossible) {
+      this.setState({
+        minimumRequired: Math.min(this.state.minimumRequired + 1,
+          maximumPossible)
+      }, () => this.props.onChangeRequiredNumber(this.state.minimumRequired));
+    }
   }
 
   onChange = (event) => {

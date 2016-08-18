@@ -119,8 +119,6 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
         .then((updatedAssessment) => {
           // have to return the ID / section of the newly created section here ...
           // it should be the last section (appended)
-          console.log('created the section!');
-          console.log(updatedAssessment);
           data.callback(_.last(updatedAssessment.sections));
         })
         .catch((error) => {

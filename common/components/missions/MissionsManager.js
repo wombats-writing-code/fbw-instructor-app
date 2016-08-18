@@ -143,7 +143,9 @@ class MissionsManager extends Component {
       assessmentId: this.state.selectedMission.id,
       params: {
         id: this.state.selectedDirective.id,
-        learningObjectiveId: outcome.id
+        itemIds: [],  // reset these when you change the directive LO
+        learningObjectiveId: outcome.id,
+        minimumProficiency: '0'
       },
       callback: this.handleSelectDirective
     };
@@ -211,8 +213,6 @@ class MissionsManager extends Component {
 
   _updateMissionItemsFromStore = (items) => {
     this.setState({ missionItems: items });
-    console.log(items);
-    console.log('those were the mission items');
   }
 
   _updateMissionsFromStore = (missions) => {

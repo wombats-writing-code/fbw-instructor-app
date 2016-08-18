@@ -1,7 +1,12 @@
 var _ = require('lodash');
 
 export const filterItemsByOutcome = (outcomeId, items) => {
-  return _.filter(items, {learningObjectiveIds: [outcomeId]});
+  let filteredItems = _.filter(items, {learningObjectiveIds: [outcomeId]});
+  if (typeof filteredItems !== "undefined") {
+    return filteredItems;
+  } else {
+    return [];
+  }
 }
 
 export const getItemsByDirective = (missionItems, directive) => {
