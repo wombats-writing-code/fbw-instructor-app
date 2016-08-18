@@ -132,6 +132,7 @@ class MissionsManager extends Component {
   }
 
   handleSelectDirective = (directive) => {
+    console.log('setting directive');
     this.setState({
       selectedDirective: directive
     });

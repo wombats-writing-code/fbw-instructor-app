@@ -119,7 +119,9 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
         .then((updatedAssessment) => {
           // have to return the ID / section of the newly created section here ...
           // it should be the last section (appended)
-          return _.last(updatedAssessment.sections);
+          console.log('created the section!');
+          console.log(updatedAssessment);
+          data.callback(_.last(updatedAssessment.sections));
         })
         .catch((error) => {
           console.log('error creating a new section');
@@ -209,15 +211,15 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
       };
       _.assign(updateSectionParams.data.sections.updatedSections[0], data.params);
 
-      Q.all([qbankFetch(updateSectionParams)])
+      Q(qbankFetch(updateSectionParams))
         .then((res) => {
-          return res[0].json;
+          return Q(res.json());
         })
         .then((updatedAssessment) => {
           // return the newly updated section
           let updatedSection = _.find(updatedAssessment.sections, {id: data.params.id});
           _this.getAssessments();
-          return updatedSection;
+          data.callback(updatedSection);
         })
         .catch((error) => {
           console.log('error updating section');

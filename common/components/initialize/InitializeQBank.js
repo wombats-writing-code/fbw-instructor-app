@@ -51,6 +51,7 @@ class InitializeQBank extends Component {
     let _this = this;
     AuthorizationStore.setAuthorizations(this.props.payload)
       .then((res) => {
+        console.log("done setting authz");
         _this.props.callback(true);
       })
       .catch((error) => {

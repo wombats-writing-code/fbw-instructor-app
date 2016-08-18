@@ -125,6 +125,7 @@ class EditDirective extends Component {
 
   constructor(props) {
     super(props);
+    let initialSearchModule = getDirectiveModule(props.modules, props.directive);
     this.state = {
       query: '',
       directiveItemIds: _.map(getItemsByDirective(props.missionItems, props.directive), 'id'),
@@ -133,9 +134,9 @@ class EditDirective extends Component {
                        props.directive.minimumProficiency :
                        0,
       moveUpAnimation: new Animated.Value(0),
-      searchResults: getDirectiveModule(props.modules, props.directive).childNodes,
+      searchResults: typeof initialSearchModule !== "undefined" ? initialSearchModule.childNodes : [],
       searchResultsDS: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
-      selectedFilters: [getDirectiveModule(props.modules, props.directive)],
+      selectedFilters: typeof initialSearchModule !== "undefined" ? [initialSearchModule] : [],
       questionsDS: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
     };
   }
@@ -189,7 +190,7 @@ class EditDirective extends Component {
       directiveName = directiveId !== '' ? ModuleStore.getOutcome(
         this.props.directive.learningObjectiveId).displayName.text : '',
       searchResults = <View />,
-      directiveModule = getDirectiveModule(this.props.modules, this.props.directive);
+      directiveModuleId = this.state.selectedFilters.length > 0 ? this.state.selectedFilters[0].id : '';
 
     if (directiveName === '' || directiveName === 'Unknown LO') {
       directiveName = 'Search for directives ...';
@@ -222,7 +223,7 @@ class EditDirective extends Component {
 
               {_.map(this.props.modules, (module, idx) => {
                 let buttonStyles = [styles.filterButton];
-                if (module.id == directiveModule.id) {
+                if (module.id == directiveModuleId) {
                   buttonStyles.push(styles.filterButtonSelected);
                 }
                 return (
@@ -277,20 +278,10 @@ class EditDirective extends Component {
 
   onChange = (event) => {
     // search against outcomes and update search results
-    let query = event.nativeEvent.text.toLowerCase(),
-      newHaystack = [];
-
-    _.each(this.state.selectedFilters, (module) => {
-      newHaystack.concat(module.childNodes);
-    });
-
-    this.setState({
-      query: query,
-      searchResults: _.filter(newHaystack, (outcome) => {
-        return (outcome.displayName.text.toLowerCase().indexOf(query) >= 0 ||
-                outcome.description.text.toLowerCase().indexOf(query) >= 0);
-      })
-    })
+    let _this = this;
+    this.setState({ query: event.nativeEvent.text.toLowerCase() }, () => {
+        _this._updateSearchResults();
+      });
   }
 
   _onSetDirectiveLO = (outcome) => {
@@ -299,11 +290,11 @@ class EditDirective extends Component {
   }
 
   _onToggleFilter = (module) => {
-    
+    let _this = this;
     // apply filter to select outcomes that belong in this module
-    this.setState({
-      searchResults: _.find(this.props.modules, {id: module.id}).childNodes
-    })
+    this.setState({ selectedFilters: [module] }, () => {
+      _this._updateSearchResults();
+    });
   }
 
   _updateDirectiveItemIds = (questionId) => {
@@ -317,6 +308,22 @@ class EditDirective extends Component {
     this.setState({ directiveItemIds: updatedItemIds }, () => {
       _this.props.onUpdateQuestions(_this.state.directiveItemIds);
     });
+  }
+
+  _updateSearchResults = () => {
+    let newHaystack = [],
+      whereToSearch = this.state.selectedFilters.length > 0 ? this.state.selectedFilters : this.props.modules;
+
+    _.each(whereToSearch, (module) => {
+      newHaystack = newHaystack.concat(module.childNodes);
+    });
+
+    this.setState({
+      searchResults: _.filter(newHaystack, (outcome) => {
+        return (outcome.displayName.text.toLowerCase().indexOf(this.state.query) >= 0 ||
+                outcome.description.text.toLowerCase().indexOf(this.state.query) >= 0);
+      })
+    })
   }
 }
 

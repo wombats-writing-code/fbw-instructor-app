@@ -43,12 +43,12 @@ var ModuleStore = _.assign({}, EventEmitter.prototype, {
             path: '/learning/objectivebanks/' + BankMap[departmentCode] + '/objectives/roots?descendentlevels=2'
           };
 
-        Q.all([HandcarFetch(params)])
+        Q(HandcarFetch(params))
           .then((res) => {
-            return Q.all([res[0].json()]);
+            return Q(res.json());
           })
           .then((data) => {
-            _modules = data[0];
+            _modules = data;
             _.each(_modules, function (module) {
               _.each(module.childNodes, function (outcome) {
                 _outcomes[outcome.id] = outcome;
