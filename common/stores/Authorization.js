@@ -4,6 +4,7 @@ var AuthorizationDispatcher = require('../dispatchers/Authorization');
 var AuthorizationConstants = require('../constants/Authorization');
 var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
+var Q = require('q');
 
 var credentials = require('../constants/credentials');
 var fbwUtils = require('fbw-utils')(credentials);
@@ -25,12 +26,14 @@ var AuthorizationStore = _.assign({}, EventEmitter.prototype, {
         proxy: data.username
       };
 
-    qbankFetch(params, function (response) {
-      callback(true);
-    }, function (response) {
-      // indicates a non-200 response from QBank
-      callback(false);
-    });
+    Q.all([qbankFetch(params)])
+      .then((response) => {
+        return true;
+      })
+      .catch((error) => {
+        return false;
+      })
+      .done();
   },
   setAuthorizations: function (data, callback) {
     // data should include username and the schoolId (acc or qcc)
@@ -72,10 +75,16 @@ var AuthorizationStore = _.assign({}, EventEmitter.prototype, {
         });
       });
     });
-    
-    qbankFetch(params, function (response) {
-      callback();
-    });
+
+    Q.all([qbankFetch(params)])
+      .then((response) => {
+        return true;
+      })
+      .catch((error) => {
+        console.log('error setting authorizations');
+        return false;
+      })
+      .done();
   }
 });
 

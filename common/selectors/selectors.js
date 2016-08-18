@@ -19,3 +19,10 @@ export const getItemsByDirective = (missionItems, directive) => {
     return [];
   }
 }
+
+export const getDirectiveModule = (modules, directive) => {
+  return _.find(modules, (module) => {
+    let childIndices = _.map(module.childNodes, 'id');
+    return childIndices.indexOf(directive.learningObjectiveId) >= 0;
+  });
+}

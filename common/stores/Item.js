@@ -4,6 +4,7 @@ var ItemDispatcher = require('../dispatchers/Item');
 var ItemConstants = require('../constants/Item');
 var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
+var Q = require('q');
 
 var credentials = require('../constants/credentials');
 var qbankFetch = require('fbw-utils')(credentials).qbankFetch;
@@ -40,12 +41,20 @@ var ItemStore = _.assign({}, EventEmitter.prototype, {
           params = {
             path: `assessment/banks/${BankMap[departmentCode]}/items?page=all`
           };
-        qbankFetch(params, function (data) {
-          if (typeof data !== 'undefined') {
-            _items = data.data.results;
-            _this.emitChange();
-          }
-        });
+        Q.all([qbankFetch(params)])
+          .then((res) => {
+            return Q.all([res[0].json()]);
+          })
+          .then((data) => {
+            if (typeof data[0] !== 'undefined') {
+              _items = data[0].data.results;
+              _this.emitChange();
+            }
+          })
+          .catch((error) => {
+            console.log('error getting items');
+          })
+          .done();
       });
   }
 });

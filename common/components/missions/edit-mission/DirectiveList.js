@@ -87,7 +87,7 @@ class DirectiveList extends Component {
     return (
       <View key={item.id} style={styles.itemContainer}>
         <Image style={styles.itemIcon} source={require('../../../assets/target-question--correct.png')} />
-        <Text key={idx} style={styles.cellSubTitle}>Item name goes here item.question.text.text</Text>
+        <Text key={idx} style={styles.cellSubTitle}>{item.displayName.text}</Text>
       </View>
     )
   }

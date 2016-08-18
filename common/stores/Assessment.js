@@ -4,6 +4,7 @@ var AssessmentDispatcher = require('../dispatchers/Assessment');
 var AssessmentConstants = require('../constants/Assessment');
 var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
+var Q = require('q');
 var store = require('react-native-simple-store');
 
 var credentials = require('../constants/credentials');
@@ -27,58 +28,73 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
     this.removeListener(CHANGE_EVENT, callback);
   },
   createAssessment: function (data) {
-    var _this = this;
+    var _this = this,
+      newAssessment = {};
     store.get('bankId')
       .then((bankId) => {
-      var params = {
-          data: data,
-          method: 'POST',
-          path: `assessment/banks/${bankId}/assessments`
-        };
+        var params = {
+            data: data,
+            method: 'POST',
+            path: `assessment/banks/${bankId}/assessments`
+          };
 
-      qbankFetch(params, function (assessmentData) {
-        var offeredParams = {
-          data: data,
-          method: 'POST',
-          path: `assessment/banks/${bankId}/assessments/${assessmentData.id}/assessmentsoffered`
-        };
+        Q.all([qbankFetch(params)])
+          .then((res) => {
+            return Q([res[0].json()]);
+          })
+          .then((assessmentData) => {
+            let offeredParams = {
+                data: data,
+                method: 'POST',
+                path: `assessment/banks/${bankId}/assessments/${assessmentData.id}/assessmentsoffered`
+              };
 
-        // set the Offered params for when solutions can be reviewed
-        offeredParams.data['reviewOptions'] = {
-          solution: {
-            duringAttempt: true,
-            afterAttempt: true,
-            beforeDeadline: true,
-            afterDeadline: true
-          },
-          whetherCorrect: {
-            duringAttempt: true,
-            afterAttempt: true,
-            beforeDeadline: true,
-            afterDeadline: true
-          }
-        };
+            newAssessment = assessmentData;
 
-        qbankFetch(offeredParams, function (offeredData) {
-          var mashUp = assessmentData;
-          mashUp.startTime = offeredData.startTime;
-          mashUp.deadline = offeredData.deadline;
-          mashUp.assessmentOfferedId = offeredData.id;
+            // set the Offered params for when solutions can be reviewed
+            offeredParams.data['reviewOptions'] = {
+              solution: {
+                duringAttempt: true,
+                afterAttempt: true,
+                beforeDeadline: true,
+                afterDeadline: true
+              },
+              whetherCorrect: {
+                duringAttempt: true,
+                afterAttempt: true,
+                beforeDeadline: true,
+                afterDeadline: true
+              }
+            };
 
-          _assessments.push(mashUp);
+            return QqbankFetch(offeredParams);
+          })
+          .then((res) => {
+            return res.json;
+          })
+          .then((offeredData) => {
+            var mashUp = newAssessment;
+            mashUp.startTime = offeredData.startTime;
+            mashUp.deadline = offeredData.deadline;
+            mashUp.assessmentOfferedId = offeredData.id;
 
-          // also create the grade object for the school
-          // store.get('school')
-          //   .then((school) => {
-          //     if (school === 'acc') {
-          //       console.log(assessmentData.displayName.text);
-          //       D2LMiddleware.createGrade(assessmentData.displayName.text);
-          //     }
-          //   });
-          _this.emitChange();
-        });
+            _assessments.push(mashUp);
+
+            // also create the grade object for the school
+            // store.get('school')
+            //   .then((school) => {
+            //     if (school === 'acc') {
+            //       console.log(assessmentData.displayName.text);
+            //       D2LMiddleware.createGrade(assessmentData.displayName.text);
+            //     }
+            //   });
+            _this.emitChange();
+          })
+          .catch((error) => {
+            console.log('error creating an assessment + offered');
+          })
+          .done();
       });
-    });
   },
   createAssessmentPart: function (data) {
     var _this = this;
@@ -96,11 +112,19 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
         path: `assessment/banks/${bankId}/assessments/${data.assessmentId}`
       };
 
-      qbankFetch(createSectionParams, function (updatedAssessment) {
-        // have to return the ID / section of the newly created section here ...
-        // it should be the last section (appended)
-        data.callback(_.last(updatedAssessment.sections));
-      });
+      Q.all([qbankFetch(createSectionParams)])
+        .then((res) => {
+          return res[0].json;
+        })
+        .then((updatedAssessment) => {
+          // have to return the ID / section of the newly created section here ...
+          // it should be the last section (appended)
+          return _.last(updatedAssessment.sections);
+        })
+        .catch((error) => {
+          console.log('error creating a new section');
+        })
+        .done();
     });
   },
   getAssessment: function (id) {
@@ -114,52 +138,53 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
       .then((bankId) => {
 
         if (bankId !== null) {
-          var numObjects = 0,
-            params = {
+          var params = {
               path: `assessment/banks/${bankId}/assessments?sections&page=all`
             },
             finalAssessments = [];
-          qbankFetch(params, function (data) {
-            if (data !== null) {
-              var assessments = data.data.results;
+          Q.all([qbankFetch(params)])
+            .then((res) => {
+              return Q(res[0].json());
+            })
+            .then((data) => {
+              if (data !== null) {
+                var assessments = data.data.results;
 
-              numObjects = numObjects + assessments.length;
-              if (numObjects != 0) {
-                _.each(assessments, function (assessment) {
-                  var assessmentParams = {
-                    path: `assessment/banks/${bankId}/assessments/${assessment.id}/assessmentsoffered?page=all`
-                  };
-                  qbankFetch(assessmentParams, function (offeredData) {
-                    if (offeredData !== null) {
-                      var mashUp = assessment,
-                        offered = offeredData.data.results[0];
-                      // Assume only one offered per assessment,
-                      //   given how we are authoring them in this app
-                      numObjects++;
-
-                      mashUp.startTime = offered.startTime;
-                      mashUp.deadline = offered.deadline;
-                      mashUp.assessmentOfferedId = offered.id;
-
-                      finalAssessments.push(mashUp);
-
-                      numObjects--;
-                      if (numObjects === 0) {
-                        _assessments = finalAssessments;
-                        _this.emitChange();
-                      }
-                    }
+                if (assessments.length !== 0) {
+                  let offeredPromises = [];
+                  _assessments = assessments;
+                  _.each(assessments, function (assessment) {
+                    offeredPromises.push(qbankFetch({
+                      path: `assessment/banks/${bankId}/assessments/${assessment.id}/assessmentsoffered?page=all`
+                    }));
                   });
-                  numObjects--;
-                });
-              } else {
-                _assessments = [];
-                _this.emitChange();
+                  return Q.all(offeredPromises);
+                } else {
+                  _assessments = [];
+                  _this.emitChange();
+                  return Q.reject();
+                }
               }
-            }
-          }, (err) => {
-            console.error('error', err);
-          });
+            })
+            .then((res) => {
+              let offeredJson = [];
+              _.each(res, (offered) => {
+                offeredJson.push(offered.json());
+              });
+              return Q.all(offeredJson);
+            })
+            .then((data) => {
+              _.each(_assessments, (_assessment, index) => {
+                _assessment.startTime = data[index].data.results[0].startTime;
+                _assessment.deadline = data[index].data.results[0].deadline;
+                _assessment.assessmentOfferedId = data[index].data.results[0].id;
+              });
+              _this.emitChange();
+            })
+            .catch((error) => {
+              console.log('error getting assessments + offered data');
+            })
+            .done();
         }
       });
   },
@@ -179,13 +204,21 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
         path: `assessment/banks/${bankId}/assessments/${data.assessmentId}`
       };
       _.assign(updateSectionParams.data.sections.updatedSections[0], data.params);
-      
-      qbankFetch(updateSectionParams, function (updatedAssessment) {
-        // return the newly updated section
-        let updatedSection = _.find(updatedAssessment.sections, {id: data.params.id});
-        _this.getAssessments();
-        data.callback(updatedSection);
-      });
+
+      Q.all([qbankFetch(updateSectionParams)])
+        .then((res) => {
+          return res[0].json;
+        })
+        .then((updatedAssessment) => {
+          // return the newly updated section
+          let updatedSection = _.find(updatedAssessment.sections, {id: data.params.id});
+          _this.getAssessments();
+          return updatedSection;
+        })
+        .catch((error) => {
+          console.log('error updating section');
+        })
+        .done();
     });
   },
 });
