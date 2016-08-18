@@ -35,43 +35,32 @@ var ModuleStore = _.assign({}, EventEmitter.prototype, {
     });
   },
   getModules: function () {
-    var _this = this,
-      departments = ['accounting', 'algebra', 'cad'],
-      departmentPromises = [];
-    // let's change this to just get all outcomes ... that will cover the
-    // future case when someone wants to pull in outcomes from another
-    // department
+    var _this = this;
+    UserStore.getDepartment()
+      .then((department) => {
+        var departmentCode = GuessDepartmentCode(department),
+          params = {
+            path: '/learning/objectivebanks/' + BankMap[departmentCode] + '/objectives/roots?descendentlevels=2'
+          };
 
-    _.each(departments, (department) => {
-      let params = {
-        path: '/learning/objectivebanks/' + BankMap[department] + '/objectives/roots?descendentlevels=2'
-      };
-      departmentPromises.push(HandcarFetch(params));
-    });
-    Q.all(departmentPromises)
-      .then((res) => {
-        let modulePromises = [];
-        _.each(res, (departmentRes) => {
-          modulePromises.push(departmentRes.json());
-        })
-        return Q.all(modulePromises);
-      })
-      .then((data) => {
-        _modules = [];
-        _.each(data, (departmentData) => {
-          _modules = _modules.concat(departmentData);
-        });
-        _.each(_modules, function (module) {
-          _.each(module.childNodes, function (outcome) {
-            _outcomes[outcome.id] = outcome;
-          });
-        });
-        _this.emitChange();
-      })
-      .catch((error) => {
-        console.log('error getting modules');
-      })
-      .done();
+        Q.all([HandcarFetch(params)])
+          .then((res) => {
+            return Q.all([res[0].json()]);
+          })
+          .then((data) => {
+            _modules = data[0];
+            _.each(_modules, function (module) {
+              _.each(module.childNodes, function (outcome) {
+                _outcomes[outcome.id] = outcome;
+              });
+            });
+            _this.emitChange();
+          })
+          .catch((error) => {
+            console.log('error getting modules');
+          })
+          .done();
+      });
   },
   getOutcome: function (outcomeId) {
     if (_.keys(_outcomes).indexOf(outcomeId) >= 0) {
