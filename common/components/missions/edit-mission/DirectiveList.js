@@ -77,6 +77,8 @@ class DirectiveList extends Component {
   }
 
   renderItem = (item, idx) => {
+    console.log('directive item', item);
+    
     return (
       <View key={item.id} style={styles.itemContainer}>
         <Image style={styles.itemIcon} source={require('../../../assets/target-question--correct.png')} />
