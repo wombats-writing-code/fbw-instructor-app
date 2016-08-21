@@ -105,23 +105,25 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
                   schoolId: school,
                   username: username
                 };
-
-                AuthorizationStore.hasAuthorizations(payload,
-                  function (hasAuthz) {
-                    if (hasAuthz) {
-                      callback();
+                AuthorizationStore.hasAuthorizations(payload)
+                  .then((res) => {
+                    if (res.status === 200) {
+                      callback(true);
                     } else {
-                      console.log('initializing qbank');
                       Actions.initializeQbank(
                         {
                           payload: payload,
                           callback: callback
                         });
                     }
-                });
+                  })
+                  .catch((error) => {
+                    console.log('error checking authz');
+                  })
+                  .done();
               });
-          });
-        }
+            });
+          }
       });
   }
 });

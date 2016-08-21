@@ -4,6 +4,7 @@ var AuthorizationDispatcher = require('../dispatchers/Authorization');
 var AuthorizationConstants = require('../constants/Authorization');
 var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
+var Q = require('q');
 
 var credentials = require('../constants/credentials');
 var fbwUtils = require('fbw-utils')(credentials);
@@ -17,22 +18,16 @@ var InstructorAuthorizationFunctions = AuthorizationConstants.InstructorAuthoriz
 var _data = {};
 
 var AuthorizationStore = _.assign({}, EventEmitter.prototype, {
-  hasAuthorizations: function (data, callback) {
+  hasAuthorizations: function (data) {
     // data should include username and the schoolId (acc or qcc)
     var url = 'assessment/banks/' + credentials.qbank.SchoolNodes[data.schoolId] + '/items',
       params = {
         path: url,
         proxy: data.username
       };
-
-    qbankFetch(params, function (response) {
-      callback(true);
-    }, function (response) {
-      // indicates a non-200 response from QBank
-      callback(false);
-    });
+    return Q(qbankFetch(params));
   },
-  setAuthorizations: function (data, callback) {
+  setAuthorizations: function (data) {
     // data should include username and the schoolId (acc or qcc)
     var qualifierIds = BaseBanks,
       schoolNodeId = credentials.qbank.SchoolNodes[data.schoolId],
@@ -72,10 +67,8 @@ var AuthorizationStore = _.assign({}, EventEmitter.prototype, {
         });
       });
     });
-    
-    qbankFetch(params, function (response) {
-      callback();
-    });
+    console.log('setting authz');
+    return Q(qbankFetch(params));
   }
 });
 

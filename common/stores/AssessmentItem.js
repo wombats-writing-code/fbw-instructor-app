@@ -4,6 +4,7 @@ var AssessmentItemDispatcher = require('../dispatchers/AssessmentItem');
 var AssessmentItemConstants = require('../constants/AssessmentItem');
 var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
+var Q = require('q');
 
 var credentials = require('../constants/credentials');
 var qbankFetch = require('fbw-utils')(credentials).qbankFetch;
@@ -35,12 +36,20 @@ var AssessmentItemStore = _.assign({}, EventEmitter.prototype, {
     UserStore.getBankId()
       .then((bankId) => {
         var params = {
-          path: 'assessment/banks/' + bankId + '/assessments/' + assessmentId + '/items?page=all'
+          path: 'assessment/banks/' + bankId + '/assessments/' + assessmentId + '/items?page=all&sections'
         };
-        qbankFetch(params, function (data) {
-          _items = data.data.results;
-          _this.emitChange();
-        });
+        Q.all([qbankFetch(params)])
+          .then((res) => {
+            return Q.all([res[0].json()]);
+          })
+          .then((data) => {
+            _items = data[0].data.results;
+            _this.emitChange();
+          })
+          .catch((error) => {
+            console.log('error in getting assessment items');
+          })
+          .done();
       });
   },
   setItems: function (data) {
@@ -58,9 +67,17 @@ var AssessmentItemStore = _.assign({}, EventEmitter.prototype, {
         _items = originalItems;
         this.emitChange();
 
-        qbankFetch(params, function (responseData) {
-          _this.getItems(data.assessmentId);
-        });
+        Q.all([qbankFetch(params)])
+          .then((res) => {
+            return res[0].json;
+          })
+          .then((responseData) => {
+            _this.getItems(data.assessmentId);
+          })
+          .catch((error) => {
+            console.log('error in setting items');
+          })
+          .done();
       });
   }
 });

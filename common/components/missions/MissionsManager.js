@@ -21,6 +21,9 @@ import Drawer from 'react-native-drawer';
 var _ = require('lodash');
 
 var AssessmentStore = require('../../stores/Assessment');
+var AssessmentConstants = require('../../constants/Assessment');
+var ActionTypes = AssessmentConstants.ActionTypes;
+var AssessmentDispatcher = require('../../dispatchers/Assessment');
 var AssessmentItemConstants = require('../../constants/AssessmentItem');
 var AssessmentItemDispatcher = require('../../dispatchers/AssessmentItem');
 var AssessmentItemStore = require('../../stores/AssessmentItem');
@@ -105,28 +108,81 @@ class MissionsManager extends Component {
   }
 
   handleAddDirective = () => {
-    // create a new assessment part; bring up the EditDirective window view
+    // create a new assessment part;
+    // set it as the selectedDirective;
+    // bring up the EditDirective window view
     // but with no Outcome assigned yet
+    var data = {
+      assessmentId: this.state.selectedMission.id,
+      callback: this.handleSelectDirective
+    };
+    AssessmentDispatcher.dispatch({
+        type: ActionTypes.CREATE_ASSESSMENT_PART,
+        content: data
+    });
+
   }
 
   handleSelectMission = (mission, mode) => {
     if (typeof mode === 'undefined') {
       mode = 'missionStatus'
     }
-    this.setState({ selectedMission: mission });
     this.setState({ content: mode });
-
-    AssessmentItemStore.getItems(mission.id);
+    this._updateSelectedMissionAndItems(mission);
   }
 
   handleSelectDirective = (directive) => {
+    console.log('setting directive');
     this.setState({
       selectedDirective: directive
     });
   }
 
-  handleSetDirectiveLO = (directiveId, outcomeId) => {
+  handleSetDirectiveLO = (outcome) => {
+    var data = {
+      assessmentId: this.state.selectedMission.id,
+      params: {
+        id: this.state.selectedDirective.id,
+        itemIds: [],  // reset these when you change the directive LO
+        learningObjectiveId: outcome.id,
+        minimumProficiency: '0'
+      },
+      callback: this.handleSelectDirective
+    };
+    AssessmentDispatcher.dispatch({
+        type: ActionTypes.UPDATE_ASSESSMENT_PART,
+        content: data
+    });
+  }
 
+  handleSetDirectiveItems = (itemIds) => {
+    var data = {
+      assessmentId: this.state.selectedMission.id,
+      params: {
+        id: this.state.selectedDirective.id,
+        itemIds: itemIds
+      },
+      callback: this.handleSelectDirective
+    };
+    AssessmentDispatcher.dispatch({
+        type: ActionTypes.UPDATE_ASSESSMENT_PART,
+        content: data
+    });
+  }
+
+  handleChangeRequiredNumber = (minimumRequired) => {
+    var data = {
+      assessmentId: this.state.selectedMission.id,
+      params: {
+        id: this.state.selectedDirective.id,
+        minimumProficiency: minimumRequired.toString()  // qbank expects a string here, not an int
+      },
+      callback: this.handleSelectDirective
+    };
+    AssessmentDispatcher.dispatch({
+        type: ActionTypes.UPDATE_ASSESSMENT_PART,
+        content: data
+    });
   }
 
   handleDeleteDirective = (directiveId) => {
@@ -151,7 +207,7 @@ class MissionsManager extends Component {
 
   _handleItemsChanged = (items) => {
     this.setState({
-      allItems: allItems
+      allItems: items
     })
   }
 
@@ -169,7 +225,14 @@ class MissionsManager extends Component {
     this.setState({
       missions: sorted,
       loading: false
-    })
+    });
+
+    if (this.state.selectedMission !== null) {
+      // update the info on this one, too, but without
+      // updating the rendered view
+      let selectedMission = _.find(missions, {id: this.state.selectedMission.id });
+      this.handleSelectMission(selectedMission);
+    }
   }
 
   _updateModulesFromStore = (modules) => {
@@ -182,11 +245,13 @@ class MissionsManager extends Component {
   render() {
     let editDirective;
     if (this.state.selectedDirective) {
-      editDirective = <EditDirective directive={this.state.selectedDirective}
+      editDirective = <EditDirective allItems={this.state.allItems}
+                                     directive={this.state.selectedDirective}
                                      onSetDirectiveOutcome={this.handleSetDirectiveLO}
-                                     onSelectQuestion={this.handleSelectQuestion}
+                                     onUpdateQuestions={this.handleSetDirectiveItems}
                                      onChangeRequiredNumber={this.handleChangeRequiredNumber}
                                      mission={this.state.selectedMission}
+                                     missionItems={this.state.missionItems}
                                      modules={this.state.modules}
                                      onClose={() => this.setState({selectedDirective: null})}
         />
@@ -206,7 +271,6 @@ class MissionsManager extends Component {
                                  missionItems={this.state.missionItems}
                                  onAddDirective={this.handleAddDirective}
                                  onSelectDirective={this.handleSelectDirective}
-                                 requiredNumberByDirectiveId={{}}
       />
     }
 
@@ -241,6 +305,10 @@ class MissionsManager extends Component {
     )
   }
 
+  _updateSelectedMissionAndItems = (mission) => {
+    this.setState({ selectedMission: mission });
+    AssessmentItemStore.getItems(mission.id);
+  }
 }
 
 module.exports = MissionsManager;

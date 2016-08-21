@@ -67,29 +67,6 @@ var styles = StyleSheet.create({
   }
 });
 
-// a mock to sub in for this.props.mission.directives
-let directives = [
-  {
-    id: '1',
-    displayName: 'Solve absolute value inequality'
-  },
-  {
-    id: '2',
-    displayName: 'Find roots of polynomials'
-  }
-];
-
-// a mock for this.props.mission.[however Cole is going to do it or whatever]
-// probably need to build out a selector for this
-let kByDirectiveId = _.reduce(directives, (result, item) => {
-  result[item.id] = 2;
-  return result;
-}, {});
-
-let itemsByDirectiveId = _.reduce(directives, (result, item, idx) => {
-  result[item.id] = {id: idx, question: {text: 'blah'}};
-  return result;
-}, {});
 
 class EditMission extends Component {
   constructor(props) {
@@ -134,20 +111,20 @@ class EditMission extends Component {
   }
 
   render() {
+
     return (
       <View style={styles.container}>
 
         <EditMissionMetaData mission={this.props.mission}/>
 
         <DirectiveList style={styles.directives}
-                       directives={this.props.mission.sections}
-                       requiredNumberByDirectiveId={kByDirectiveId}
-                       itemsByDirectiveId={itemsByDirectiveId}
+                       directives={this.props.mission.sections || []}
+                       missionItems={this.props.missionItems}
                        onSelectDirective={this.props.onSelectDirective}
         />
 
         <TouchableHighlight style={styles.addDirectiveButton}
-                            onPress={this.props.handleAddDirective}>
+                            onPress={this.props.onAddDirective}>
           <View style={styles.addDirectiveButtonWrapper}>
             <Image source={require('../../../assets/add--dark.png')}/>
             <Text style={styles.addDirectiveButtonText}>Add a directive</Text>

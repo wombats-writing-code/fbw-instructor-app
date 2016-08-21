@@ -14,6 +14,13 @@ import {
   } from 'react-native';
 
 var _ = require('lodash');
+var Icon = require('react-native-vector-icons/FontAwesome');
+
+import {
+  getDirectiveModule,
+  getItemsByDirective,
+  filterItemsByOutcome
+} from '../../../selectors/selectors';
 
 var ModuleStore = require('../../../stores/Module');
 
@@ -118,13 +125,18 @@ class EditDirective extends Component {
 
   constructor(props) {
     super(props);
+    let initialSearchModule = getDirectiveModule(props.modules, props.directive);
     this.state = {
       query: '',
+      directiveItemIds: _.map(getItemsByDirective(props.missionItems, props.directive), 'id'),
       fadeInAnimation: new Animated.Value(0),
+      minimumRequired: props.directive.minimumProficiency !== '' ?
+                       props.directive.minimumProficiency :
+                       0,
       moveUpAnimation: new Animated.Value(0),
-      outcomes: ModuleStore.getOutcomes(),
-      searchResults: [],
+      searchResults: typeof initialSearchModule !== "undefined" ? initialSearchModule.childNodes : [],
       searchResultsDS: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
+      selectedFilters: typeof initialSearchModule !== "undefined" ? [initialSearchModule] : [],
       questionsDS: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
     };
   }
@@ -143,42 +155,65 @@ class EditDirective extends Component {
     .start();
   }
 
-  closeAndSave() {
-
+  closeAndSave = () => {
     this.props.onClose();
   }
 
-  renderOutcomeRow(outcome) {
+  renderOutcomeRow = (outcome) => {
     return (
       <TouchableOpacity key={outcome.id}
-                        onPress={() => this.setDirective(outcome)}>
+                        onPress={() => this._onSetDirectiveLO(outcome)}>
         <Text>{outcome.displayName.text}</Text>
       </TouchableOpacity>
     )
   }
 
-  setDirective = (outcome) => {
-    this.setState({
-      directiveId: outcome.id,
-      directiveName: outcome.displayName.text,
-      searchResults: []
-    });
-  }
+  renderQuestionRow = (question) => {
+    let selectedIcon = <View />;
 
-  renderQuestionRow(question) {
+    if (this.state.directiveItemIds.indexOf(question.id) >= 0) {
+      selectedIcon = <Icon name="check" />;
+    }
     return (
-      <TouchableOpacity key={question.id}>
-        <Text>Question that matches the selected directive (outcome)</Text>
+      <TouchableOpacity key={question.id}
+                        onPress={() => this._updateDirectiveItemIds(question.id)}>
+        <View>
+          {selectedIcon}
+          <Text>{question.displayName.text}</Text>
+        </View>
       </TouchableOpacity>
     )
   }
 
   render() {
     let directiveId = this.props.directive !== '' ? this.props.directive.id : '',
-      directiveName = directiveId !== '' ? ModuleStore.getOutcome(directiveId).displayName.text : '';
+      directiveName = directiveId !== '' ? ModuleStore.getOutcome(
+        this.props.directive.learningObjectiveId).displayName.text : '',
+      searchResults = <View />,
+      directiveModuleId = this.state.selectedFilters.length > 0 ? this.state.selectedFilters[0].id : '',
+      itemsList = <View />,
+      items = filterItemsByOutcome(this.props.directive.learningObjectiveId, this.props.allItems);
+
+    if (directiveName === '' || directiveName === 'Unknown LO') {
+      directiveName = 'Search for directives ...';
+    }
+
+    if (items.length > 0) {
+      itemsList = (<ListView dataSource={this.state.questionsDS.cloneWithRows(items)}
+                renderRow={this.renderQuestionRow}>
+      </ListView>);
+    }
+
+    if (this.state.searchResults.length > 0) {
+      searchResults = (<ListView style={[styles.searchResultsList]}
+              dataSource={this.state.searchResultsDS.cloneWithRows(this.state.searchResults)}
+              renderRow={this.renderOutcomeRow}>
+      </ListView>);
+    }
     return (
       <Animated.View style={[styles.container, {opacity: this.state.fadeInAnimation, top: this.state.moveUpAnimation}]}>
-        <TouchableOpacity onPress={this.closeAndSave} style={styles.closeButton}>
+        <TouchableOpacity onPress={this.closeAndSave}
+                          style={styles.closeButton}>
           <Image source={require('../../../assets/cancel--light.png')}/>
         </TouchableOpacity>
 
@@ -186,8 +221,7 @@ class EditDirective extends Component {
           <View style={styles.searchWrapper}>
             <Image source={require('../../../assets/search--light.png')}/>
             <TextInput style={styles.searchInput}
-                       value={directiveName}
-                       defaultValue="Search for directives ..."
+                       defaultValue={directiveName}
                        onChange={this.onChange}/>
           </View>
 
@@ -197,7 +231,7 @@ class EditDirective extends Component {
 
               {_.map(this.props.modules, (module, idx) => {
                 let buttonStyles = [styles.filterButton];
-                if (module.childNodes.indexOf(this.props.directive.id) >= 0) {
+                if (module.id == directiveModuleId) {
                   buttonStyles.push(styles.filterButtonSelected);
                 }
                 return (
@@ -209,11 +243,7 @@ class EditDirective extends Component {
                 )
               })}
           </View>
-
-          <ListView style={[styles.searchResultsList]}
-                  dataSource={this.state.searchResultsDS.cloneWithRows(this.state.searchResults)}
-                  renderRow={this.renderOutcomeRow}>
-          </ListView>
+          {searchResults}
         </View>
 
         <View style={styles.searchQuestionsWrapper}>
@@ -224,56 +254,82 @@ class EditDirective extends Component {
             </TouchableHighlight>
 
             <TouchableHighlight style={styles.addKButton} onPress={this.onAddK}>
-              <Text style={styles.addKButtonText}>{this.props.directive.minimumProficiency}</Text>
+              <Text style={styles.addKButtonText}>{this.state.minimumRequired}</Text>
             </TouchableHighlight>
           </View>
 
-          <ListView dataSource={this.state.questionsDS.cloneWithRows(this.visibleQuestions(this.props.directive.id))}
-                    renderRow={this.renderQuestionRow}>
-          </ListView>
+          {itemsList}
         </View>
 
       </Animated.View>
     )
   }
 
-  visibleQuestions(directiveId) {
-    // returns the items that pertain to a given directive (outcome) id
-    // might be good to pull this into a selector.
-    return [];
+  onMinusK = () => {
+    if (this.state.minimumRequired !== 0) {
+      this.setState({
+        minimumRequired: Math.max(this.state.minimumRequired - 1, 0)
+      }, () => this.props.onChangeRequiredNumber(this.state.minimumRequired));
+    }
   }
 
-  onMinusK() {
-    this.setState({
-      k: this.props.mission.k - 1
-    })
-  }
-
-  onAddK() {
-    this.setState({
-      k: this.props.mission.k + 1
-    });
+  onAddK = () => {
+    let maximumPossible = getItemsByDirective(this.props.missionItems, this.props.directive).length;
+    if (this.state.minimumRequired !== maximumPossible) {
+      this.setState({
+        minimumRequired: Math.min(this.state.minimumRequired + 1,
+          maximumPossible)
+      }, () => this.props.onChangeRequiredNumber(this.state.minimumRequired));
+    }
   }
 
   onChange = (event) => {
     // search against outcomes and update search results
-    let query = event.nativeEvent.text.toLowerCase();
-    this.setState({
-      query: query,
-      searchResults: _.filter(this.state.outcomes, (outcome, outcomeId) => {
-        return (outcome.displayName.text.toLowerCase().indexOf(query) >= 0 ||
-                outcome.description.text.toLowerCase().indexOf(query) >= 0);
-      })
-    })
+    let _this = this;
+    this.setState({ query: event.nativeEvent.text.toLowerCase() }, () => {
+        _this._updateSearchResults();
+      });
   }
 
-  _onToggleFilter(module) {
-    let newSearchResults = [];
+  _onSetDirectiveLO = (outcome) => {
+    this.props.onSetDirectiveOutcome(outcome);
+    this.setState({ searchResults: [] });
+  }
 
+  _onToggleFilter = (module) => {
+    let _this = this;
     // apply filter to select outcomes that belong in this module
+    this.setState({ selectedFilters: [module] }, () => {
+      _this._updateSearchResults();
+    });
+  }
+
+  _updateDirectiveItemIds = (questionId) => {
+    let updatedItemIds = this.state.directiveItemIds,
+      _this = this;
+    if (this.state.directiveItemIds.indexOf(questionId) < 0) {
+      updatedItemIds.push(questionId);
+    } else {
+      _.remove(updatedItemIds, (id) => {return id == questionId;});
+    }
+    this.setState({ directiveItemIds: updatedItemIds }, () => {
+      _this.props.onUpdateQuestions(_this.state.directiveItemIds);
+    });
+  }
+
+  _updateSearchResults = () => {
+    let newHaystack = [],
+      whereToSearch = this.state.selectedFilters.length > 0 ? this.state.selectedFilters : this.props.modules;
+
+    _.each(whereToSearch, (module) => {
+      newHaystack = newHaystack.concat(module.childNodes);
+    });
+
     this.setState({
-      selectedFilters: [],
-      searchResults: newSearchResults
+      searchResults: _.filter(newHaystack, (outcome) => {
+        return (outcome.displayName.text.toLowerCase().indexOf(this.state.query) >= 0 ||
+                outcome.description.text.toLowerCase().indexOf(this.state.query) >= 0);
+      })
     })
   }
 }

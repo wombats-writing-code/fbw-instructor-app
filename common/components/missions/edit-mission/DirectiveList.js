@@ -17,6 +17,10 @@ import {
 
 var _ = require('lodash');
 
+import {getItemsByDirective} from '../../../selectors/selectors';
+
+var ModuleStore = require('../../../stores/Module');
+
 let styles = StyleSheet.create({
   cell: {
     flexDirection: 'row',
@@ -68,10 +72,13 @@ class DirectiveList extends Component {
   }
 
   renderDirective = (directive) => {
+    let outcomeName = directive.learningObjectiveId !== '' ?
+      ModuleStore.getOutcome(directive.learningObjectiveId).displayName.text :
+      'No learning outcome assigned yet';
     return (
       <View key={directive.id} style={styles.directiveContainer}>
         <Image style={styles.directiveIcon} source={require('../../../assets/directive.png')} />
-        <Text style={styles.cellTitle}>Outcome name goes here. outcome.displayName.text</Text>
+        <Text style={styles.cellTitle}>{outcomeName}</Text>
       </View>
     )
   }
@@ -82,12 +89,16 @@ class DirectiveList extends Component {
     return (
       <View key={item.id} style={styles.itemContainer}>
         <Image style={styles.itemIcon} source={require('../../../assets/target-question--correct.png')} />
-        <Text key={idx} style={styles.cellSubTitle}>Item name goes here item.question.text.text</Text>
+        <Text key={idx} style={styles.cellSubTitle}>{item.displayName.text}</Text>
       </View>
     )
   }
 
   renderRow = (directive) => {
+    let minimumRequired = directive.minimumProficiency !== '' ?
+                          directive.minimumProficiency :
+                          0,
+      directiveItems = getItemsByDirective(this.props.missionItems, directive);
 
     return (
       <TouchableHighlight style={{marginBottom: 21}}
@@ -97,14 +108,14 @@ class DirectiveList extends Component {
           <View style={styles.cellInfoWrapper}>
             {this.renderDirective(directive)}
 
-            {_.map(this.props.itemsByDirectiveId[directive.id], this.renderItem)}
+            {_.map(directiveItems, this.renderItem)}
 
           </View>
 
           {/*hook into this.requiredNumberByDirectiveId and this.props.itemsByDirectiveId.length.
             feel free to rename and / or make a selector out of it
             */}
-          <Text style={styles.countIndicator}>{1} of {2}</Text>
+          <Text style={styles.countIndicator}>{minimumRequired} of {directiveItems.length}</Text>
 
         </View>
       </TouchableHighlight>
@@ -112,12 +123,16 @@ class DirectiveList extends Component {
   }
 
   render() {
-    return (
-      <ListView style={[styles.listView, this.props.style]}
-              dataSource={this.state.ds.cloneWithRows(this.props.directives)}
-              renderRow={this.renderRow}>
-      </ListView>
-    )
+    if (this.props.directives.length === 0) {
+      return <View />
+    } else {
+      return (
+        <ListView style={[styles.listView, this.props.style]}
+                dataSource={this.state.ds.cloneWithRows(this.props.directives)}
+                renderRow={this.renderRow}>
+        </ListView>
+      )
+    }
   }
 
 

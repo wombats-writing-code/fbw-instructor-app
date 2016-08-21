@@ -34,10 +34,8 @@ class Loading extends Component {
   componentDidMount() {
     UserStore.hasSession((hasSession) => {
       if (hasSession) {
-        console.log('has mission');
         Actions.missions();
       } else {
-        console.log('no mission');
         Actions.login();
       }
     });

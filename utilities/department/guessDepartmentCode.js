@@ -3,13 +3,13 @@
 'use strict';
 
 var GuessDepartmentCode = function (departmentName) {
-  var departmentCode = 'algebra';
+  var departmentCode = 'accounting';
   departmentName = departmentName.toLowerCase();
-  if (departmentName.indexOf('sandbox') >= 0 ||
-      departmentName.indexOf('algebra') >= 0 ||
+  if (departmentName.indexOf('algebra') >= 0 ||
       departmentName.indexOf('math') >= 0) {
     departmentCode = 'algebra';
-  } else if (departmentName.indexOf('accounting') >= 0 ||
+  } else if (departmentName.indexOf('sandbox') >= 0 ||
+      departmentName.indexOf('accounting') >= 0 ||
       departmentName.indexOf('acc') >= 0) {
     departmentCode = 'accounting';
   } else if (departmentName.indexOf('computer') >= 0 ||

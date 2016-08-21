@@ -3,6 +3,7 @@ var BankConstants = require('../constants/Bank');
 var BankDispatcher = require('../dispatchers/Bank');
 var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
+var Q = require('q');
 
 var ActionTypes = BankConstants.ActionTypes;
 var CHANGE_EVENT = ActionTypes.CHANGE_EVENT;
@@ -29,7 +30,7 @@ var BankStore = _.assign({}, EventEmitter.prototype, {
   removeChangeListener: function (callback) {
     this.removeListener(CHANGE_EVENT, callback);
   },
-  aliasTerm: function (bankId, aliasId, callback) {
+  aliasTerm: function (bankId, aliasId) {
     var aliasParams = {
       method: 'PUT',
       path: `assessment/banks/${bankId}`,
@@ -37,78 +38,121 @@ var BankStore = _.assign({}, EventEmitter.prototype, {
         aliasId: D2LMiddlware.id(aliasId)
       }
     };
-    qbankFetch(aliasParams, callback);
+    return Q.all([qbankFetch(aliasParams)])
+      .then((response) => {
+        return response[0].json;
+      })
+      .then((data) => {
+        return data;
+      })
+      .catch((error) => {
+        console.log('error aliasing a term');
+      })
+      .done();
   },
-  getOrCreateChildNode: function (parentId, nodeName, nodeGenus, callback) {
+  getOrCreateChildNode: function (parentId, nodeName, nodeGenus) {
     // don't need to proxy users when creating banks
-    var getBankParams = {
+    let getBankParams = {
       path: `assessment/banks?genus_type_id=${nodeGenus}&display_name=${nodeName}`
-    };
-    qbankFetch(getBankParams, function (bankData) {
-      if (bankData.data.count === 0) {
-        // create the bank and add it as a child node
-        var createParams = {
-          method: 'POST',
-          path: 'assessment/banks',
-          data: {
-            genusTypeId: nodeGenus,
-            name: nodeName,
-            description: "FbW node"
-          }
-        };
-        qbankFetch(createParams, function (newBankData) {
-          // add as a hierarchy child
-          var hierarchyParams = {
-            path: `assessment/hierarchies/nodes/${parentId}/children`
+    },
+    newBank = {};
+    return Q(qbankFetch(getBankParams))
+      .then((res) => {
+        return Q(res.json());
+      })
+      .then((bankData) => {
+        if (bankData.data.count === 0) {
+          // create the bank and add it as a child node
+          var createParams = {
+            method: 'POST',
+            path: 'assessment/banks',
+            data: {
+              genusTypeId: nodeGenus,
+              name: nodeName,
+              description: "FbW node"
+            }
           };
-          qbankFetch(hierarchyParams, function (currentChildrenData) {
-            var currentChildrenIds = _.map(currentChildrenData.data.results, 'id'),
-              addChildParams = {
-                method: 'POST',
-                path: `assessment/hierarchies/nodes/${parentId}/children`,
-                data: {
-                }
-              };
-              currentChildrenIds.push(newBankData.id);
-              addChildParams.data.ids = currentChildrenIds;
-              qbankFetch(addChildParams, function (childAddedData) {
-                callback(newBankData);
-              });
-          });
-        });
-      } else {
-        // child bank exists (and we assume as a child node)
-        // return it
-        callback(bankData.data.results[0]);
-      }
-    }, function (error) {
-      console.log(error);
-    });
+          return Q(qbankFetch(createParams));
+        } else {
+          newBank = bankData.data.results[0];
+          return Q.reject(newBank);
+        }
+      })
+      .then((res) => {
+        return Q(res.json());
+      })
+      .then((newBankData) => {
+        // add as a hierarchy child
+        var hierarchyParams = {
+          path: `assessment/hierarchies/nodes/${parentId}/children`
+        };
+        newBank = newBankData;
+        return Q(qbankFetch(hierarchyParams));
+      })
+      .then((res) => {
+        return Q(res.json());
+      })
+      .then((currentChildrenData) => {
+        var currentChildrenIds = _.map(currentChildrenData.data.results, 'id'),
+          addChildParams = {
+            method: 'POST',
+            path: `assessment/hierarchies/nodes/${parentId}/children`,
+            data: {
+            }
+          };
+        currentChildrenIds.push(newBank.id);
+        addChildParams.data.ids = currentChildrenIds;
+        return Q(qbankFetch(addChildParams));
+      })
+      .then(() => {
+        return newBank;
+      }, (err) => {
+        // from http://stackoverflow.com/questions/29499582/how-to-properly-break-out-of-a-promise-chain#29505206
+        if (err == newBank) {
+          return newBank;
+        }
+      })
+      .catch((error) => {
+        console.log('error creating a child node');
+      });
   },
   setBankAlias: function (data, callback) {
     // try to GET the alias first, to see if it already exists
     var params = {
         path: 'assessment/banks/' + D2LMiddlware.id(data.aliasId)
       },
-      _this = this;
-    qbankFetch(params, function (bankData) {
-      // the bank already exists, so return it
-      callback(bankData.id);
-    }, function (error) {
-      // bank does not exist, create it -- first see if the
-      // name exists, then we're just missing term.
-      // Otherwise, create both bank and term.
-      console.log("Let's create the bank ... check if the department exists, first.");
-      _this.getOrCreateChildNode(ACCId, data.departmentName, DepartmentGenus, function (departmentData) {
-        _this.getOrCreateChildNode(departmentData.id, data.subjectName, SubjectGenus, function (subjectData) {
-          _this.getOrCreateChildNode(subjectData.id, data.termName, TermGenus, function (termData) {
-            _this.aliasTerm(termData.id, data.aliasId, function () {
-              callback(termData.id);
-            });
-          });
-        });
-      });
-    });
+      _this = this,
+      newTermId = '';
+    Q(qbankFetch(params))
+      .then((res) => {
+        return Q(res.json());
+      })
+      .then((bankData) => {
+        // the bank already exists, so return it
+        console.log(bankData);
+        callback(bankData.id);
+      })
+      .catch((error) => {
+        // bank does not exist, create it -- first see if the
+        // name exists, then we're just missing term.
+        // Otherwise, create both bank and term.
+        Q.when(_this.getOrCreateChildNode(ACCId, data.departmentName, DepartmentGenus))
+          .then((departmentData) => {
+            return Q(_this.getOrCreateChildNode(departmentData.id, data.subjectName, SubjectGenus));
+          })
+          .then((subjectData) => {
+            return Q(_this.getOrCreateChildNode(subjectData.id, data.termName, TermGenus));
+          })
+          .then((termData) => {
+            newTermId = termData.id;
+            return Q(_this.aliasTerm(termData.id, data.aliasId));
+          })
+          .then(() => {
+            callback(newTermId);
+          })
+          .done();
+      })
+      .done();
   }
 });
 

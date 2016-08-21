@@ -80,7 +80,6 @@ var styles = StyleSheet.create({
 class EditMissionMetaData extends Component {
   constructor(props) {
     super(props);
-    console.log(props);
     this.state = {
       missionName: this.props.mission.displayName.text
     }
@@ -94,7 +93,19 @@ class EditMissionMetaData extends Component {
 
     nativeStartTime.month = nativeStartTime.month - 1;
     nativeDeadline.month = nativeDeadline.month - 1;
-
+    if (nativeStartTime.month < 0) {
+      nativeStartTime.month = nativeStartTime.month + 12;
+    }
+    if (nativeDeadline.month < 0) {
+      nativeDeadline.month = nativeDeadline.month + 12;
+    }
+    if (moment.tz(nativeStartTime, "Europe/London").isDST()) {
+      nativeStartTime.hour = nativeStartTime.hour + 1;
+      // let moment.js handle numbers > 23 by also changing the day internally
+    }
+    if (moment.tz(nativeDeadline, "Europe/London").isDST()) {
+      nativeDeadline.hour = nativeDeadline.hour + 1;
+    }
     nativeStartTime = moment.tz(nativeStartTime, "Europe/London").clone().tz(timezone).format();
     nativeDeadline = moment.tz(nativeDeadline, "Europe/London").clone().tz(timezone).format();
 
@@ -115,8 +126,8 @@ class EditMissionMetaData extends Component {
             <View style={styles.sectionInfoWrapper}>
               <Text style={[styles.sectionTitle]}>Dates</Text>
               <Text style={[styles.sectionSubTitle]}>
-                <Text style={styles.muted}>Start </Text><Text>{moment.tz(nativeStartTime, timezone).format('ddd, h:mA MMM D')}</Text>
-                <Text style={styles.muted}>   Deadline </Text><Text >{moment.tz(nativeDeadline, timezone).format('ddd, h:mA MMM D')}</Text>
+                <Text style={styles.muted}>Start </Text><Text>{moment.tz(nativeStartTime, timezone).format('ddd, h:mmA MMM D')}</Text>
+                <Text style={styles.muted}>   Deadline </Text><Text >{moment.tz(nativeDeadline, timezone).format('ddd, h:mmA MMM D')}</Text>
               </Text>
             </View>
             <Text style={styles.sectionChangeIndicator}>Change</Text>
