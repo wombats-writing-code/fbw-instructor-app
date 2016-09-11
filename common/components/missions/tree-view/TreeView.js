@@ -46,16 +46,19 @@ class TreeView extends Component {
 
     let edges = _.map(this.props.edges, (edge, idx) => {
       return (
-        <Line id={edge.id} x1={edge.x1} y1={edge.y1} x2={edge.x2} y2={edge.y2} stroke={edge.stroke} strokeWidth={edge.strokeWidth} />
+        <Line id={edge.id} x1={edge.x1} y1={edge.y1} x2={edge.x2} y2={edge.y2} stroke={edge.stroke} strokeWidth={edge.strokeWidth}
+
+        />
       )
     });
 
     let nodes = _.map(this.props.nodes, (node, idx) => {
       return (
-        <Circle id={node.id} cx={node.x} cy={node.y} r={node.r} fill={node.fill} stroke={node.stroke} strokeWidth={node.strokeWidth} />
+        <Circle id={node.id} cx={node.x} cy={node.y} r={node.r} fill={node.fill} stroke={node.stroke} strokeWidth={node.strokeWidth}
+                onPress={() => this.props.onPressNode(node)}
+        />
       )
     });
-
 
     return (
       <Svg height="500" width="600" style={styles.svg}>
@@ -63,6 +66,10 @@ class TreeView extends Component {
         {nodes}
       </Svg>
     )
+  }
+
+  onPressIn() {
+    console.log('press in');
   }
 }
 

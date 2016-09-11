@@ -53,7 +53,8 @@ class Dashboard extends Component {
               <Text></Text>
             </View>
 
-            <TreeView nodes={this._getNodes()} edges={this._getEdges()} />
+            <TreeView nodes={this._getNodes()} edges={this._getEdges()}
+                      onPressNode={this.handlePressNode} />
 
           </ScrollView>
         </Animated.View>
@@ -61,12 +62,16 @@ class Dashboard extends Component {
     );
   }
 
+  handlePressNode(node) {
+    console.log('node was pressed', node);
+  }
+
   // below are just dummy methods. will compute real stuff later
 
   _getNodes() {
     return _.map(_.range(0, 5), (idx) => {
       return {
-        id: Math.random() + '-hi',
+        id: idx + '-dummy-node',
         x: idx*100 + 50,
         y: _.random(30, 80),
         r: 20,
@@ -80,7 +85,7 @@ class Dashboard extends Component {
   _getEdges() {
     return _.map(_.range(0, 5), (idx) => {
       return {
-        id: Math.random() + '-hi',
+        id: idx + '-dummy-edge',
         x1: idx*100 + 50,
         y1: _.random(30, 80),
         x2: _.random(30, 500),
