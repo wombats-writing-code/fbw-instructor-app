@@ -21,10 +21,12 @@ var styles = StyleSheet.create({
   }
 });
 
+import TreeView from './tree-view/TreeView'
 
 class Dashboard extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
       opacity: new Animated.Value(0)
     }
@@ -39,6 +41,7 @@ class Dashboard extends Component {
       toValue: 1
     }).start();
   }
+
   render() {
     return (
       <View style={styles.container}>
@@ -49,12 +52,45 @@ class Dashboard extends Component {
             <View>
               <Text></Text>
             </View>
-            
+
+            <TreeView nodes={this._getNodes()} edges={this._getEdges()} />
+
           </ScrollView>
         </Animated.View>
       </View>
     );
   }
+
+  // below are just dummy methods. will compute real stuff later
+
+  _getNodes() {
+    return _.map(_.range(0, 5), (idx) => {
+      return {
+        id: Math.random() + '-hi',
+        x: idx*100 + 50,
+        y: _.random(30, 80),
+        r: 20,
+        fill: '#FFEEAD',
+        stroke: '#cccccc',
+        strokeWidth: 1
+      }
+    });
+  }
+
+  _getEdges() {
+    return _.map(_.range(0, 5), (idx) => {
+      return {
+        id: Math.random() + '-hi',
+        x1: idx*100 + 50,
+        y1: _.random(30, 80),
+        x2: _.random(30, 500),
+        y2: _.random(80, 500),
+        stroke: '#cccccc',
+        strokeWidth: 1
+      }
+    });
+  }
+
 }
 
 module.exports = Dashboard;
