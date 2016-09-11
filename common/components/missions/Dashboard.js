@@ -17,7 +17,27 @@ import {
 
 var styles = StyleSheet.create({
   container: {
+    marginTop: 60,
     flex: 3
+  },
+  dashboardNav: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 18
+  },
+  dashboardNavButton: {
+    padding: 9,
+    borderRadius: 3,
+    borderWidth: 1,
+    borderColor: 'transparent'
+  },
+  selectedButton: {
+    borderColor: '#888'
+  },
+  buttonText: {
+    color: '#666',
+    fontWeight: "500",
+    letterSpacing: 1
   }
 });
 
@@ -28,6 +48,7 @@ class Dashboard extends Component {
     super(props);
 
     this.state = {
+      activeView: 'outcomesView',
       opacity: new Animated.Value(0)
     }
   }
@@ -43,20 +64,39 @@ class Dashboard extends Component {
   }
 
   render() {
+    let questionsView;
+    if (this.state.activeView === 'questionsView') {
+
+    }
+
+    let treeView;
+    if (this.state.activeView === 'outcomesView') {
+      treeView = (
+        <ScrollView>
+          <TreeView nodes={this._getNodes()} edges={this._getEdges()}
+                    onPressNode={this.handlePressNode} />
+        </ScrollView>
+      )
+    }
+
     return (
       <View style={styles.container}>
         <Animated.View style={{opacity: this.state.opacity}}>
-          <ScrollView>
-            <Text>Dashboard</Text>
+        <View style={styles.dashboardNav}>
+          <TouchableHighlight style={[styles.dashboardNavButton, this.state.activeView === 'questionsView' ? styles.selectedButton : null]}
+              onPress={() => this.setState({activeView: 'questionsView'})}>
+            <Text style={styles.buttonText}>QUESTIONS</Text>
+          </TouchableHighlight>
 
-            <View>
-              <Text></Text>
-            </View>
+          <TouchableHighlight style={[styles.dashboardNavButton, this.state.activeView === 'outcomesView' ? styles.selectedButton : null]}
+              onPress={() => this.setState({activeView: 'outcomesView'})}>
+            <Text style={styles.buttonText}>OUTCOMES</Text>
+          </TouchableHighlight>
+        </View>
 
-            <TreeView nodes={this._getNodes()} edges={this._getEdges()}
-                      onPressNode={this.handlePressNode} />
+          {questionsView}
+          {treeView}
 
-          </ScrollView>
         </Animated.View>
       </View>
     );
