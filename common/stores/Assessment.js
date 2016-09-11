@@ -104,7 +104,8 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
         data: {
           sections: {
             newSections: [{
-              scaffold: true
+              scaffold: true,
+              quota: 1
             }]
           }
         },
@@ -200,7 +201,8 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
         data: {
           sections: {
             updatedSections: [{
-              scaffold: true
+              scaffold: true,
+              quota: 1
             }]
           }
         },
