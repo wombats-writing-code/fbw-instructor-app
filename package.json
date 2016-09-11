@@ -32,6 +32,7 @@
     "react-native-router-flux": "^3.31.0",
     "react-native-simple-store": "^1.0.1",
     "react-native-store": "^0.4.1",
+    "react-native-swipe-list-view": "^0.3.0",
     "react-native-vector-icons": "^2.0.2",
     "valence": "github:wombats-writing-code/valence-sdk-javascript"
   },

@@ -45,6 +45,11 @@ class Dashboard extends Component {
         <Animated.View style={{opacity: this.state.opacity}}>
           <ScrollView>
             <Text>Dashboard</Text>
+
+            <View>
+              <Text></Text>
+            </View>
+            
           </ScrollView>
         </Animated.View>
       </View>

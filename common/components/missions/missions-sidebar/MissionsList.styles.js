@@ -23,23 +23,33 @@ module.exports = StyleSheet.create({
 
   // list of missions
   missionsList: {
-  },
-  missionsListWrapper: {
-    flex: 1,
-  },
-  missionWrapper: {
-    borderBottomColor: '#e5e5e5',
-    borderBottomWidth: 1,
-  },
-  missionWrapperSelected: {
-    backgroundColor: '#444'
+    position: 'relative',
+    flex: 1
   },
   missionRow: {
+    borderBottomColor: '#e5e5e5',
+    borderBottomWidth: 1,
+    position: 'relative',
     flex: 1,
     flexDirection: 'row',
     alignItems: 'flex-start',
+    paddingLeft: 9,
+    paddingRight: 9,
     paddingBottom: _lineHeight / 2,
     paddingTop: _lineHeight / 2
+    // alignItems: 'center',
+    // justifyContent: 'center',
+    // height: 50,
+  },
+  // rowBack: {
+  //   alignItems: 'center',
+  //   flex: 1,
+  //   flexDirection: 'row',
+  //   justifyContent: 'space-between',
+  //   paddingLeft: 15,
+  // },
+  missionRowSelected: {
+    backgroundColor: '#444'
   },
   missionInformation: {
     flex: 1

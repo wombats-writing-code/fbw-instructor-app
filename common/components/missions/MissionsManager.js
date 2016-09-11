@@ -131,6 +131,11 @@ class MissionsManager extends Component {
     this._updateSelectedMissionAndItems(mission);
   }
 
+  _updateSelectedMissionAndItems = (mission) => {
+    this.setState({ selectedMission: mission });
+    AssessmentItemStore.getItems(mission.id);
+  }
+
   handleSelectDirective = (directive) => {
     console.log('setting directive');
     this.setState({
@@ -244,7 +249,11 @@ class MissionsManager extends Component {
 
   render() {
     let editDirective;
-    if (this.state.selectedDirective) {
+    let addMission;
+    let editMission;
+    let dashboard;
+
+    if (this.state.content === 'editMission' && this.state.selectedDirective) {
       editDirective = <EditDirective allItems={this.state.allItems}
                                      directive={this.state.selectedDirective}
                                      onSetDirectiveOutcome={this.handleSetDirectiveLO}
@@ -255,23 +264,19 @@ class MissionsManager extends Component {
                                      modules={this.state.modules}
                                      onClose={() => this.setState({selectedDirective: null})}
         />
-    }
 
-    let addMission;
-    if (this.state.content === 'addMission') {
-      addMission = <AddMission onClose={() => this.setState({content: 'dashboard'})}
-                  />
-    }
-
-    // TODO: plug in the required number by directive if it's something that qbank returns,
-    // if it can be computed from existing info, let's make it a selector
-    let editMission;
-    if (this.state.selectedMission) {
-      editMission = <EditMission mission={this.state.selectedMission}
+    } else if (this.state.content === 'editMission') {
+      editMission = (<EditMission mission={this.state.selectedMission}
                                  missionItems={this.state.missionItems}
                                  onAddDirective={this.handleAddDirective}
                                  onSelectDirective={this.handleSelectDirective}
-      />
+      />)
+
+    } else if (this.state.content === 'addMission') {
+          addMission = <AddMission onClose={() => this.setState({content: 'dashboard'})} />
+
+    } else if (this.state.content === 'dashboard') {
+      dashboard = <Dashboard mission={this.state.selectedMission}/>
     }
 
     return (
@@ -287,11 +292,10 @@ class MissionsManager extends Component {
                            toggleSidebar={this._toggleSidebar} />
 
 
-           {/*<Dashboard/>*/}
-
           <View style={styles.missionsMainContentContainer}>
             {addMission}
             {editMission}
+            {dashboard}
           </View>
         </View>
 
@@ -305,10 +309,6 @@ class MissionsManager extends Component {
     )
   }
 
-  _updateSelectedMissionAndItems = (mission) => {
-    this.setState({ selectedMission: mission });
-    AssessmentItemStore.getItems(mission.id);
-  }
 }
 
 module.exports = MissionsManager;
