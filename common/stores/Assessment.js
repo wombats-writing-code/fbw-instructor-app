@@ -128,6 +128,45 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
         .done();
     });
   },
+  deleteAssessment: function (data) {
+    var _this = this,
+      newAssessment = {};
+    store.get('bankId')
+      .then((bankId) => {
+        var deleteOfferedParams = {
+            method: 'DELETE',
+            path: `assessment/banks/${bankId}/assessmentsoffered/${data.assessmentOfferedId}`
+          };
+
+        Q(qbankFetch(deleteOfferedParams))
+          .then((res) => {
+            return Q(res.json());
+          })
+          .then((assessmentOfferedData) => {
+            let deleteAssessmentParams = {
+              method: 'DELETE',
+              path: `assessment/banks/${bankId}/assessments/${data.assessmentId}`
+            };
+
+            return Q(qbankFetch(deleteAssessmentParams));
+          })
+          .then((res) => {
+            return Q(res.json());
+          })
+          .then((assessmentData) => {
+            let updatedAssessments = _.filter(_assessments, (assessment) => {
+              return assessment.id !== data.assessmentId;
+            });
+
+            _assessments = updatedAssessments;
+            _this.emitChange();
+          })
+          .catch((error) => {
+            console.log('error deleting an assessment + offered');
+          })
+          .done();
+      });
+  },
   getAssessment: function (id) {
     return _.find(_assessments, function (assessment) {
       return assessment.id == id;
@@ -193,6 +232,26 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
         }
       });
   },
+  getResults: function (data) {
+    var _this = this;
+    store.get('bankId')
+      .then((bankId) => {
+        var params = {
+            path: `assessment/banks/${bankId}/assessmentsoffered/${data.assessmentOfferedId}/results?page=all`
+          };
+        Q(qbankFetch(params))
+          .then((res) => {
+            return Q(res.json());
+          })
+          .then((resultsData) => {
+            data.callback(resultsData.data.results);
+          })
+          .catch((error) => {
+            console.log('error getting assessment results');
+          })
+          .done();
+      });
+  },
   updateAssessmentPart: function (data) {
     var _this = this;
     store.get('bankId')
@@ -245,6 +304,9 @@ AssessmentStore.dispatchToken = AssessmentDispatcher.register(function (action) 
             break;
         case ActionTypes.UPDATE_ASSESSMENT_PART:
             AssessmentStore.updateAssessmentPart(action.content);
+            break;
+        case ActionTypes.GET_ASSESSMENT_RESULTS:
+            AssessmentStore.getResults(action.content);
             break;
     }
 });

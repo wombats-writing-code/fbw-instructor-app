@@ -22,12 +22,18 @@ import {
 
 var _ = require('lodash');
 
+var credentials = require('../constants/credentials');
+
 var UserStore = require('../stores/User');
 
 var Error = require('./error/Error');
 var InitializeQBank = require('./initialize/InitializeQBank');
 var Loading = require('./loading/Loading');
-var Login = require('./login/D2LLogin');
+if (credentials.login == 'd2l') {
+  var Login = require('./login/D2LLogin');
+} else {
+  var Login = require('./login/SimpleLogin');
+}
 var Missions = require('./missions/MissionsManager');
 
 

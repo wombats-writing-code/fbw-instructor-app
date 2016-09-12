@@ -20,6 +20,7 @@ module.exports = {
                                      'assessment.AssessmentOffered%3Adelete%40ODL.MIT.EDU',
                                      'assessment.AssessmentOffered%3Alookup%40ODL.MIT.EDU',
                                      'assessment.AssessmentOffered%3Aupdate%40ODL.MIT.EDU',
+                                     'assessment.AssessmentResults%3Aaccess%40ODL.MIT.EDU',
                                      'assessment.AssessmentTaken%3Acreate%40ODL.MIT.EDU',
                                      'assessment.AssessmentTaken%3Alookup%40ODL.MIT.EDU',
                                      'assessment.AssessmentTaken%3Asearch%40ODL.MIT.EDU',

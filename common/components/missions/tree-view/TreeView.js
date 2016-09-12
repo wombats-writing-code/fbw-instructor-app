@@ -29,6 +29,8 @@ import Svg,{
     Stop
 } from 'react-native-svg';
 
+let _ = require('lodash');
+
 let styles = {
   svg: {
     borderWidth: 1,
@@ -46,8 +48,9 @@ class TreeView extends Component {
 
     let edges = _.map(this.props.edges, (edge, idx) => {
       return (
-        <Line id={edge.id} x1={edge.x1} y1={edge.y1} x2={edge.x2} y2={edge.y2} stroke={edge.stroke} strokeWidth={edge.strokeWidth}
-
+        <Line id={edge.id} x1={edge.x1} y1={edge.y1} x2={edge.x2} y2={edge.y2} stroke={edge.stroke}
+              strokeWidth={edge.strokeWidth}
+              key={edge.id}
         />
       )
     });
@@ -56,6 +59,7 @@ class TreeView extends Component {
       return (
         <Circle id={node.id} cx={node.x} cy={node.y} r={node.r} fill={node.fill} stroke={node.stroke} strokeWidth={node.strokeWidth}
                 onPress={() => this.props.onPressNode(node)}
+                key={node.id}
         />
       )
     });
