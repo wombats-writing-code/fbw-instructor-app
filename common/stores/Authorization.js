@@ -20,12 +20,22 @@ var _data = {};
 var AuthorizationStore = _.assign({}, EventEmitter.prototype, {
   hasAuthorizations: function (data) {
     // data should include username and the schoolId (acc or qcc)
-    var url = 'assessment/banks/' + credentials.qbank.SchoolNodes[data.schoolId] + '/items',
+    var url = `assessment/banks/${credentials.qbank.SchoolNodes[data.schoolId]}/items`,
       params = {
         path: url,
         proxy: data.username
       };
-    return Q(qbankFetch(params));
+      Q(qbankFetch(params))
+        .then((res) => {
+          return Q(res.json())
+        })
+        .then((data) => {
+          callback(data.canTake);
+        })
+        .catch((error) => {
+          callback(false);
+        })
+        .done();
   },
   setAuthorizations: function (data) {
     // data should include username and the schoolId (acc or qcc)
@@ -48,12 +58,12 @@ var AuthorizationStore = _.assign({}, EventEmitter.prototype, {
       endDate.year++;
     }
 
-    if (endDate.month == 2 && endDate.date > 28) {
-      endDate.date = 28;
+    if (endDate.month == 2 && endDate.day > 28) {
+      endDate.day = 28;
     }
 
-    if ([4, 6, 9, 11].indexOf(endDate.month) >= 0 && endDate.date == 31) {
-      endDate.date = 30;
+    if ([4, 6, 9, 11].indexOf(endDate.month) >= 0 && endDate.day == 31) {
+      endDate.day = 30;
     }
 
     qualifierIds = qualifierIds.concat([schoolNodeId]);
