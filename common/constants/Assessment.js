@@ -14,6 +14,7 @@ module.exports = {
         CREATE_ASSESSMENT_PART: null,
         DELETE_ASSESSMENT_PART: null,
         UPDATE_ASSESSMENT_PART: null,
+        GET_ASSESSMENT_RESULTS: null,
     }),
     GenusTypes: {
       HOMEWORK: 'assessment-genus%3Afbw-homework-mission%40ODL.MIT.EDU',
