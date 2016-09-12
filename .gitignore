@@ -40,4 +40,5 @@ buck-out/
 android/app/libs
 android/keystores/debug.keystore
 
-credentials.js
+# fbw credentials
+common/constants/credentials.js

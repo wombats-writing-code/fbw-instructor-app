@@ -15,6 +15,8 @@ import {
   StyleSheet
 } from 'react-native';
 
+var _ = require('lodash');
+
 var styles = StyleSheet.create({
   container: {
     marginTop: 60,
