@@ -6,10 +6,12 @@ var _bodyFontSize = 12;
 var _captionFontSize = 10;
 var _lineHeight = 18;
 
+var sidebarBackground = '#f0f0f0';
+
 module.exports = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: sidebarBackground,
   },
   sideBarNav: {
     alignItems: 'center',
@@ -36,18 +38,20 @@ module.exports = StyleSheet.create({
     paddingLeft: 9,
     paddingRight: 9,
     paddingBottom: _lineHeight / 2,
-    paddingTop: _lineHeight / 2
-    // alignItems: 'center',
-    // justifyContent: 'center',
-    // height: 50,
+    paddingTop: _lineHeight / 2,
+    backgroundColor: sidebarBackground
   },
-  // rowBack: {
-  //   alignItems: 'center',
-  //   flex: 1,
-  //   flexDirection: 'row',
-  //   justifyContent: 'space-between',
-  //   paddingLeft: 15,
-  // },
+  rowBack: {
+    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingRight: 15,
+    backgroundColor: '#445577'
+  },
+  rowBackButtonText: {
+    color: '#fff'
+  },
   missionRowSelected: {
     backgroundColor: '#444'
   },

@@ -76,8 +76,8 @@ class MissionsList extends Component {
     let hiddenRow;
     if (missionStatus !== 'over') {
       hiddenRow = (
-        <TouchableHighlight onPress={() => this._editMission(rowData)}>
-          <Text>Edit</Text>
+        <TouchableHighlight onPress={() => this._editMission(rowData)} style={styles.rowBack}>
+          <Text style={styles.rowBackButtonText}>Edit</Text>
         </TouchableHighlight>
       )
     } else {
