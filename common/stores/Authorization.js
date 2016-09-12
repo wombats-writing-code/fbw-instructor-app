@@ -18,7 +18,7 @@ var InstructorAuthorizationFunctions = AuthorizationConstants.InstructorAuthoriz
 var _data = {};
 
 var AuthorizationStore = _.assign({}, EventEmitter.prototype, {
-  hasAuthorizations: function (data) {
+  hasAuthorizations: function (data, callback) {
     // data should include username and the schoolId (acc or qcc)
     var url = `assessment/banks/${credentials.qbank.SchoolNodes[data.schoolId]}/items`,
       params = {

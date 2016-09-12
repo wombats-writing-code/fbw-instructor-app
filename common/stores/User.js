@@ -5,6 +5,8 @@ import {
   Actions
 } from "react-native-router-flux";
 
+var credentials = require('../constants/credentials');
+
 var UserDispatcher = require('../dispatchers/User');
 var UserConstants = require('../constants/User');
 var EventEmitter = require('events').EventEmitter;
@@ -13,10 +15,12 @@ var store = require('react-native-simple-store');
 
 var AuthorizationStore = require('./Authorization');
 var D2LMiddlware = require('../middleware/D2L.js');
+var HardcodedMiddlware = require('../middleware/Hardcoded.js');
 
 var ActionTypes = UserConstants.ActionTypes;
 var CHANGE_EVENT = ActionTypes.CHANGE_EVENT;
 
+var D2LLOGIN = credentials.login == 'd2l';
 
 var UserStore = _.assign({}, EventEmitter.prototype, {
   clearUserContext: function (callback) {
@@ -31,8 +35,11 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
   enrollments: function (callback) {
     store.get('school')
       .then(function (school) {
-        if (school === 'acc') {
+        if (D2LLOGIN) {
           D2LMiddlware.enrollments(callback);
+        } else {
+          console.log('getting hardcoded enrollments');
+          HardcodedMiddlware.enrollments(callback);
         }
       });
   },
@@ -61,15 +68,21 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
           store.delete('school');
           Actions.login();
         } else {
-          D2LMiddlware.hasSession((hasSession) => {
-            if (hasSession) {
+          if (D2LLOGIN) {
+            D2LMiddlware.hasSession((hasSession) => {
+              if (hasSession) {
+                callback(hasSession);
+              } else {
+                UserStore.clearUserContext(() => {
+                  callback(false);
+                });
+              }
+            });
+          } else {
+            HardcodedMiddlware.hasSession((hasSession) => {
               callback(hasSession);
-            } else {
-              UserStore.clearUserContext(() => {
-                callback(false);
-              });
-            }
-          });
+            });
+          }
         }
     });
   },
@@ -105,9 +118,9 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
                   schoolId: school,
                   username: username
                 };
-                AuthorizationStore.hasAuthorizations(payload)
-                  .then((res) => {
-                    if (res.status === 200) {
+                AuthorizationStore.hasAuthorizations(payload,
+                  (hasAuthz) => {
+                    if (hasAuthz) {
                       callback(true);
                     } else {
                       Actions.initializeQbank(
@@ -116,14 +129,40 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
                           callback: callback
                         });
                     }
-                  })
-                  .catch((error) => {
-                    console.log('error checking authz');
-                  })
-                  .done();
+                  });
               });
             });
           }
+      });
+  },
+  setUsernameSimple: function (username, callback) {
+    store.get('school')
+      .then(function (school) {
+        if (school === 'acc') {
+          username = username.indexOf('@') >= 0 ? username : `${username}@acc.edu`;
+          store.save('username', username)
+            .then(function () {
+              // also create the QBank authorizations here
+              var payload = {
+                schoolId: school,
+                username: username
+              };
+
+              AuthorizationStore.hasAuthorizations(payload,
+                (hasAuthz) => {
+                  if (hasAuthz) {
+                    callback();
+                  } else {
+                    console.log('initializing qbank');
+                    Actions.initializeQbank(
+                      {
+                        payload: payload,
+                        callback: callback
+                      });
+                  }
+                });
+            });
+        }
       });
   }
 });
