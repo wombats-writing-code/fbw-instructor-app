@@ -27,10 +27,11 @@ var AuthorizationStore = _.assign({}, EventEmitter.prototype, {
       };
       Q(qbankFetch(params))
         .then((res) => {
-          return Q(res.json())
-        })
-        .then((data) => {
-          callback(data.canTake);
+          if (res.status == 200) {
+            callback(true);
+          } else {
+            callback(false);
+          }
         })
         .catch((error) => {
           callback(false);
