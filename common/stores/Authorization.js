@@ -4,7 +4,6 @@ var AuthorizationDispatcher = require('../dispatchers/Authorization');
 var AuthorizationConstants = require('../constants/Authorization');
 var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
-var Q = require('q');
 
 var credentials = require('../constants/credentials');
 var fbwUtils = require('fbw-utils')(credentials);
@@ -25,7 +24,7 @@ var AuthorizationStore = _.assign({}, EventEmitter.prototype, {
         path: url,
         proxy: data.username
       };
-      Q(qbankFetch(params))
+      qbankFetch(params)
         .then((res) => {
           if (res.status == 200) {
             callback(true);
@@ -79,7 +78,7 @@ var AuthorizationStore = _.assign({}, EventEmitter.prototype, {
       });
     });
     console.log('setting authz');
-    return Q(qbankFetch(params));
+    return qbankFetch(params);
   }
 });
 

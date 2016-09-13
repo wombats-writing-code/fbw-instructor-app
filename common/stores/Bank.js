@@ -38,9 +38,9 @@ var BankStore = _.assign({}, EventEmitter.prototype, {
         aliasId: D2LMiddlware.id(aliasId)
       }
     };
-    return Q.all([qbankFetch(aliasParams)])
+    return qbankFetch(aliasParams)
       .then((response) => {
-        return response[0].json;
+        return response.json();
       })
       .then((data) => {
         return data;
@@ -56,6 +56,7 @@ var BankStore = _.assign({}, EventEmitter.prototype, {
       path: `assessment/banks?genus_type_id=${nodeGenus}&display_name=${nodeName}`
     },
     newBank = {};
+    // keep Q here because we're doing a Q.reject() later
     return Q(qbankFetch(getBankParams))
       .then((res) => {
         return Q(res.json());
@@ -123,9 +124,9 @@ var BankStore = _.assign({}, EventEmitter.prototype, {
       },
       _this = this,
       newTermId = '';
-    Q(qbankFetch(params))
+    qbankFetch(params)
       .then((res) => {
-        return Q(res.json());
+        return res.json();
       })
       .then((bankData) => {
         // the bank already exists, so return it
@@ -136,21 +137,23 @@ var BankStore = _.assign({}, EventEmitter.prototype, {
         // bank does not exist, create it -- first see if the
         // name exists, then we're just missing term.
         // Otherwise, create both bank and term.
-        Q.when(_this.getOrCreateChildNode(ACCId, data.departmentName, DepartmentGenus))
-          .then((departmentData) => {
-            return Q(_this.getOrCreateChildNode(departmentData.id, data.subjectName, SubjectGenus));
-          })
-          .then((subjectData) => {
-            return Q(_this.getOrCreateChildNode(subjectData.id, data.termName, TermGenus));
-          })
-          .then((termData) => {
-            newTermId = termData.id;
-            return Q(_this.aliasTerm(termData.id, data.aliasId));
-          })
-          .then(() => {
-            callback(newTermId);
-          })
-          .done();
+        return _this.getOrCreateChildNode(ACCId, data.departmentName, DepartmentGenus);
+      })
+      .then((departmentData) => {
+        return _this.getOrCreateChildNode(departmentData.id, data.subjectName, SubjectGenus);
+      })
+      .then((subjectData) => {
+        return _this.getOrCreateChildNode(subjectData.id, data.termName, TermGenus);
+      })
+      .then((termData) => {
+        newTermId = termData.id;
+        return _this.aliasTerm(termData.id, data.aliasId);
+      })
+      .then(() => {
+        callback(newTermId);
+      })
+      .catch((error) => {
+        console.log('error creating the nodes and aliases');
       })
       .done();
   }

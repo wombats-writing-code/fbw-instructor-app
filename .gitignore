@@ -42,3 +42,4 @@ android/keystores/debug.keystore
 
 # fbw credentials
 common/constants/credentials.js
+common/constants/prod_credentials.js

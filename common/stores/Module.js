@@ -3,7 +3,6 @@
 var ModuleConstants = require('../constants/Module');
 var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
-var Q = require('q');
 
 var credentials = require('../constants/credentials');
 var HandcarFetch = require('fbw-utils')(credentials).handcarFetch;
@@ -43,24 +42,24 @@ var ModuleStore = _.assign({}, EventEmitter.prototype, {
             path: '/learning/objectivebanks/' + BankMap[departmentCode] + '/objectives/roots?descendentlevels=2'
           };
 
-        Q(HandcarFetch(params))
-          .then((res) => {
-            return Q(res.json());
-          })
-          .then((data) => {
-            _modules = data;
-            _.each(_modules, function (module) {
-              _.each(module.childNodes, function (outcome) {
-                _outcomes[outcome.id] = outcome;
-              });
-            });
-            _this.emitChange();
-          })
-          .catch((error) => {
-            console.log('error getting modules');
-          })
-          .done();
-      });
+        return HandcarFetch(params);
+      })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        _modules = data;
+        _.each(_modules, function (module) {
+          _.each(module.childNodes, function (outcome) {
+            _outcomes[outcome.id] = outcome;
+          });
+        });
+        _this.emitChange();
+      })
+      .catch((error) => {
+        console.log('error getting modules');
+      })
+      .done();
   },
   getOutcome: function (outcomeId) {
     if (_.keys(_outcomes).indexOf(outcomeId) >= 0) {

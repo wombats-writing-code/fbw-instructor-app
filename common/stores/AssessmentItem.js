@@ -4,7 +4,6 @@ var AssessmentItemDispatcher = require('../dispatchers/AssessmentItem');
 var AssessmentItemConstants = require('../constants/AssessmentItem');
 var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
-var Q = require('q');
 
 var credentials = require('../constants/credentials');
 var qbankFetch = require('fbw-utils')(credentials).qbankFetch;
@@ -36,21 +35,21 @@ var AssessmentItemStore = _.assign({}, EventEmitter.prototype, {
     UserStore.getBankId()
       .then((bankId) => {
         var params = {
-          path: 'assessment/banks/' + bankId + '/assessments/' + assessmentId + '/items?page=all&sections'
+          path: `assessment/banks/${bankId}/assessments/${assessmentId}/items?page=all&sections`
         };
-        Q.all([qbankFetch(params)])
-          .then((res) => {
-            return Q.all([res[0].json()]);
-          })
-          .then((data) => {
-            _items = data[0].data.results;
-            _this.emitChange();
-          })
-          .catch((error) => {
-            console.log('error in getting assessment items');
-          })
-          .done();
-      });
+        return qbankFetch(params);
+      })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        _items = data.data.results;
+        _this.emitChange();
+      })
+      .catch((error) => {
+        console.log('error in getting assessment items');
+      })
+      .done();
   },
   setItems: function (data) {
     var _this = this;
@@ -60,25 +59,25 @@ var AssessmentItemStore = _.assign({}, EventEmitter.prototype, {
           params = {
             data: data,
             method: 'PUT',
-            path: 'assessment/banks/' + bankId + '/assessments/' + data.assessmentId + '/items'
+            path: `assessment/banks/${bankId}/assessments/${data.assessmentId}/items`
           };
 
         params.data.itemIds = _.map(originalItems, 'id');
         _items = originalItems;
         this.emitChange();
 
-        Q.all([qbankFetch(params)])
-          .then((res) => {
-            return res[0].json;
-          })
-          .then((responseData) => {
-            _this.getItems(data.assessmentId);
-          })
-          .catch((error) => {
-            console.log('error in setting items');
-          })
-          .done();
-      });
+        return qbankFetch(params);
+      })
+      .then((res) => {
+        return res.json();
+      })
+      .then((responseData) => {
+        _this.getItems(data.assessmentId);
+      })
+      .catch((error) => {
+        console.log('error in setting items');
+      })
+      .done();
   }
 });
 

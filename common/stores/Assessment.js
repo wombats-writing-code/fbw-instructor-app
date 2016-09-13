@@ -38,95 +38,95 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
             path: `assessment/banks/${bankId}/assessments`
           };
 
-        Q(qbankFetch(params))
-          .then((res) => {
-            return Q(res.json());
-          })
-          .then((assessmentData) => {
-            let offeredParams = {
-                data: data,
-                method: 'POST',
-                path: `assessment/banks/${bankId}/assessments/${assessmentData.id}/assessmentsoffered`
-              };
+        return qbankFetch(params);
+      })
+      .then((res) => {
+        return res.json();
+      })
+      .then((assessmentData) => {
+        let offeredParams = {
+            data: data,
+            method: 'POST',
+            path: `assessment/banks/${bankId}/assessments/${assessmentData.id}/assessmentsoffered`
+          };
 
-            newAssessment = assessmentData;
+        newAssessment = assessmentData;
 
-            // set the Offered params for when solutions can be reviewed
-            offeredParams.data['reviewOptions'] = {
-              solution: {
-                duringAttempt: true,
-                afterAttempt: true,
-                beforeDeadline: true,
-                afterDeadline: true
-              },
-              whetherCorrect: {
-                duringAttempt: true,
-                afterAttempt: true,
-                beforeDeadline: true,
-                afterDeadline: true
-              }
-            };
+        // set the Offered params for when solutions can be reviewed
+        offeredParams.data['reviewOptions'] = {
+          solution: {
+            duringAttempt: true,
+            afterAttempt: true,
+            beforeDeadline: true,
+            afterDeadline: true
+          },
+          whetherCorrect: {
+            duringAttempt: true,
+            afterAttempt: true,
+            beforeDeadline: true,
+            afterDeadline: true
+          }
+        };
 
-            return Q(qbankFetch(offeredParams));
-          })
-          .then((res) => {
-            return Q(res.json());
-          })
-          .then((offeredData) => {
-            var mashUp = newAssessment;
-            mashUp.startTime = offeredData.startTime;
-            mashUp.deadline = offeredData.deadline;
-            mashUp.assessmentOfferedId = offeredData.id;
+        return qbankFetch(offeredParams);
+      })
+      .then((res) => {
+        return res.json();
+      })
+      .then((offeredData) => {
+        var mashUp = newAssessment;
+        mashUp.startTime = offeredData.startTime;
+        mashUp.deadline = offeredData.deadline;
+        mashUp.assessmentOfferedId = offeredData.id;
 
-            _assessments.push(mashUp);
+        _assessments.push(mashUp);
 
-            // also create the grade object for the school
-            // store.get('school')
-            //   .then((school) => {
-            //     if (school === 'acc') {
-            //       console.log(assessmentData.displayName.text);
-            //       D2LMiddleware.createGrade(assessmentData.displayName.text);
-            //     }
-            //   });
-            _this.emitChange();
-          })
-          .catch((error) => {
-            console.log('error creating an assessment + offered');
-          })
-          .done();
-      });
+        // also create the grade object for the school
+        // store.get('school')
+        //   .then((school) => {
+        //     if (school === 'acc') {
+        //       console.log(assessmentData.displayName.text);
+        //       D2LMiddleware.createGrade(assessmentData.displayName.text);
+        //     }
+        //   });
+        _this.emitChange();
+      })
+      .catch((error) => {
+        console.log('error creating an assessment + offered');
+      })
+      .done();
   },
   createAssessmentPart: function (data) {
     var _this = this;
     store.get('bankId')
       .then((bankId) => {
-      var createSectionParams = {
-        data: {
-          sections: {
-            newSections: [{
-              scaffold: true,
-              quota: 1
-            }]
-          }
-        },
-        method: 'PUT',
-        path: `assessment/banks/${bankId}/assessments/${data.assessmentId}`
-      };
+        var createSectionParams = {
+          data: {
+            sections: {
+              newSections: [{
+                scaffold: true,
+                quota: 1
+              }]
+            }
+          },
+          method: 'PUT',
+          path: `assessment/banks/${bankId}/assessments/${data.assessmentId}`
+        };
 
-      Q(qbankFetch(createSectionParams))
-        .then((res) => {
-          return Q(res.json());
-        })
-        .then((updatedAssessment) => {
-          // have to return the ID / section of the newly created section here ...
-          // it should be the last section (appended)
-          data.callback(_.last(updatedAssessment.sections));
-        })
-        .catch((error) => {
-          console.log('error creating a new section');
-        })
-        .done();
-    });
+        return qbankFetch(createSectionParams);
+      })
+      .then((res) => {
+        return res.json();
+      })
+      .then((updatedAssessment) => {
+        // have to return the ID / section of the newly created section here ...
+        // it should be the last section (appended)
+        data.callback(_.last(updatedAssessment.sections));
+      })
+      .catch((error) => {
+        console.log('error creating a new section');
+      })
+      .done();
   },
   deleteAssessment: function (data) {
     var _this = this,
@@ -138,34 +138,34 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
             path: `assessment/banks/${bankId}/assessmentsoffered/${data.assessmentOfferedId}`
           };
 
-        Q(qbankFetch(deleteOfferedParams))
-          .then((res) => {
-            return Q(res.json());
-          })
-          .then((assessmentOfferedData) => {
-            let deleteAssessmentParams = {
-              method: 'DELETE',
-              path: `assessment/banks/${bankId}/assessments/${data.assessmentId}`
-            };
+        return qbankFetch(deleteOfferedParams);
+      })
+      .then((res) => {
+        return res.json();
+      })
+      .then((assessmentOfferedData) => {
+        let deleteAssessmentParams = {
+          method: 'DELETE',
+          path: `assessment/banks/${bankId}/assessments/${data.assessmentId}`
+        };
 
-            return Q(qbankFetch(deleteAssessmentParams));
-          })
-          .then((res) => {
-            return Q(res.json());
-          })
-          .then((assessmentData) => {
-            let updatedAssessments = _.filter(_assessments, (assessment) => {
-              return assessment.id !== data.assessmentId;
-            });
+        return qbankFetch(deleteAssessmentParams);
+      })
+      .then((res) => {
+        return res.json();
+      })
+      .then((assessmentData) => {
+        let updatedAssessments = _.filter(_assessments, (assessment) => {
+          return assessment.id !== data.assessmentId;
+        });
 
-            _assessments = updatedAssessments;
-            _this.emitChange();
-          })
-          .catch((error) => {
-            console.log('error deleting an assessment + offered');
-          })
-          .done();
-      });
+        _assessments = updatedAssessments;
+        _this.emitChange();
+      })
+      .catch((error) => {
+        console.log('error deleting an assessment + offered');
+      })
+      .done();
   },
   getAssessment: function (id) {
     return _.find(_assessments, function (assessment) {
@@ -239,52 +239,52 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
         var params = {
             path: `assessment/banks/${bankId}/assessmentsoffered/${data.assessmentOfferedId}/results?page=all`
           };
-        Q(qbankFetch(params))
-          .then((res) => {
-            return Q(res.json());
-          })
-          .then((resultsData) => {
-            data.callback(resultsData.data.results);
-          })
-          .catch((error) => {
-            console.log('error getting assessment results');
-          })
-          .done();
-      });
+        return qbankFetch(params);
+      })
+      .then((res) => {
+        return res.json();
+      })
+      .then((resultsData) => {
+        data.callback(resultsData.data.results);
+      })
+      .catch((error) => {
+        console.log('error getting assessment results');
+      })
+      .done();
   },
   updateAssessmentPart: function (data) {
     var _this = this;
     store.get('bankId')
       .then((bankId) => {
-      var updateSectionParams = {
-        data: {
-          sections: {
-            updatedSections: [{
-              scaffold: true,
-              quota: 1
-            }]
-          }
-        },
-        method: 'PUT',
-        path: `assessment/banks/${bankId}/assessments/${data.assessmentId}`
-      };
-      _.assign(updateSectionParams.data.sections.updatedSections[0], data.params);
+        var updateSectionParams = {
+          data: {
+            sections: {
+              updatedSections: [{
+                scaffold: true,
+                quota: 1
+              }]
+            }
+          },
+          method: 'PUT',
+          path: `assessment/banks/${bankId}/assessments/${data.assessmentId}`
+        };
+        _.assign(updateSectionParams.data.sections.updatedSections[0], data.params);
 
-      Q(qbankFetch(updateSectionParams))
-        .then((res) => {
-          return Q(res.json());
-        })
-        .then((updatedAssessment) => {
-          // return the newly updated section
-          let updatedSection = _.find(updatedAssessment.sections, {id: data.params.id});
-          _this.getAssessments();
-          data.callback(updatedSection);
-        })
-        .catch((error) => {
-          console.log('error updating section');
-        })
-        .done();
-    });
+        return qbankFetch(updateSectionParams);
+      })
+      .then((res) => {
+        return res.json();
+      })
+      .then((updatedAssessment) => {
+        // return the newly updated section
+        let updatedSection = _.find(updatedAssessment.sections, {id: data.params.id});
+        _this.getAssessments();
+        data.callback(updatedSection);
+      })
+      .catch((error) => {
+        console.log('error updating section');
+      })
+      .done();
   },
 });
 
