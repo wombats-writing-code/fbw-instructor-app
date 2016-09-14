@@ -83,7 +83,6 @@ class QuestionsView extends Component {
   }
 
   renderRow = (rowData) => {
-    let selectorValue = this.props.attemptsSelector ? this.props.attemptsSelector : 1;
     return (
       <View style={styles.questionRow}>
         <View style={styles.questionTextWrapper}>
@@ -91,7 +90,7 @@ class QuestionsView extends Component {
         </View>
         <View style={styles.attemptsTextWrapper}>
           <Text>
-            {rowData.numberStudentsByAttempt[selectorValue]}
+            {rowData.numberStudentsByAttempt}
           </Text>
         </View>
       </View>
@@ -100,29 +99,25 @@ class QuestionsView extends Component {
 
   render() {
     let sortedQuestions = {},
+      selectorValue = this.props.attemptsSelector ? this.props.attemptsSelector : 1,
       questions;
+
     // let's organize all the questions in all takens by itemId
     _.each(this.props.results, (taken) => {
       let studentAttemptsBeforeCorrect = {};
       _.each(taken.questions, (question) => {
         if (_.keys(sortedQuestions).indexOf(question.itemId) < 0) {
-          // TODO: it would be nice not to hardcode the possible # of attempts
-          // this correlates to possible input values from the slider
+          // the # of attempts
+          // correlates to possible input values from the slider
           sortedQuestions[question.itemId] = {
             text: question.text.text,
-            numberStudentsByAttempt: {
-              0: 0,
-              1: 0,
-              2: 0,
-              3: 0,
-              4: 0
-            }
+            numberStudentsByAttempt: 0
           };
           studentAttemptsBeforeCorrect[question.itemId] = 0;
         }
         // because a specific item / LO might be duplicated within a route,
         // we'll increment until they got that item right
-        if (question.response) {
+        if (question.responses[0]) {
           if (!question.responses[0].isCorrect) {
             studentAttemptsBeforeCorrect[question.itemId]++;
           }
@@ -133,8 +128,8 @@ class QuestionsView extends Component {
       // attempts
       _.each(_.keys(studentAttemptsBeforeCorrect), (itemId) => {
         let numberAttempts = studentAttemptsBeforeCorrect[itemId];
-        if (numberAttempts > 0) {
-          sortedQuestions[itemId].numberStudentsByAttempt[numberAttempts]++;
+        if (numberAttempts > 0 && numberAttempts <= selectorValue) {
+          sortedQuestions[itemId].numberStudentsByAttempt++;
         }
       });
     });
@@ -147,6 +142,9 @@ class QuestionsView extends Component {
         numberStudentsByAttempt: question.numberStudentsByAttempt
       };
     });
+
+    // sort in descending order by # of students?
+    sortedQuestions = _.reverse(_.sortBy(sortedQuestions, ['numberStudentsByAttempt', 'text']));
 
     questions = sortedQuestions.length > 0 ?
               ( <ListView

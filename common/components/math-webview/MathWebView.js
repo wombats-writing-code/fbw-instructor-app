@@ -121,11 +121,11 @@ class MathWebView extends Component {
   }
 
   _updateWebViewNavState = (navState) => {
-    console.log('navigationStateChange', navState.title);
+    //console.log('navigationStateChange', navState.title);
 
     if (navState.title) {
       let height = parseInt(navState.title);
-      console.log('setting new state in updatewebviewnav', height);
+      //console.log('setting new state in updatewebviewnav', height);
       this.setState({ height: height});
 
       if (this.props.setHeightCallback) {
