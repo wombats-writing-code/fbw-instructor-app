@@ -39,6 +39,7 @@ let _ = require('lodash');
 
 var credentials = require('../../../constants/credentials');
 var MathJaxURL = credentials.MathJaxURL;
+var MathWebView = require('../../math-webview/MathWebView');
 
 let styles = StyleSheet.create({
   notification: {
@@ -56,14 +57,19 @@ let styles = StyleSheet.create({
     borderRadius: 3
   },
   questionRow: {
+    borderWidth: 1,
     flex: 1,
-    height: 100
+    flexDirection: 'row',
+    margin: 10,
+    padding: 5
   },
   questionTextWrapper: {
     flex: 5
   },
   attemptsTextWrapper: {
-    flex: 1
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center'
   }
 });
 
@@ -77,13 +83,11 @@ class QuestionsView extends Component {
   }
 
   renderRow = (rowData) => {
-    let selectorValue = this.props.selectorValue ? this.props.selectorValue : 1;
+    let selectorValue = this.props.attemptsSelector ? this.props.attemptsSelector : 1;
     return (
       <View style={styles.questionRow}>
         <View style={styles.questionTextWrapper}>
-          <WebView scrollEnabled={false}
-                   source={{html: this._wrapHTMLWithMathjax(rowData.text)}}
-                   style={styles.questionText} />
+          <MathWebView content={rowData.text} />
         </View>
         <View style={styles.attemptsTextWrapper}>
           <Text>
@@ -154,6 +158,7 @@ class QuestionsView extends Component {
                   No questions in this mission.
                 </Text>
               </View> );
+
     return (
       <View>
         {questions}

@@ -10,6 +10,7 @@ import {
   Animated,
   Text,
   ListView,
+  Picker,
   ScrollView,
   View,
   TouchableHighlight,
@@ -41,6 +42,9 @@ var styles = StyleSheet.create({
     color: '#666',
     fontWeight: "500",
     letterSpacing: 1
+  },
+  scrollContainer: {
+    height: 650
   }
 });
 
@@ -57,7 +61,8 @@ class Dashboard extends Component {
       activeView: 'outcomesView',
       loading: true,
       opacity: new Animated.Value(0),
-      results: []
+      results: [],
+      selector: 1
     }
   }
   componentWillUnmount() {
@@ -70,6 +75,7 @@ class Dashboard extends Component {
       toValue: 1
     }).start();
     // get the results from QBank
+    // every time this updates and props changes ...
     AssessmentDispatcher.dispatch({
         type: ActionTypes.GET_ASSESSMENT_RESULTS,
         content: {
@@ -77,6 +83,19 @@ class Dashboard extends Component {
           callback: this.setResults
         }
     });
+  }
+
+  componentDidUpdate = (prevProps, prevState) => {
+    if (this.props.mission.id != prevProps.mission.id) {
+      AssessmentDispatcher.dispatch({
+          type: ActionTypes.GET_ASSESSMENT_RESULTS,
+          content: {
+            assessmentOfferedId: this.props.mission.assessmentOfferedId,
+            callback: this.setResults
+          }
+      });
+      this.setState({ loading: true });
+    }
   }
 
   render() {
@@ -90,9 +109,20 @@ class Dashboard extends Component {
 
     let questionsView;
     if (this.state.activeView === 'questionsView') {
+      // TODO: remove the picker ... right now it's just here to verify the
+      // functionality of picking different # attempts.
+
       questionsView = (
         <ScrollView>
-          <QuestionsView results={this.state.results} />
+          <Picker onValueChange={(attempts) => this.setState({selector: attempts})}
+                  selectedValue={this.state.selector}>
+            <Picker.Item label="1" value={1} />
+            <Picker.Item label="2" value={2} />
+            <Picker.Item label="3" value={3} />
+            <Picker.Item label="4" value={4} />
+          </Picker>
+          <QuestionsView results={this.state.results}
+                         attemptsSelector={this.state.selector} />
         </ScrollView>
       )
     }
@@ -110,21 +140,21 @@ class Dashboard extends Component {
     return (
       <View style={styles.container}>
         <Animated.View style={{opacity: this.state.opacity}}>
-        <View style={styles.dashboardNav}>
-          <TouchableHighlight style={[styles.dashboardNavButton, this.state.activeView === 'questionsView' ? styles.selectedButton : null]}
-              onPress={() => this.setState({activeView: 'questionsView'})}>
-            <Text style={styles.buttonText}>QUESTIONS</Text>
-          </TouchableHighlight>
+          <View style={styles.dashboardNav}>
+            <TouchableHighlight style={[styles.dashboardNavButton, this.state.activeView === 'questionsView' ? styles.selectedButton : null]}
+                onPress={() => this.setState({activeView: 'questionsView'})}>
+              <Text style={styles.buttonText}>QUESTIONS</Text>
+            </TouchableHighlight>
 
-          <TouchableHighlight style={[styles.dashboardNavButton, this.state.activeView === 'outcomesView' ? styles.selectedButton : null]}
-              onPress={() => this.setState({activeView: 'outcomesView'})}>
-            <Text style={styles.buttonText}>OUTCOMES</Text>
-          </TouchableHighlight>
-        </View>
-
-          {questionsView}
-          {treeView}
-
+            <TouchableHighlight style={[styles.dashboardNavButton, this.state.activeView === 'outcomesView' ? styles.selectedButton : null]}
+                onPress={() => this.setState({activeView: 'outcomesView'})}>
+              <Text style={styles.buttonText}>OUTCOMES</Text>
+            </TouchableHighlight>
+          </View>
+          <View style={styles.scrollContainer}>
+            {questionsView}
+            {treeView}
+          </View>
         </Animated.View>
       </View>
     );
