@@ -159,8 +159,8 @@ class MissionsList extends Component {
   }
 
   _viewMission(mission) {
-    this.props.changeContent('dashboard');
     this.setState({ selectedId: mission.id });
+    this.props.selectMission(mission, 'dashboard');
   }
   _addNewMission() {
     this.props.changeContent('addMission');
@@ -171,6 +171,7 @@ class MissionsList extends Component {
     this.setState({ selectedId: mission.id });
   }
   _editMission = (mission) => {
+    console.log('selected edit mission: ' + mission.id);
     this.props.selectMission(mission, 'missionEdit');
     this.setState({ selectedId: mission.id });
   }

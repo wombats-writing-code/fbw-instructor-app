@@ -6,6 +6,7 @@ import React, {
 } from 'react';
 
 import {
+  ActivityIndicator,
   Animated,
   Text,
   ListView,
@@ -43,7 +44,10 @@ var styles = StyleSheet.create({
   }
 });
 
-import TreeView from './tree-view/TreeView'
+import TreeView from './tree-view/TreeView';
+import QuestionsView from './questions-view/QuestionsView';
+let ActionTypes = require('../../constants/Assessment').ActionTypes;
+let AssessmentDispatcher = require('../../dispatchers/Assessment');
 
 class Dashboard extends Component {
   constructor(props) {
@@ -51,7 +55,9 @@ class Dashboard extends Component {
 
     this.state = {
       activeView: 'outcomesView',
-      opacity: new Animated.Value(0)
+      loading: true,
+      opacity: new Animated.Value(0),
+      results: []
     }
   }
   componentWillUnmount() {
@@ -63,12 +69,32 @@ class Dashboard extends Component {
     Animated.timing(this.state.opacity, {
       toValue: 1
     }).start();
+    // get the results from QBank
+    AssessmentDispatcher.dispatch({
+        type: ActionTypes.GET_ASSESSMENT_RESULTS,
+        content: {
+          assessmentOfferedId: this.props.mission.assessmentOfferedId,
+          callback: this.setResults
+        }
+    });
   }
 
   render() {
+    if (this.state.loading) {
+      return (
+        <View>
+          <ActivityIndicator size="large" />
+        </View>
+      )
+    }
+
     let questionsView;
     if (this.state.activeView === 'questionsView') {
-
+      questionsView = (
+        <ScrollView>
+          <QuestionsView results={this.state.results} />
+        </ScrollView>
+      )
     }
 
     let treeView;
@@ -102,6 +128,33 @@ class Dashboard extends Component {
         </Animated.View>
       </View>
     );
+  }
+
+  setResults = (offeredResults) => {
+      //offeredResults will be a list of takens, each taken
+      // will have a list of questions, with each questions
+      // having a list of responses.
+      //  [
+      //    {
+      //      displayName, description, id, etc.
+      //      questions: [
+      //        itemId:  < use this field to match across students >
+      //        text.text: < show this as a preview to faculty >
+      //        responses: [ <null> or { isCorrect: state,
+      //                                 submissionTime: ISO time string }]  < may have to sort by submissionTime? >
+      //        learningObjectiveIds: [ < use this for outcomes view > ]
+      //      ]
+      //    }
+      // ]
+
+      console.log('got results');
+      console.log(offeredResults);
+
+      // So first, let's save the results in state, then
+      // pass that along to the QuestionsView
+      // Remember to pass a selector value (i.e. student got it right in X tries)
+      this.setState({results: offeredResults,
+                     loading: false});
   }
 
   handlePressNode(node) {

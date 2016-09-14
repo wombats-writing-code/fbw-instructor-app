@@ -275,7 +275,7 @@ class MissionsManager extends Component {
     } else if (this.state.content === 'addMission') {
           addMission = <AddMission onClose={() => this.setState({content: 'dashboard'})} />
 
-    } else if (this.state.content === 'dashboard') {
+    } else if (this.state.content === 'dashboard' && this.state.selectedMission) {
       dashboard = <Dashboard mission={this.state.selectedMission}/>
     }
 

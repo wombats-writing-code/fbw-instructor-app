@@ -47,8 +47,7 @@ var BankStore = _.assign({}, EventEmitter.prototype, {
       })
       .catch((error) => {
         console.log('error aliasing a term');
-      })
-      .done();
+      });
   },
   getOrCreateChildNode: function (parentId, nodeName, nodeGenus) {
     // don't need to proxy users when creating banks
@@ -124,36 +123,37 @@ var BankStore = _.assign({}, EventEmitter.prototype, {
       },
       _this = this,
       newTermId = '';
+
     qbankFetch(params)
       .then((res) => {
         return res.json();
       })
       .then((bankData) => {
         // the bank already exists, so return it
-        console.log(bankData);
         callback(bankData.id);
       })
       .catch((error) => {
         // bank does not exist, create it -- first see if the
         // name exists, then we're just missing term.
         // Otherwise, create both bank and term.
-        return _this.getOrCreateChildNode(ACCId, data.departmentName, DepartmentGenus);
-      })
-      .then((departmentData) => {
-        return _this.getOrCreateChildNode(departmentData.id, data.subjectName, SubjectGenus);
-      })
-      .then((subjectData) => {
-        return _this.getOrCreateChildNode(subjectData.id, data.termName, TermGenus);
-      })
-      .then((termData) => {
-        newTermId = termData.id;
-        return _this.aliasTerm(termData.id, data.aliasId);
-      })
-      .then(() => {
-        callback(newTermId);
+        _this.getOrCreateChildNode(ACCId, data.departmentName, DepartmentGenus)
+          .then((departmentData) => {
+            return _this.getOrCreateChildNode(departmentData.id, data.subjectName, SubjectGenus);
+          })
+          .then((subjectData) => {
+            return _this.getOrCreateChildNode(subjectData.id, data.termName, TermGenus);
+          })
+          .then((termData) => {
+            newTermId = termData.id;
+            return _this.aliasTerm(termData.id, data.aliasId);
+          })
+          .then(() => {
+            callback(newTermId);
+          })
       })
       .catch((error) => {
         console.log('error creating the nodes and aliases');
+        console.log(error);
       })
       .done();
   }

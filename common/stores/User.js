@@ -80,7 +80,13 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
             });
           } else {
             HardcodedMiddlware.hasSession((hasSession) => {
-              callback(hasSession);
+              if (hasSession) {
+                callback({
+                  Identifier: 'fake-hardcoded-user-id'
+                });
+              } else {
+                callback(hasSession);
+              }
             });
           }
         }

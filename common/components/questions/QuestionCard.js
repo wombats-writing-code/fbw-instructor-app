@@ -20,8 +20,8 @@ import {
 var _ = require('lodash');
 var Icon = require('react-native-vector-icons/FontAwesome');
 
-var AssessmentItemConstants = require('../../constants/AssessmentItem');
-var MathJaxURL = AssessmentItemConstants.MathJax.URL;
+var credentials = require('../../constants/credentials');
+var MathJaxURL = credentials.MathJaxURL;
 var ModuleStore = require('../../stores/Module');
 
 var styles = require('./QuestionCard.styles.js');
