@@ -112,7 +112,10 @@ class MathWebView extends Component {
                  injectedJavaScript={credentials.MathJaxConfig}
                  onNavigationStateChange={this._updateWebViewNavState}
                  scrollEnabled={false}
-                 source={{html: wrapHTML(newContent, null, credentials.MathJaxURL)}}
+                 source={{html: wrapHTML(newContent,
+                                         credentials.KatexCSS,
+                                         credentials.KatexURL,
+                                         credentials.KatexAutoRender)}}
                  style={[this.props.style, styles.webViewStyle, {height: this.state.height }]}
                  />
       </View>

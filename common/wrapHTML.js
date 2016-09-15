@@ -1,7 +1,8 @@
 
 
 
-function wrapHTML (markup, withStyleURL, withMathJaxURL) {
+function wrapHTML (markup, withStyleURL, withKatexURL, withKatexExtension) {
+  markup = markup.replace(/&nbsp;/g, ' ');
   return `<!DOCTYPE html>
     <html>
       <head>
@@ -24,9 +25,10 @@ function wrapHTML (markup, withStyleURL, withMathJaxURL) {
         ${markup}
 
 
-      <script defer src="${withMathJaxURL}"></script>
+      <script src="${withKatexURL}"></script>
+      <script src="${withKatexExtension}"></script>
       <script defer>
-        MathJax.Hub.Queue(["Typeset", MathJax.Hub, document.body]);
+        renderMathInElement(document.body);
       </script>
       <script defer>
         // window.setTimeout(function() {
