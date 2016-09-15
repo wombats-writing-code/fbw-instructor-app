@@ -45,15 +45,17 @@ class MissionsList extends Component {
     this.setState({ sortedMissions: _.sortBy(nextProps.missions, 'displayName.text') });
   }
 
-  renderRow = (rowData, sectionId, rowId) => {
+  renderRow = (rowData, sectionId, rowId, rowMap) => {
     // change icon that appears depending on now time vs. item deadline + startTime
     var missionTypeIcon = '',
       missionStatus = MissionStatus(rowData);
 
     let rowStyles = [styles.missionRow];
 
-    if (rowData.id == this.state.selectedId) {
-      rowStyles.push(styles.missionRowSelected);
+    if (this.props.selectedMission) {
+      if (rowData.id == this.props.selectedMission.id) {
+        rowStyles.push(styles.missionRowSelected);
+      }
     }
 
     // chooses mission icon depending on mission type and status of mission
@@ -76,9 +78,18 @@ class MissionsList extends Component {
     let hiddenRow;
     if (missionStatus !== 'over') {
       hiddenRow = (
-        <TouchableHighlight onPress={() => this._editMission(rowData)} style={styles.rowBack}>
-          <Text style={styles.rowBackButtonText}>Edit</Text>
-        </TouchableHighlight>
+        <View style={styles.rowBack}>
+          <TouchableHighlight onPress={() => {
+                this._deleteMission(rowData);
+                rowMap[`${sectionId}${rowId}`].closeRow();
+                }}
+              style={styles.deleteMission}>
+            <Text style={styles.rowBackButtonText}>Delete</Text>
+          </TouchableHighlight>
+          <TouchableHighlight onPress={() => this._editMission(rowData)}>
+            <Text style={styles.rowBackButtonText}>Edit</Text>
+          </TouchableHighlight>
+        </View>
       )
     } else {
       hiddenRow = <View></View>
@@ -89,7 +100,7 @@ class MissionsList extends Component {
         // TODO: Change this onPress call depending on what is swiped / touched
       <SwipeRow	leftOpenValue={60}
 								rightOpenValue={-60}
-                disableRightSwipe={true}>
+                disableRightSwipe={false}>
 
         {hiddenRow}
 
@@ -159,25 +170,19 @@ class MissionsList extends Component {
   }
 
   _viewMission(mission) {
-    this.setState({ selectedId: mission.id });
     this.props.selectMission(mission, 'dashboard');
   }
   _addNewMission() {
     this.props.changeContent('addMission');
-    this.setState({ selectedId: '' });
   }
   _deleteMission = (mission) => {
     this.props.selectMission(mission, 'missionDelete');
-    this.setState({ selectedId: mission.id });
   }
   _editMission = (mission) => {
-    console.log('selected edit mission: ' + mission.id);
     this.props.selectMission(mission, 'missionEdit');
-    this.setState({ selectedId: mission.id });
   }
   _setMission = (mission) => {
     this.props.selectMission(mission, 'missionStatus');
-    this.setState({ selectedId: mission.id });
   }
 }
 

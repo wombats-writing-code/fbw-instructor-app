@@ -45,12 +45,19 @@ module.exports = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     paddingRight: 15,
     backgroundColor: '#445577'
   },
   rowBackButtonText: {
     color: '#fff'
+  },
+  deleteMission: {
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    backgroundColor: '#9a0000',
+    justifyContent: 'center',
+    width: 60
   },
   missionRowSelected: {
     backgroundColor: '#444'

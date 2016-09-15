@@ -38,6 +38,7 @@ var EditDirective = require('./edit-mission/EditDirective')
 var Dashboard = require('./Dashboard');
 var AddMission = require('./add-mission/AddMission');
 var EditMission = require('./edit-mission/EditMission');
+var DeleteMission = require('./delete-mission/DeleteMission');
 
 
 var styles = StyleSheet.create({
@@ -128,12 +129,14 @@ class MissionsManager extends Component {
       mode = 'missionStatus'
     }
     this.setState({ content: mode });
-    this._updateSelectedMissionAndItems(mission);
+    this._updateSelectedMissionAndItems(mission, mode);
   }
 
-  _updateSelectedMissionAndItems = (mission) => {
+  _updateSelectedMissionAndItems = (mission, mode) => {
     this.setState({ selectedMission: mission });
-    AssessmentItemStore.getItems(mission.id);
+    if (mode !== 'missionDelete' && typeof mission !== "undefined") {
+      AssessmentItemStore.getItems(mission.id);
+    }
   }
 
   handleSelectDirective = (directive) => {
@@ -194,6 +197,11 @@ class MissionsManager extends Component {
 
   }
 
+  handleResetContent = () => {
+    this.setState({ content: 'dashboard',
+                    selectedMission: null });
+  }
+
   _changeContent = (newContent) => {
     this.setState({ content: newContent });
   }
@@ -250,6 +258,7 @@ class MissionsManager extends Component {
   render() {
     let editDirective;
     let addMission;
+    let deleteMission;
     let editMission;
     let dashboard;
 
@@ -277,6 +286,9 @@ class MissionsManager extends Component {
 
     } else if (this.state.content === 'dashboard' && this.state.selectedMission) {
       dashboard = <Dashboard mission={this.state.selectedMission}/>
+    } else if (this.state.content === 'missionDelete' && this.state.selectedMission) {
+      deleteMission = <DeleteMission mission={this.state.selectedMission}
+                                     reset={this.handleResetContent} />;
     }
 
     return (
@@ -287,6 +299,7 @@ class MissionsManager extends Component {
                            loadingMissions={this.state.loading}
                            missions={this.state.missions}
                            selectMission={this.handleSelectMission}
+                           selectedMission={this.state.selectedMission}
                            setBankId={this._setBankId}
                            sidebarOpen={this.state.drawerOpen}
                            toggleSidebar={this._toggleSidebar} />
@@ -296,6 +309,7 @@ class MissionsManager extends Component {
             {addMission}
             {editMission}
             {dashboard}
+            {deleteMission}
           </View>
         </View>
 

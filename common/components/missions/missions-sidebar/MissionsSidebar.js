@@ -81,7 +81,8 @@ class MissionsSidebar extends Component {
         missionsNav = ( <View>
           <MissionsList changeContent={this.props.changeContent}
                         missions={this.props.missions}
-                        selectMission={this.props.selectMission} />
+                        selectMission={this.props.selectMission}
+                        selectedMission={this.props.selectedMission} />
         </View>);
       }
     }

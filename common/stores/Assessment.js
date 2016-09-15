@@ -29,6 +29,7 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
   },
   createAssessment: function (data) {
     var _this = this,
+      currentBankId = '',
       newAssessment = {};
     store.get('bankId')
       .then((bankId) => {
@@ -37,7 +38,7 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
             method: 'POST',
             path: `assessment/banks/${bankId}/assessments`
           };
-
+        currentBankId = bankId;
         return qbankFetch(params);
       })
       .then((res) => {
@@ -47,7 +48,7 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
         let offeredParams = {
             data: data,
             method: 'POST',
-            path: `assessment/banks/${bankId}/assessments/${assessmentData.id}/assessmentsoffered`
+            path: `assessment/banks/${currentBankId}/assessments/${assessmentData.id}/assessmentsoffered`
           };
 
         newAssessment = assessmentData;
@@ -130,6 +131,7 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
   },
   deleteAssessment: function (data) {
     var _this = this,
+      currentBankId = '',
       newAssessment = {};
     store.get('bankId')
       .then((bankId) => {
@@ -137,22 +139,16 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
             method: 'DELETE',
             path: `assessment/banks/${bankId}/assessmentsoffered/${data.assessmentOfferedId}`
           };
-
+        currentBankId = bankId;
         return qbankFetch(deleteOfferedParams);
-      })
-      .then((res) => {
-        return res.json();
       })
       .then((assessmentOfferedData) => {
         let deleteAssessmentParams = {
           method: 'DELETE',
-          path: `assessment/banks/${bankId}/assessments/${data.assessmentId}`
+          path: `assessment/banks/${currentBankId}/assessments/${data.assessmentId}`
         };
 
         return qbankFetch(deleteAssessmentParams);
-      })
-      .then((res) => {
-        return res.json();
       })
       .then((assessmentData) => {
         let updatedAssessments = _.filter(_assessments, (assessment) => {
@@ -164,6 +160,7 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
       })
       .catch((error) => {
         console.log('error deleting an assessment + offered');
+        console.log(error);
       })
       .done();
   },
