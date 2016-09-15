@@ -16,6 +16,7 @@ var HardcodedMiddleware = _.assign({}, EventEmitter.prototype, {
   createGrade: function (assessmentName) {
   },
   enrollments: function (callback) {
+    debugger;
     if (credentials.hardcodedBanks) {
       let departments = {};
       store.get('username')
@@ -30,30 +31,29 @@ var HardcodedMiddleware = _.assign({}, EventEmitter.prototype, {
               };
             departments[bankId] = department;
             banksPromises.push(qbankFetch(params));
-            console.log(params);
           });
-          Q.all(banksPromises)
-            .then((res) => {
-              return Q.all(_.map(res, (oneRes) => {return oneRes.json();}));
-            })
-            .then((data) => {
-              let returnData = [];
-              _.each(data, (datum) => {
-                returnData.push({
-                  department: departments[datum.id],
-                  term: datum.description.text,
-                  id: datum.id,
-                  name: datum.displayName.text
-                });
-              });
-              callback(returnData);
-            })
-            .catch((error) => {
-              console.log('error getting enrollments');
-              console.log(error);
-            })
-            .done();
-        });
+          return Q.all(banksPromises);
+        })
+        .then((res) => {
+          return Q.all(_.map(res, (oneRes) => {return oneRes.json();}));
+        })
+        .then((data) => {
+          let returnData = [];
+          _.each(data, (datum) => {
+            returnData.push({
+              department: departments[datum.id],
+              term: datum.description.text,
+              id: datum.id,
+              name: datum.displayName.text
+            });
+          });
+          callback(returnData);
+        })
+        .catch((error) => {
+          console.log('error getting enrollments');
+          console.log(error);
+        })
+        .done();
     }
   },
   hasSession: function (callback) {
