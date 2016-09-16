@@ -176,10 +176,10 @@ class MissionsList extends Component {
     this.props.changeContent('addMission');
   }
   _deleteMission = (mission) => {
-    this.props.selectMission(mission, 'missionDelete');
+    this.props.selectMission(mission, 'deleteMission');
   }
   _editMission = (mission) => {
-    this.props.selectMission(mission, 'missionEdit');
+    this.props.selectMission(mission, 'editMission');
   }
   _setMission = (mission) => {
     this.props.selectMission(mission, 'missionStatus');

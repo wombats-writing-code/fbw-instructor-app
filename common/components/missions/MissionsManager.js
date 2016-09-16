@@ -134,7 +134,7 @@ class MissionsManager extends Component {
 
   _updateSelectedMissionAndItems = (mission, mode) => {
     this.setState({ selectedMission: mission });
-    if (mode !== 'missionDelete' && typeof mission !== "undefined") {
+    if (mode !== 'deleteMission' && typeof mission !== "undefined") {
       AssessmentItemStore.getItems(mission.id);
     }
   }
@@ -286,7 +286,7 @@ class MissionsManager extends Component {
 
     } else if (this.state.content === 'dashboard' && this.state.selectedMission) {
       dashboard = <Dashboard mission={this.state.selectedMission}/>
-    } else if (this.state.content === 'missionDelete' && this.state.selectedMission) {
+    } else if (this.state.content === 'deleteMission' && this.state.selectedMission) {
       deleteMission = <DeleteMission mission={this.state.selectedMission}
                                      reset={this.handleResetContent} />;
     }

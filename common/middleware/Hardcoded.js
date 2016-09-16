@@ -16,7 +16,6 @@ var HardcodedMiddleware = _.assign({}, EventEmitter.prototype, {
   createGrade: function (assessmentName) {
   },
   enrollments: function (callback) {
-    debugger;
     if (credentials.hardcodedBanks) {
       let departments = {};
       store.get('username')
