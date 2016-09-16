@@ -110,7 +110,7 @@ class MissionsList extends Component {
     );
 
     let hiddenRow;
-    if (missionStatus !== 'over') {
+    if (missionStatus === 'future') {
       row = (
         <SwipeRow	leftOpenValue={60}
   								rightOpenValue={-60}
