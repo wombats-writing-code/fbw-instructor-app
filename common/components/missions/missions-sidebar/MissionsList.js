@@ -47,8 +47,9 @@ class MissionsList extends Component {
 
   renderRow = (rowData, sectionId, rowId, rowMap) => {
     // change icon that appears depending on now time vs. item deadline + startTime
-    var missionTypeIcon = '',
-      missionStatus = MissionStatus(rowData);
+    let missionTypeIcon = '',
+      missionStatus = MissionStatus(rowData),
+      row;
 
     let rowStyles = [styles.missionRow];
 
@@ -75,67 +76,65 @@ class MissionsList extends Component {
       console.warn('mission type not recognized, icon not fetched', rowData.genusTypeId, missionStatus);
     }
 
+    let missionRow = (
+      <TouchableHighlight onPress={() => this._viewMission(rowData)}
+                          style={rowStyles}>
+
+        <View style={styles.missionRow}>
+          <Image
+            style={styles.missionTypeIcon}
+            source={missionTypeIcon}
+          />
+
+          <View style={styles.missionInformation}>
+              <Text
+                  style={styles.missionTitle}
+                  numberOfLines={2}>
+                {(rowData.displayName.text || '').toUpperCase()}
+              </Text>
+            <View>
+              <Text style={styles.missionSubtitle}>
+                Start {rowData.startTime.month}-{rowData.startTime.day}-{rowData.startTime.year}
+              </Text>
+            </View>
+            <View>
+              <Text style={styles.missionSubtitle}>
+                Due {rowData.deadline.month}-{rowData.deadline.day}-{rowData.deadline.year}
+              </Text>
+            </View>
+          </View>
+
+          <Icon name="angle-right" style={styles.missionRightIcon} />
+        </View>
+      </TouchableHighlight>
+    );
+
     let hiddenRow;
     if (missionStatus !== 'over') {
-      hiddenRow = (
-        <View style={styles.rowBack}>
-          <TouchableHighlight onPress={() => {
-                this._deleteMission(rowData);
-                rowMap[`${sectionId}${rowId}`].closeRow();
-                }}
-              style={styles.deleteMission}>
-            <Text style={styles.rowBackButtonText}>Delete</Text>
-          </TouchableHighlight>
-          <TouchableHighlight onPress={() => this._editMission(rowData)}>
-            <Text style={styles.rowBackButtonText}>Edit</Text>
-          </TouchableHighlight>
-        </View>
+      row = (
+        <SwipeRow	leftOpenValue={60}
+  								rightOpenValue={-60}
+                  disableRightSwipe={false}>
+          <View style={styles.rowBack}>
+            <TouchableHighlight onPress={() => {
+                  this._deleteMission(rowData);
+                  rowMap[`${sectionId}${rowId}`].closeRow();
+                  }}
+                style={styles.deleteMission}>
+              <Text style={styles.rowBackButtonText}>Delete</Text>
+            </TouchableHighlight>
+            <TouchableHighlight onPress={() => this._editMission(rowData)}>
+              <Text style={styles.rowBackButtonText}>Edit</Text>
+            </TouchableHighlight>
+          </View>
+          {missionRow}
+        </SwipeRow>
       )
     } else {
-      hiddenRow = <View></View>
+      row = missionRow;
     }
 
-    return (
-
-        // TODO: Change this onPress call depending on what is swiped / touched
-      <SwipeRow	leftOpenValue={60}
-								rightOpenValue={-60}
-                disableRightSwipe={false}>
-
-        {hiddenRow}
-
-        <TouchableHighlight onPress={() => this._viewMission(rowData)}
-                            style={rowStyles}>
-
-          <View style={styles.missionRow}>
-            <Image
-              style={styles.missionTypeIcon}
-              source={missionTypeIcon}
-            />
-
-            <View style={styles.missionInformation}>
-                <Text
-                    style={styles.missionTitle}
-                    numberOfLines={2}>
-                  {(rowData.displayName.text || '').toUpperCase()}
-                </Text>
-              <View>
-                <Text style={styles.missionSubtitle}>
-                  Start {rowData.startTime.month}-{rowData.startTime.day}-{rowData.startTime.year}
-                </Text>
-              </View>
-              <View>
-                <Text style={styles.missionSubtitle}>
-                  Due {rowData.deadline.month}-{rowData.deadline.day}-{rowData.deadline.year}
-                </Text>
-              </View>
-            </View>
-
-            <Icon name="angle-right" style={styles.missionRightIcon} />
-          </View>
-        </TouchableHighlight>
-
-      </SwipeRow>);
+    return row;
   }
   render() {
 
