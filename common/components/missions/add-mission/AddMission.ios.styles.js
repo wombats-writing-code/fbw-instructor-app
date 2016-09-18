@@ -25,13 +25,23 @@ module.exports = StyleSheet.create({
     borderWidth: 1,
     color: '#444'
   },
-  missionTypeSelector: {
-    justifyContent: 'space-around',
+  selectMissionType: {
     flexDirection: 'row',
-    width: 400,
+    alignItems: 'center',
     marginBottom: 18
   },
-  missionTypeSelectorIcon: {
+  selectMissionTypeHeader: {
+    flex: 4
+  },
+  missionTypeButtons: {
+    flex: 8,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+  },
+  missionTypeButton: {
+    marginRight: 80
+  },
+  missionTypeIcon: {
     width: 40,
     opacity: 0.45
   },

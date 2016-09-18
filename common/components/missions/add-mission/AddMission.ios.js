@@ -127,22 +127,25 @@ class AddMission extends Component {
                      style={styles.missionNameInput}
                      value={this.state.missionDisplayName} />
 
-          <ScrollView style={ {height:   this.state.height - 50 } }>
-              <View style={styles.missionTypeSelector}>
-                <Text style={styles.inputLabel}>Mission type</Text>
-                <TouchableHighlight onPress={() => this._onSelectMissionType('homework')}>
+          <ScrollView style={ {height: this.state.height - 50 } }>
+
+            <View style={styles.selectMissionType}>
+              <Text style={styles.selectMissionTypeHeader}>Mission type</Text>
+              <View style={styles.missionTypeButtons}>
+                <TouchableHighlight style={styles.missionTypeButton} onPress={() => this._onSelectMissionType('homework')}>
                   <Image
                     source={require('../../../assets/mission-selector-icon--homework.png')}
-                    style={[styles.missionTypeSelectorIcon, this.state.selectedMissionType === 'homework' && styles.activeIcon]}
+                    style={[styles.missionTypeIcon, this.state.selectedMissionType === 'homework' && styles.activeIcon]}
                   />
                 </TouchableHighlight>
-                <TouchableHighlight onPress={() => this._onSelectMissionType('in-class')}>
+                <TouchableHighlight style={styles.missionTypeButton} onPress={() => this._onSelectMissionType('in-class')}>
                   <Image
                     source={require('../../../assets/mission-selector-icon--in-class.png')}
-                    style={[styles.missionTypeSelectorIcon, this.state.selectedMissionType === 'in-class' && styles.activeIcon]}
+                    style={[styles.missionTypeIcon, this.state.selectedMissionType === 'in-class' && styles.activeIcon]}
                   />
                 </TouchableHighlight>
               </View>
+            </View>
 
            <View styles={styles.startDateWrapper}>
               <Text style={styles.inputLabel}>Start Date</Text>
