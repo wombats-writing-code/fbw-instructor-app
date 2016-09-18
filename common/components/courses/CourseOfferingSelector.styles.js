@@ -11,14 +11,7 @@ module.exports = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     backgroundColor: '#f0f0f0',
-    paddingTop: 10,
-    maxHeight: 100,
-  },
-  sideBarNav: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingBottom: 9,
-    paddingTop: 9
+    maxHeight: 100
   },
   addNewMissionButton: {
     flex: 0,
@@ -33,71 +26,25 @@ module.exports = StyleSheet.create({
   },
 
   // list of missions
-  courseOfferingsList: {
-  },
-  courseOfferingsListWrapper: {
-    maxHeight: 75
-  },
-  missionWrapper: {
+  courseWrapper: {
     borderBottomColor: '#e5e5e5',
     borderBottomWidth: 1,
   },
   missionWrapperSelected: {
     backgroundColor: '#444'
   },
-  missionRow: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+  courseRow: {
     paddingLeft: 8,
     paddingRight: 8,
     paddingBottom: _lineHeight / 2,
     paddingTop: _lineHeight / 2
   },
-  courseInformation: {
-    paddingLeft: 10
+  rowTitle: {
+    fontSize: _bodyFontSize
   },
-  missionTypeIcon: {
-    flex: 0,
-    width: 30,
-    justifyContent: 'center',
-    alignSelf: 'flex-start',
-    marginRight: 10,
-    marginRight: 5,
-  },
-  missionRightIcon: {
-    color: '#656565',
-    justifyContent: 'center',
-  },
-  missionTitle: {
-    fontSize: _bodyFontSize,
-    letterSpacing: .5,
-    fontWeight: "600",
-    color: '#333',
-    marginBottom: _lineHeight / 2
-  },
-  missionSubtitle: {
+  rowSubtitle: {
     color: '#aaa',
     fontSize: _captionFontSize
-  },
-
-
-  notification: {
-    backgroundColor: '#ff9c9c',
-    padding: 3
-  },
-  notificationText: {
-    fontSize: 10,
-    padding: 5
-  },
-  progressIcon: {
-    marginRight: 3
-  },
-  rounded: {
-    borderRadius: 3
-  },
-  sidebarFooter: {
-    height: 10
   },
 
 });

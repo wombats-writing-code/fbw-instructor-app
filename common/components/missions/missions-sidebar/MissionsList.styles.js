@@ -88,14 +88,9 @@ module.exports = StyleSheet.create({
     fontSize: _captionFontSize
   },
 
-
-  notification: {
-    backgroundColor: '#ff9c9c',
-    padding: 3
-  },
-  notificationText: {
-    fontSize: 10,
-    padding: 5
+  noMissionsText: {
+    fontSize: _captionFontSize,
+    textAlign: 'center'
   },
   progressIcon: {
     marginRight: 3

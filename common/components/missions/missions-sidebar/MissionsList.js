@@ -147,16 +147,12 @@ class MissionsList extends Component {
         />)
 
     } else {
-      currentMissions = (
-        <View style={[styles.notification, styles.rounded]} >
-          <Text style={styles.notificationText}>
-            No existing missions.
-          </Text>
-        </View>)
+      currentMissions = (<Text style={styles.noMissionsText}>No missions yet. Create a new one.</Text>)
     }
 
     return (
       <View style={styles.container}>
+
         <View style={styles.sideBarNav}>
           <TouchableHighlight onPress={() => this._addNewMission()}>
             <Image style={styles.addNewMissionButton} source={require('../../../assets/add-icon.png')} />

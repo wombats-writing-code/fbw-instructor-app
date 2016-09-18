@@ -10,12 +10,22 @@ module.exports = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
+    justifyContent: 'flex-start',
     backgroundColor: '#f0f0f0',
     paddingTop: 60,
     // alignItems: 'stretch'
   },
   loadingMissions: {
     paddingTop: 30,
+  },
+  sectionHeader: {
+    paddingLeft: 8,
+    fontSize: _bodyFontSize,
+    letterSpacing: .5,
+    fontWeight: "600",
+    color: '#333',
+    marginBottom: _lineHeight / 2,
+    marginTop: _lineHeight /2
   },
   sidebarFooter: {
     height: 10
