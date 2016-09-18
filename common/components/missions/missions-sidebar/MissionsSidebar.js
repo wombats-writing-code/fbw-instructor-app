@@ -13,7 +13,7 @@ import {
   Text,
   Image,
   TouchableHighlight,
-  View
+  View, Dimensions
 } from 'react-native';
 
 // import SwipeableListView from 'SwipeableRow';
@@ -65,7 +65,7 @@ class MissionsSidebar extends Component {
   }
   render() {
     var toggleIcon = <View />,
-      missionsNav = <View />;
+      missionsList = <View />;
 
     if (this.props.sidebarOpen) {
       toggleIcon = <Icon name="caret-left"
@@ -74,24 +74,24 @@ class MissionsSidebar extends Component {
 
     if (this.state.showMissionsNav) {
       if (this.props.loadingMissions) {
-        missionsNav = ( <View style={styles.loadingMissions}>
+        missionsList = ( <View style={styles.loadingMissions}>
           <ActivityIndicator size="large" />
         </View>);
       } else {
-        missionsNav = ( <View>
+        missionsList = (
           <MissionsList changeContent={this.props.changeContent}
                         missions={this.props.missions}
                         selectMission={this.props.selectMission}
                         selectedMission={this.props.selectedMission} />
-        </View>);
+        );
       }
     }
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, {height: Dimensions.get("window").height}]}>
         <CourseOfferingSelector courseOfferingId={this.state.courseOfferingId}
                                 setCourse={this._setCourseOffering}
                                 subjects={this.state.subjects} />
-        {missionsNav}
+        {missionsList}
         <View style={styles.sidebarFooter} />
       </View>
     );

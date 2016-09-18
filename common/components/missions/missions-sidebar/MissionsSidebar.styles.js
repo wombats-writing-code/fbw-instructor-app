@@ -9,6 +9,7 @@ var _lineHeight = 18;
 module.exports = StyleSheet.create({
   container: {
     flex: 1,
+    flexDirection: 'column',
     backgroundColor: '#f0f0f0',
     paddingTop: 60,
     // alignItems: 'stretch'
