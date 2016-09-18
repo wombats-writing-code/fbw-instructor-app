@@ -38,7 +38,7 @@ class AddMission extends Component {
     super(props);
     this.state = {
       height: 0,
-      inClass: false,
+      selectedMissionType: null,
       items: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
       missionDeadline: new Date(),
       missionDisplayName: '',
@@ -76,7 +76,7 @@ class AddMission extends Component {
       startTime: DateConvert(this.state.missionStartDate)
     };
 
-    if (this.state.inClass) {
+    if (this.state.selectedMissionType === 'in-class') {
       data.genusTypeId = GenusTypes.IN_CLASS;
     } else {
       data.genusTypeId = GenusTypes.HOMEWORK;
@@ -133,13 +133,13 @@ class AddMission extends Component {
                 <TouchableHighlight onPress={() => this._onSelectMissionType('homework')}>
                   <Image
                     source={require('../../../assets/mission-selector-icon--homework.png')}
-                    style={[styles.missionTypeSelectorIcon, !this.state.inClass && styles.active]}
+                    style={[styles.missionTypeSelectorIcon, this.state.selectedMissionType === 'homework' && styles.activeIcon]}
                   />
                 </TouchableHighlight>
                 <TouchableHighlight onPress={() => this._onSelectMissionType('in-class')}>
                   <Image
                     source={require('../../../assets/mission-selector-icon--in-class.png')}
-                    style={[styles.missionTypeSelectorIcon, this.state.inClass && styles.active]}
+                    style={[styles.missionTypeSelectorIcon, this.state.selectedMissionType === 'in-class' && styles.activeIcon]}
                   />
                 </TouchableHighlight>
               </View>
@@ -172,10 +172,7 @@ class AddMission extends Component {
   }
 
   _onSelectMissionType = (missionTypeString) => {
-
-    let value = (missionTypeString === 'in-class');
-    console.log('selected value', value)
-    this.setState({ inClass: value });
+    this.setState({ selectedMissionType: missionTypeString });
   }
 }
 

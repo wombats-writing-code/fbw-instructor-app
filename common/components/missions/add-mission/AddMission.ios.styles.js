@@ -33,7 +33,7 @@ module.exports = StyleSheet.create({
   },
   missionTypeSelectorIcon: {
     width: 40,
-    opacity: 0.5
+    opacity: 0.45
   },
   activeIcon: {
     opacity: 1
