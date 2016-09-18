@@ -89,7 +89,7 @@ class MissionsSidebar extends Component {
     return (
       <View style={[styles.container, {height: Dimensions.get("window").height}]}>
         <Text style={styles.sectionHeader}>Courses</Text>
-        
+
         <CourseOfferingSelector courseOfferingId={this.state.courseOfferingId}
                                 setCourse={this._setCourseOffering}
                                 subjects={this.state.subjects}

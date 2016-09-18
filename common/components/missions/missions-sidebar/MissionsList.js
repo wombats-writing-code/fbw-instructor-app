@@ -152,12 +152,9 @@ class MissionsList extends Component {
 
     return (
       <View style={styles.container}>
-
-        <View style={styles.sideBarNav}>
-          <TouchableHighlight onPress={() => this._addNewMission()}>
-            <Image style={styles.addNewMissionButton} source={require('../../../assets/add-icon.png')} />
-          </TouchableHighlight>
-        </View>
+        <TouchableHighlight style={styles.addMissionButton} onPress={() => this._addNewMission()}>
+          <Image style={styles.addNewMissionButton} source={require('../../../assets/add-icon.png')} />
+        </TouchableHighlight>
 
         {currentMissions}
       </View>

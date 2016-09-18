@@ -13,14 +13,13 @@ module.exports = StyleSheet.create({
     flex: 1,
     backgroundColor: sidebarBackground,
   },
-  sideBarNav: {
-    alignItems: 'center',
+  addMissionButton: {
     flexWrap: 'nowrap',
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingBottom: 9,
-    paddingTop: 30,
-    marginBottom: 18
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    marginRight: _lineHeight,
+    marginBottom: _lineHeight
   },
 
   // list of missions
