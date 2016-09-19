@@ -40,7 +40,8 @@ module.exports = StyleSheet.create({
     paddingTop: _lineHeight / 2
   },
   rowTitle: {
-    fontSize: _bodyFontSize
+    fontSize: _bodyFontSize,
+    marginBottom: _lineHeight / 2
   },
   rowSubtitle: {
     color: '#aaa',

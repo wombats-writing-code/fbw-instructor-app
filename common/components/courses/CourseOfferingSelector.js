@@ -53,7 +53,7 @@ class CourseOfferingSelector extends Component {
                 {(rowData.name || '').toUpperCase()}
               </Text>
               <Text style={styles.rowSubtitle}>
-                {(rowData.term || '').toUpperCase()}
+                {rowData.term}
               </Text>
           </View>
         </TouchableHighlight>);
