@@ -117,9 +117,11 @@ class QuestionsView extends Component {
         }
         // because a specific item / LO might be duplicated within a route,
         // we'll increment until they got that item right
+        studentAttemptsBeforeCorrect[question.itemId]++;
         if (question.responses[0]) {
-          if (!question.responses[0].isCorrect) {
-            studentAttemptsBeforeCorrect[question.itemId]++;
+          if (question.responses[0].isCorrect) {
+            // if they got it right, then revert the ++ a couple lines above
+            studentAttemptsBeforeCorrect[question.itemId]--;
           }
         }
       });

@@ -177,8 +177,8 @@ class Dashboard extends Component {
       //    }
       // ]
 
-      console.log('got results');
-      console.log(offeredResults);
+      // console.log('got results');
+      // console.log(offeredResults);
 
       // So first, let's save the results in state, then
       // pass that along to the QuestionsView
