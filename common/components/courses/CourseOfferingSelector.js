@@ -60,12 +60,14 @@ class CourseOfferingSelector extends Component {
   }
   render() {
     var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-
+    // suppress the yellow box warning about empty sections, per
+    // https://github.com/FaridSafi/react-native-gifted-listview/issues/39
     return (
       <View style={styles.container}>
         <ListView
               dataSource={ds.cloneWithRows(this.props.subjects)}
-              renderRow={this.renderRow}>
+              renderRow={this.renderRow}
+              enableEmptySections={true}>
         </ListView>
       </View>);
   }
