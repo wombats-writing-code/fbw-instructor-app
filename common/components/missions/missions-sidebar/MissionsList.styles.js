@@ -54,7 +54,7 @@ module.exports = StyleSheet.create({
   deleteMission: {
     alignItems: 'center',
     alignSelf: 'stretch',
-    backgroundColor: '#9a0000',
+    backgroundColor: '#FF5F59',
     justifyContent: 'center',
     width: 60
   },
