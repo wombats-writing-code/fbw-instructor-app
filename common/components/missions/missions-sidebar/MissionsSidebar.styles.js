@@ -30,5 +30,15 @@ module.exports = StyleSheet.create({
   sidebarFooter: {
     height: 10
   },
+  logoutWrapper: {
+    position: 'absolute',
+    left: 15,
+    top: 30
+  },
+  logoutButton: {
 
+  },
+  logoutText: {
+    color: '#0000ff'
+  }
 });
