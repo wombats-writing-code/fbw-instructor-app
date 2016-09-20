@@ -118,14 +118,14 @@ class MathWebView extends Component {
   }
 
   _handleError = (error) => {
-    console.log('webview error', error)
+    //console.log('webview error', error)
   }
 
   _updateWebViewNavState = (navState) => {
-    console.log(this.stripBreakingChars(this.rescaleImage(this.props.content)));
+    //console.log(this.stripBreakingChars(this.rescaleImage(this.props.content)));
 
     if (navState.title) {
-      console.log('height found', navState.title);
+      //console.log('height found', navState.title);
 
       let height = parseInt(navState.title);
 
@@ -136,7 +136,7 @@ class MathWebView extends Component {
       }
 
     } else {
-      console.log('height not found, assigning minimum height')
+      //console.log('height not found, assigning minimum height')
       this.setState({height: 14*3});
     }
 
