@@ -210,6 +210,7 @@ class MissionsManager extends Component {
     UserStore.getBankId()
       .then((previousBankId) => {
         if (previousBankId !== bankId) {
+          this.setState({ loading: true });
           UserStore.setBankId(bankId);
           AssessmentStore.getAssessments();
           ItemStore.getItems();
