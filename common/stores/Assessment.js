@@ -302,7 +302,7 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
       .then((updatedAssessment) => {
         // return the newly updated section
         let updatedSection = _.find(updatedAssessment.sections, {id: data.params.id});
-        _this.getAssessments();
+        //_this.getAssessments();
         data.callback(updatedSection);
       })
       .catch((error) => {

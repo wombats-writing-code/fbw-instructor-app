@@ -107,6 +107,10 @@ class MissionsManager extends Component {
       }
     });
   }
+  addAndSelectNewDirective = (directive) => {
+    this.updateMissionDirectives(directive);
+    this.handleSelectDirective(directive);
+  }
 
   handleAddDirective = () => {
     // create a new assessment part;
@@ -115,7 +119,7 @@ class MissionsManager extends Component {
     // but with no Outcome assigned yet
     var data = {
       assessmentId: this.state.selectedMission.id,
-      callback: this.handleSelectDirective
+      callback: this.addAndSelectNewDirective
     };
     AssessmentDispatcher.dispatch({
         type: ActionTypes.CREATE_ASSESSMENT_PART,
@@ -155,7 +159,7 @@ class MissionsManager extends Component {
         learningObjectiveId: outcome.id,
         minimumProficiency: '0'
       },
-      callback: this.handleSelectDirective
+      callback: this.updateMissionDirectives
     };
     AssessmentDispatcher.dispatch({
         type: ActionTypes.UPDATE_ASSESSMENT_PART,
@@ -278,11 +282,39 @@ class MissionsManager extends Component {
         updatedMissionItems.push(section);
       }
     });
-    
+
     updatedMission.sections = updatedMissionItems;
     this.setState({
       missionItems: updatedMissionItems,
       selectedMission: updatedMission
+    });
+  }
+
+  updateMissionDirectives = (updatedDirective) => {
+    // update the directive LO in this.state.selectedMission.sections
+    // and this.state.missionItems and this.state.selectedDirective
+    let updatedSections = [],
+      updatedMission = this.state.selectedMission,
+      isNewDirective = true;
+
+    _.each(this.state.missionItems, (section) => {
+      if (section.id !== updatedDirective.id) {
+        updatedSections.push(section);
+      } else {
+        updatedSections.push(updatedDirective);
+        isNewDirective = false;
+      }
+    });
+
+    if (isNewDirective) {
+      updatedSections.push(updatedDirective);
+    }
+
+    updatedMission.sections = updatedSections;
+    this.setState({
+      selectedMission: updatedMission,
+      missionItems: updatedSections,
+      selectedDirective: updatedDirective
     });
   }
 
@@ -292,6 +324,8 @@ class MissionsManager extends Component {
     let deleteMission;
     let editMission;
     let dashboard;
+    console.log(this.state.content);
+    console.log(this.state.selectedDirective);
 
     if (this.state.content === 'editMission' && this.state.selectedDirective) {
       editDirective = <EditDirective allItems={this.state.allItems}
@@ -307,10 +341,10 @@ class MissionsManager extends Component {
 
     } else if (this.state.content === 'editMission') {
       editMission = (<EditMission mission={this.state.selectedMission}
-                                 missionItems={this.state.missionItems}
-                                 onAddDirective={this.handleAddDirective}
-                                 onSelectDirective={this.handleSelectDirective}
-                                 onDeleteDirective={this.handleDeleteDirective}
+                                  missionItems={this.state.missionItems}
+                                  onAddDirective={this.handleAddDirective}
+                                  onSelectDirective={this.handleSelectDirective}
+                                  onDeleteDirective={this.handleDeleteDirective}
       />)
 
     } else if (this.state.content === 'addMission') {

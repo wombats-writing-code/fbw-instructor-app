@@ -14,7 +14,11 @@ export const getItemsByDirective = (missionItems, directive) => {
   //    directives ...
   let items = _.find(missionItems, {learningObjectiveId: directive.learningObjectiveId});
   if (typeof items !== "undefined") {
-    return items.questions;
+    if (items.questions) {
+      return items.questions;
+    } else {
+      return [];
+    }
   } else {
     return [];
   }
