@@ -78,13 +78,14 @@ class FbWRouter extends Component {
   render() {
     var loginTitleStyle = _.assign({}, styles.titleStyle, {
       color: '#fff',
-      fontWeight: "300",
-      fontSize: 14,
-      letterSpacing: 5,
+      fontWeight: "600",
+      fontStyle: 'italic',
+      marginTop: 42,
+      fontSize: 21,
     });
     var loginNavBarStyle = _.assign({}, styles.navigationBarStyle, {
       paddingTop: 60,
-      backgroundColor: '#3498DB',
+      backgroundColor: '#FF6F69',
       borderBottomWidth: 0,
     });
 
@@ -93,7 +94,7 @@ class FbWRouter extends Component {
         <Scene key="root">
           <Scene component={Login}
                  key="login"
-                 title="Fly-by-Wire Login"
+                 title="Fly-by-Wire"
                  titleStyle={loginTitleStyle}
                  type="reset"
                  navigationBarStyle={loginNavBarStyle} />

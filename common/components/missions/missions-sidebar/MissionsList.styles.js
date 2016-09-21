@@ -52,7 +52,11 @@ module.exports = StyleSheet.create({
     color: '#fff'
   },
   deleteMission: {
-    backgroundColor: '#9a0000',
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    backgroundColor: '#FF5F59',
+    justifyContent: 'center',
+    width: 60
   },
   missionRowSelected: {
     backgroundColor: '#444'

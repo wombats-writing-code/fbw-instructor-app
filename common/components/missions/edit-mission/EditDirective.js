@@ -24,108 +24,14 @@ import {
 
 var ModuleStore = require('../../../stores/Module');
 
-let {width, height} = Dimensions.get('window');
-
-let styles = StyleSheet.create({
-  container: {
-    position: 'absolute',
-    bottom: -300,
-    left: 0,
-    right: 0,
-    width: width,
-    height: height,
-    paddingTop: 105,
-    paddingLeft: 42,
-    paddingRight: 42,
-    backgroundColor: '#96CEB4',
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between'
-  },
-  closeButton: {
-    position: 'absolute',
-    top: 31,
-    left: 21
-  },
-  searchDirectiveWrapper: {
-
-  },
-  searchQuestionsWrapper: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  searchWrapper: {
-    flexDirection: 'row',
-    marginBottom: 42
-  },
-  searchInput: {
-    fontSize: 18,
-    color: '#fff',
-    marginLeft: 10.5,
-    width: 300,
-    justifyContent: 'center',
-  },
-  filters: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 21
-  },
-  filterText: {
-    color: '#eee',
-  },
-  filterButton: {
-    padding: 10.5,
-    borderWidth: 2,
-    borderRadius: 3,
-    borderColor: '#eee',
-    marginLeft: 10.5,
-    marginRight: 10.5
-  },
-  filterButtonSelected: {
-    backgroundColor: 'blue'
-  },
-  filterButtonText: {
-    color: '#eee'
-  },
-  searchResultsList: {
-
-  },
-  kControl: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  kControlText: {
-    color: '#eee',
-    marginRight: 21
-  },
-  addKButton: {
-    width: 40,
-    height: 40,
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  addKButtonText: {
-    color: '#96CEB4',
-    fontSize: 16,
-    fontWeight: "700"
-  },
-  minusKButton: {
-    marginRight: 10.5
-  }
-});
-
+let styles = require('./EditDirective.styles');
 
 class EditDirective extends Component {
 
   constructor(props) {
     super(props);
     let initialSearchModule = getDirectiveModule(props.modules, props.directive);
+
     this.state = {
       query: '',
       directiveItemIds: _.map(getItemsByDirective(props.missionItems, props.directive), 'id'),
@@ -134,6 +40,7 @@ class EditDirective extends Component {
                        props.directive.minimumProficiency :
                        0,
       moveUpAnimation: new Animated.Value(0),
+      moduleDS: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
       searchResults: typeof initialSearchModule !== "undefined" ? initialSearchModule.childNodes : [],
       searchResultsDS: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
       selectedFilters: typeof initialSearchModule !== "undefined" ? [initialSearchModule] : [],
@@ -161,9 +68,9 @@ class EditDirective extends Component {
 
   renderOutcomeRow = (outcome) => {
     return (
-      <TouchableOpacity key={outcome.id}
+      <TouchableOpacity style={styles.searchResult} key={outcome.id}
                         onPress={() => this._onSetDirectiveLO(outcome)}>
-        <Text>{outcome.displayName.text}</Text>
+        <Text style={styles.searchResultText}>{outcome.displayName.text}</Text>
       </TouchableOpacity>
     )
   }
@@ -185,14 +92,33 @@ class EditDirective extends Component {
     )
   }
 
+  renderModuleRow = (module) => {
+    let buttonStyles = [styles.filterButton];
+    let buttonTextStyles = [styles.filterButtonText];
+    let directiveModuleId = this.state.selectedFilters.length > 0 ? this.state.selectedFilters[0].id : '';
+
+    if (module.id == directiveModuleId) {
+      buttonStyles.push(styles.filterButtonSelected);
+      buttonTextStyles.push(styles.filterButtonTextSelected);
+    }
+    return (
+      <TouchableOpacity key={module.id}
+                        onPress={() => this._onToggleFilter(module)}
+                        style={buttonStyles}>
+        <Text style={buttonTextStyles}>{module.displayName.text}</Text>
+      </TouchableOpacity>
+    )
+  }
+
   render() {
     let directiveId = this.props.directive !== '' ? this.props.directive.id : '',
       directiveName = directiveId !== '' ? ModuleStore.getOutcome(
         this.props.directive.learningObjectiveId).displayName.text : '',
       searchResults = <View />,
-      directiveModuleId = this.state.selectedFilters.length > 0 ? this.state.selectedFilters[0].id : '',
       itemsList = <View />,
       items = filterItemsByOutcome(this.props.directive.learningObjectiveId, this.props.allItems);
+
+    let height = Dimensions.get('window').height;
 
     if (directiveName === '' || directiveName === 'Unknown LO') {
       directiveName = 'Search for directives ...';
@@ -205,10 +131,15 @@ class EditDirective extends Component {
     }
 
     if (this.state.searchResults.length > 0) {
-      searchResults = (<ListView style={[styles.searchResultsList]}
-              dataSource={this.state.searchResultsDS.cloneWithRows(this.state.searchResults)}
-              renderRow={this.renderOutcomeRow}>
-      </ListView>);
+      searchResults = (
+        <View style={styles.searchResults}>
+          <Text style={styles.filterText}>{'Outcomes'.toUpperCase()}</Text>
+          <ListView style={[styles.searchResultsList]}
+                dataSource={this.state.searchResultsDS.cloneWithRows(this.state.searchResults)}
+                renderRow={this.renderOutcomeRow}>
+        </ListView>
+      </View>)
+
     }
     return (
       <Animated.View style={[styles.container, {opacity: this.state.fadeInAnimation, top: this.state.moveUpAnimation}]}>
@@ -217,34 +148,28 @@ class EditDirective extends Component {
           <Image source={require('../../../assets/cancel--light.png')}/>
         </TouchableOpacity>
 
-        <View style={styles.searchDirectiveWrapper}>
-          <View style={styles.searchWrapper}>
-            <Image source={require('../../../assets/search--light.png')}/>
-            <TextInput style={styles.searchInput}
-                       defaultValue={directiveName}
-                       onChange={this.onChange}/>
-          </View>
+        <ScrollView>
+          <View style={styles.searchDirectiveWrapper}>
+            <View style={styles.searchWrapper}>
+              <Image source={require('../../../assets/search--light.png')}/>
+              <TextInput style={styles.searchInput}
+                         defaultValue={directiveName}
+                         onChange={this.onChange}/>
+            </View>
 
-          <View style={styles.filters}>
-            <Text style={styles.filterText}>Filter by</Text>
-              {/*the one selected on default should be the module of the current outcome */}
+            <View style={[styles.filters]}>
+              <Text style={styles.filterText}>{'Filter by module'.toUpperCase()}</Text>
+                {/*the one selected on default should be the module of the current outcome */}
 
-              {_.map(this.props.modules, (module, idx) => {
-                let buttonStyles = [styles.filterButton];
-                if (module.id == directiveModuleId) {
-                  buttonStyles.push(styles.filterButtonSelected);
-                }
-                return (
-                  <TouchableOpacity key={module.id}
-                                    onPress={() => this._onToggleFilter(module)}
-                                    style={buttonStyles}>
-                    <Text style={styles.filterButtonText}>{module.displayName.text}</Text>
-                  </TouchableOpacity>
-                )
-              })}
+                <ListView
+                  dataSource={this.state.moduleDS.cloneWithRows(this.props.modules)}
+                  renderRow={this.renderModuleRow}
+                />
+            </View>
+
+            {searchResults}
           </View>
-          {searchResults}
-        </View>
+        </ScrollView>
 
         <View style={styles.searchQuestionsWrapper}>
           <View style={styles.kControl}>

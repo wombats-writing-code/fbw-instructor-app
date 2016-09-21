@@ -49,7 +49,7 @@ class SimpleLogin extends Component {
                    autoFocus={true}
                    onChangeText={(text) => this.setState({ username: text })}
                    placeholder="Username"
-                   placeholderTextColor="#ddd"
+                   placeholderTextColor="#efefef"
                    style={styles.usernameInput}
                    value={this.state.username} />
         <Picker onValueChange={(school) => this.setState({ school: school })}
