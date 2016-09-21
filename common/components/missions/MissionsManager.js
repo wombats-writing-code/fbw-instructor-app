@@ -194,7 +194,17 @@ class MissionsManager extends Component {
   }
 
   handleDeleteDirective = (directiveId) => {
-
+    var data = {
+      assessmentId: this.state.selectedMission.id,
+      params: {
+        oldSectionIds: [directiveId]
+      },
+      callback: this.removeDirectiveFromMission
+    };
+    AssessmentDispatcher.dispatch({
+        type: ActionTypes.DELETE_ASSESSMENT_PART,
+        content: data
+    });
   }
 
   handleResetContent = () => {
@@ -256,6 +266,26 @@ class MissionsManager extends Component {
     });
   }
 
+  removeDirectiveFromMission = (currentMission) => {
+    // after you delete a directive, you need to also remove it
+    // on the client -- so iterate through this.state.missionItems
+    // and remove any sections that do not exist in currentMission
+    let updatedMissionItems = [],
+      updatedMission = this.state.selectedMission,
+      updatedMissionSectionIds = _.map(currentMission.sections, 'id');
+    _.each(this.state.missionItems, (section) => {
+      if (updatedMissionSectionIds.indexOf(section.id) >= 0) {
+        updatedMissionItems.push(section);
+      }
+    });
+    
+    updatedMission.sections = updatedMissionItems;
+    this.setState({
+      missionItems: updatedMissionItems,
+      selectedMission: updatedMission
+    });
+  }
+
   render() {
     let editDirective;
     let addMission;
@@ -280,6 +310,7 @@ class MissionsManager extends Component {
                                  missionItems={this.state.missionItems}
                                  onAddDirective={this.handleAddDirective}
                                  onSelectDirective={this.handleSelectDirective}
+                                 onDeleteDirective={this.handleDeleteDirective}
       />)
 
     } else if (this.state.content === 'addMission') {

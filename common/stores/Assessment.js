@@ -164,6 +164,33 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
       })
       .done();
   },
+  deleteAssessmentPart: function (data) {
+    var _this = this;
+    store.get('bankId')
+      .then((bankId) => {
+        var deleteSectionParams = {
+          data: {
+            sections: {}
+          },
+          method: 'PUT',
+          path: `assessment/banks/${bankId}/assessments/${data.assessmentId}`
+        };
+        _.assign(deleteSectionParams.data.sections, data.params);
+
+        return qbankFetch(deleteSectionParams);
+      })
+      .then((res) => {
+        return res.json();
+      })
+      .then((updatedAssessment) => {
+        data.callback(updatedAssessment);
+      })
+      .catch((error) => {
+        console.log('error deleting section');
+        console.log(error);
+      })
+      .done();
+  },
   getAssessment: function (id) {
     return _.find(_assessments, function (assessment) {
       return assessment.id == id;
@@ -301,6 +328,9 @@ AssessmentStore.dispatchToken = AssessmentDispatcher.register(function (action) 
             break;
         case ActionTypes.UPDATE_ASSESSMENT_PART:
             AssessmentStore.updateAssessmentPart(action.content);
+            break;
+        case ActionTypes.DELETE_ASSESSMENT_PART:
+            AssessmentStore.deleteAssessmentPart(action.content);
             break;
         case ActionTypes.GET_ASSESSMENT_RESULTS:
             AssessmentStore.getResults(action.content);

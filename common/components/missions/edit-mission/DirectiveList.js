@@ -189,6 +189,7 @@ class DirectiveList extends Component {
 
   _deleteDirective = (directive) => {
     console.log('deleting directive');
+    this.props.onDeleteDirective(directive.id);
   }
 
 

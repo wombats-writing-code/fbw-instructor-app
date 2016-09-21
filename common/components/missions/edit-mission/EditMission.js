@@ -121,6 +121,7 @@ class EditMission extends Component {
                        directives={this.props.mission.sections || []}
                        missionItems={this.props.missionItems}
                        onSelectDirective={this.props.onSelectDirective}
+                       onDeleteDirective={this.props.onDeleteDirective}
         />
 
         <TouchableHighlight style={styles.addDirectiveButton}
