@@ -121,7 +121,7 @@ class DirectiveList extends Component {
   }
 
   renderItem = (item, idx) => {
-    console.log('directive item', item);
+    //console.log('directive item', item);
 
     return (
       <View key={item.id} style={styles.itemContainer}>

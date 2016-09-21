@@ -303,7 +303,13 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
         // return the newly updated section
         let updatedSection = _.find(updatedAssessment.sections, {id: data.params.id});
         //_this.getAssessments();
-        data.callback(updatedSection);
+        // when updating a section with items, need to return the itemIds
+        // back, so the UI can be updated appropriately
+        if (data.params.itemIds) {
+          data.callback(updatedSection, data.params.itemIds);
+        } else {
+          data.callback(updatedSection);
+        }
       })
       .catch((error) => {
         console.log('error updating section');
