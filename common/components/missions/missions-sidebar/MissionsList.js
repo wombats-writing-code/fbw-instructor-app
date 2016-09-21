@@ -120,10 +120,11 @@ class MissionsList extends Component {
                   this._deleteMission(rowData);
                   rowMap[`${sectionId}${rowId}`].closeRow();
                   }}
-                style={styles.deleteMission}>
+                style={[styles.deleteMission, styles.swipeButton]}>
               <Text style={styles.rowBackButtonText}>Delete</Text>
             </TouchableHighlight>
-            <TouchableHighlight onPress={() => this._editMission(rowData)}>
+            <TouchableHighlight onPress={() => this._editMission(rowData)}
+                                style={[styles.swipeButton, styles.editMission]}>
               <Text style={styles.rowBackButtonText}>Edit</Text>
             </TouchableHighlight>
           </View>

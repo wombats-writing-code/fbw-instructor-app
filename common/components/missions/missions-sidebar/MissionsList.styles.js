@@ -52,11 +52,7 @@ module.exports = StyleSheet.create({
     color: '#fff'
   },
   deleteMission: {
-    alignItems: 'center',
-    alignSelf: 'stretch',
     backgroundColor: '#9a0000',
-    justifyContent: 'center',
-    width: 60
   },
   missionRowSelected: {
     backgroundColor: '#444'
@@ -100,5 +96,13 @@ module.exports = StyleSheet.create({
   sidebarFooter: {
     height: 10
   },
-
+  swipeButton: {
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    justifyContent: 'center',
+    width: 60
+  },
+  editMission: {
+    marginRight: -15
+  }
 });
