@@ -37,12 +37,12 @@ class MissionsList extends Component {
 
     this.state = {
       ds: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
-      sortedMissions: _.sortBy(this.props.missions, 'displayName.text'), // this should be passed in already sorted by date
+      sortedMissions: _.sortBy(this.props.missions, ['startTime.year', 'startTime.month', 'startTime.day', 'displayName.text']), // this should be passed in already sorted by date
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ sortedMissions: _.sortBy(nextProps.missions, 'displayName.text') });
+    this.setState({ sortedMissions: _.sortBy(nextProps.missions, ['startTime.year', 'startTime.month', 'startTime.day', 'displayName.text']) });
   }
 
   renderRow = (rowData, sectionId, rowId, rowMap) => {
