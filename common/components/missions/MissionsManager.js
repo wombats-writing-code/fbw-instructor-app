@@ -189,7 +189,7 @@ class MissionsManager extends Component {
         id: this.state.selectedDirective.id,
         minimumProficiency: minimumRequired.toString()  // qbank expects a string here, not an int
       },
-      callback: this.handleSelectDirective
+      callback: this.updateMissionDirectives
     };
     AssessmentDispatcher.dispatch({
         type: ActionTypes.UPDATE_ASSESSMENT_PART,

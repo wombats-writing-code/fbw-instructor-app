@@ -13,6 +13,7 @@ module.exports = StyleSheet.create({
     paddingLeft: 42,
     paddingRight: 42,
     backgroundColor: '#96CEB4',
+    flexDirection: "column"
   },
   closeButton: {
     position: 'absolute',
@@ -25,7 +26,6 @@ module.exports = StyleSheet.create({
     maxHeight: 300
   },
   searchQuestionsWrapper: {
-
   },
   searchWrapper: {
     alignItems: 'center',
@@ -84,6 +84,7 @@ module.exports = StyleSheet.create({
   kControl: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 25
   },
   kControlText: {
     color: '#eee',
@@ -105,5 +106,17 @@ module.exports = StyleSheet.create({
   },
   minusKButton: {
     marginRight: 10.5
+  },
+  questionText: {
+    flex: 1,
+    color: '#fff',
+    flexWrap: 'wrap'
+  },
+  questionIcon: {
+    marginRight: 20
+  },
+  questionRow: {
+    flex: 1,
+    flexDirection: 'row'
   }
 });
