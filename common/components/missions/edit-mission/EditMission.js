@@ -66,7 +66,8 @@ var styles = StyleSheet.create({
     marginTop: 42
   },
   directivesScrollView: {
-    maxHeight: Dimensions.get('window').height - 300
+    maxHeight: Dimensions.get('window').height - 325,
+    marginBottom: 25
   }
 });
 
