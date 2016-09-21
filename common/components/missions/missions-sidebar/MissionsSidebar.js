@@ -63,6 +63,9 @@ class MissionsSidebar extends Component {
   }
   componentWillReceiveProps(nextProps) {
   }
+  logout = () => {
+    UserStore.logout();
+  }
   render() {
     var toggleIcon = <View />,
       missionsList = <View />;
@@ -88,6 +91,14 @@ class MissionsSidebar extends Component {
     }
     return (
       <View style={[styles.container, {height: Dimensions.get("window").height}]}>
+        <View style={styles.logoutWrapper}>
+          <TouchableHighlight onPress={() => this.logout()}
+                              style={styles.logoutButton}>
+            <Text style={styles.logoutText}>
+              Logout
+            </Text>
+          </TouchableHighlight>
+        </View>
         <Text style={styles.sectionHeader}>Courses</Text>
 
         <CourseOfferingSelector courseOfferingId={this.state.courseOfferingId}

@@ -18,7 +18,7 @@ var credentials = require('../../constants/credentials');
 var fbwUtils = require('fbw-utils')(credentials);
 // var WrapHTML = fbwUtils.WrapMathjax;
 var wrapHTML = require('../../wrapHTML');
-//var heightCalculate = require('../../heightCalculate');
+var heightCalculate = require('../../heightCalculate');
 
 var styles = StyleSheet.create({
   webViewStyle: {
@@ -26,14 +26,26 @@ var styles = StyleSheet.create({
   }
 });
 
-// const webviewStyles = require('../../web')
+const JS_CODE =  `
+    var el = document.getElementById('markup');
+    renderMathInElement(el);
+
+    var body = document.body;
+    var html = document.documentElement;
+
+    var rawHeight = parseInt(el.offsetHeight || el.clientHeight || 500);
+
+    document.title = rawHeight + 14*2;
+
+    window.location.hash = Math.random();`;
 
 class MathWebView extends Component {
   constructor(props) {
     super (props);  // props includes the mission / assessment
 
     this.state = {
-      height: 0
+      height: 0,
+      dummy: 0,
     };
   }
 
@@ -42,15 +54,15 @@ class MathWebView extends Component {
     return width * .75;
   }
 
-  rescaleImage() {
+  rescaleImage(str) {
     // scales the image to fit the view. probably should refactor into a selector
 
     let newContent;
-    if (this.props.content.indexOf('<img ') > -1) {
+    if (str.indexOf('<img ') > -1) {
       // console.log('image content', this.props.content);
 
-      let widthMatch = this.props.content.match(/width:(.*)px/)[0];
-      let heightMatch = this.props.content.match(/height:(.*)px/)[0];
+      let widthMatch = str.match(/width:(.*)px/)[0];
+      let heightMatch = str.match(/height:(.*)px/)[0];
       let originalWidth = parseInt(widthMatch.replace('width:', ''), 10);
       let originalHeight = parseInt(heightMatch.replace('height:', ''), 10);
 
@@ -59,38 +71,29 @@ class MathWebView extends Component {
       let scaledWidth = Math.floor(originalWidth * k);        // important to prevent layout thrashing
       let scaledHeight = Math.floor(originalHeight * k);
 
-      newContent = this.props.content.replace(/width:(.*?)px/, 'width:' + scaledWidth + 'px');
+      newContent = str.replace(/width:(.*?)px/, 'width:' + scaledWidth + 'px');
       newContent = newContent.replace(/height:(.*)px(?=;)/, 'height:' + scaledHeight + 'px');
       // console.log('replaced height:', newContent);
 
     } else {
-      newContent = this.props.content;
+      newContent = str;
     }
 
     return newContent
   }
 
-  // componentDidMount() {
-  //   // we need to adjust height after the component has rendered once,
-  //   // because of MathJax
-  //
-  //   // remember to use the rescaled image's height
-  //   let newContent = this.rescaleImage();
-  //   // font size of assessment is pegged to a static 14
-  //   let {height, width} = Dimensions.get('window');
-  //   let requiredHeight = heightCalculate(newContent, 16, this.effectiveWidth());
-  //
-  //   // requiredHeight = 0;
-  //
-  //   console.log('setting new height in componentDidMount')
-  //   this.setState({
-  //     height: requiredHeight
-  //   });
-  //
-  //   if (this.props.onHeightCalculate) {
-  //     this.props.onHeightCalculate(requiredHeight);
-  //   }
-  // }
+  componentDidMount() {
+    // setTimeout(() => {
+    //   this.setState({dummy: Math.random()});
+    //   console.log('will update again');
+    // }, 1000);
+  }
+
+  stripBreakingChars(str) {
+    let newStr = str.replace(/&nbsp;/g, ' ');
+
+    return newStr;
+  }
 
   // because we might need to call TouchableHighlight on this custom element
   setNativeProps(nativeProps) {
@@ -98,43 +101,46 @@ class MathWebView extends Component {
   }
 
   render() {
-    // source={{html: WrapHTML(this.props.content)}}
-    //automaticallyAdjustContentInsets={false}
-    //  contentInset={{top: -15}}
-
-    let newContent = this.rescaleImage();
-    // console.log('newContent', newContent);
+    let newContent = this.stripBreakingChars(this.rescaleImage(this.props.content));
+    let html = wrapHTML(newContent);
 
     return (
-      <View ref={component => this._root = component}>
         <WebView contentInset={{top: 0}}
                  javascriptEnabled={true}
-                 injectedJavaScript={credentials.MathJaxConfig}
                  onNavigationStateChange={this._updateWebViewNavState}
+                 onError={this._handleError}
                  scrollEnabled={false}
-                 source={{html: wrapHTML(newContent,
-                                         credentials.KatexCSS,
-                                         credentials.KatexURL,
-                                         credentials.KatexAutoRender)}}
+                 source={{html: html}}
                  style={[this.props.style, styles.webViewStyle, {height: this.state.height }]}
-                 />
-      </View>
+       />
 
     )
   }
 
+  _handleError = (error) => {
+    //console.log('webview error', error)
+  }
+
   _updateWebViewNavState = (navState) => {
-    //console.log('navigationStateChange', navState.title);
+    //console.log(this.stripBreakingChars(this.rescaleImage(this.props.content)));
 
     if (navState.title) {
+      //console.log('height found', navState.title);
+
       let height = parseInt(navState.title);
-      //console.log('setting new state in updatewebviewnav', height);
+
       this.setState({ height: height});
 
-      if (this.props.setHeightCallback) {
-        this.props.setHeightCallback(height);
+      if (this.props.onAdjustHeight) {
+        this.props.onAdjustHeight(height);
       }
+
+    } else {
+      //console.log('height not found, assigning minimum height')
+      this.setState({height: 14*3});
     }
+
+    return true;
   }
 }
 

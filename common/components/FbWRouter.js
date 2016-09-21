@@ -96,6 +96,7 @@ class FbWRouter extends Component {
                  key="login"
                  title="Fly-by-Wire"
                  titleStyle={loginTitleStyle}
+                 type="reset"
                  navigationBarStyle={loginNavBarStyle} />
           <Scene component={Loading}
                  initial={true}

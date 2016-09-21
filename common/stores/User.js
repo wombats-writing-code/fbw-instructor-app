@@ -92,6 +92,15 @@ var UserStore = _.assign({}, EventEmitter.prototype, {
         }
     });
   },
+  logout: function () {
+    store.delete('username');
+    store.delete('bankId');
+    store.delete('department');
+    // no way to get the inProgress data yet ... but every
+    // student should have different sectionId's
+
+    Actions.loading();
+  },
   setAuthenticationUrlD2L: function (d2lURL) {
     D2LMiddlware.setAuthenticationUrl(d2lURL);
   },

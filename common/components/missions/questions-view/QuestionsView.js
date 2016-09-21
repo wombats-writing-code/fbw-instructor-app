@@ -36,6 +36,7 @@ import {
 } from 'react-native';
 
 let _ = require('lodash');
+var moment = require('moment');
 
 var credentials = require('../../../constants/credentials');
 var MathJaxURL = credentials.MathJaxURL;
@@ -90,61 +91,159 @@ class QuestionsView extends Component {
         </View>
         <View style={styles.attemptsTextWrapper}>
           <Text>
-            {rowData.numberStudentsByAttempt}
+            {rowData.numberStudentsByAttempt} of {rowData.numberStudentsWhoSawThisItem}
           </Text>
         </View>
       </View>
     )
   }
 
+  submissionTime = (responseA, responseB) => {
+    if (responseA.submissionTime && responseB.submissionTime) {
+      return moment(_.assign({}, responseA.submissionTime)).unix() < moment(_.assign({}, responseB.submissionTime)).unix();
+    } else if (responseA.submissionTime) {
+      return false;
+    } else if (responseB.submissionTime) {
+      return true;
+    } else {
+      return true; // arbitrarily let the first unanswered response be <
+    }
+  }
+
   render() {
-    let sortedQuestions = {},
+    let sortedQuestions = [],
+      itemsByStudentAndResponses = {},
+      itemsByStudentWithAttemptsCounter = {},
+      // separate dict to store questions a student got right, finally, otherwise we have no way of
+      // knowing if the student attempts == number of views and they never got it right,
+      // or if they got it right on their last attempt...
+      studentQuestionsCorrect = {},
+      questionTexts = {},
       selectorValue = this.props.attemptsSelector ? this.props.attemptsSelector : 1,
+      _this = this,
       questions;
 
-    // let's organize all the questions in all takens by itemId
+    // first, organize all responses by timestamp and itemId
     _.each(this.props.results, (taken) => {
-      let studentAttemptsBeforeCorrect = {};
+      let studentId = taken.takingAgentId;
+
       _.each(taken.questions, (question) => {
-        if (_.keys(sortedQuestions).indexOf(question.itemId) < 0) {
-          // the # of attempts
-          // correlates to possible input values from the slider
-          sortedQuestions[question.itemId] = {
-            text: question.text.text,
-            numberStudentsByAttempt: 0
-          };
-          studentAttemptsBeforeCorrect[question.itemId] = 0;
+        let itemId = question.itemId;
+        questionTexts[itemId] = question.text.text;
+
+        if (_.keys(itemsByStudentAndResponses).indexOf(itemId) < 0) {
+          itemsByStudentAndResponses[itemId] = {};
         }
-        // because a specific item / LO might be duplicated within a route,
-        // we'll increment until they got that item right
-        if (question.responses[0]) {
-          if (!question.responses[0].isCorrect) {
-            studentAttemptsBeforeCorrect[question.itemId]++;
+        if (_.keys(itemsByStudentAndResponses[itemId]).indexOf(studentId) < 0) {
+          itemsByStudentAndResponses[itemId][studentId] = [];  // list of responses; will need to sort by time
+        }
+
+        _.each(question.responses, (response) => {
+          itemsByStudentAndResponses[itemId][studentId].push(response);
+        })
+      });
+    });
+    // itemsByStudentAndResponses should now look like:
+    //  {
+    //    "assessment.Item": {
+    //      "student1": [response1, response2, response3],
+    //      "student2": [response5, response1, response4]
+    //    }
+    //
+    //
+    //  }
+
+    _.each(itemsByStudentAndResponses, (studentData, itemId) => {
+      _.each(studentData, (responses, studentId) => {
+        responses.sort(_this.submissionTime);
+      });
+    });
+
+    // itemsByStudentAndResponses should now look like:
+    //  {
+    //    "assessment.Item": {
+    //      "student1": [response1, response2, response3],
+    //      "student2": [response1, response2, response3, ...]
+    //    }
+    //
+    //
+    //  }
+
+    // now let's count how many responses each student has before
+    // getting it correct
+    _.each(itemsByStudentAndResponses, (studentData, itemId) => {
+      if (_.keys(itemsByStudentWithAttemptsCounter).indexOf(itemId) < 0) {
+        itemsByStudentWithAttemptsCounter[itemId] = {};
+      }
+      _.each(studentData, (responses, studentId) => {
+        if (_.keys(itemsByStudentWithAttemptsCounter[itemId]).indexOf(studentId) < 0) {
+          itemsByStudentWithAttemptsCounter[itemId][studentId] = 0;
+        }
+
+        _.each(responses, (response) => {
+          let studentAlreadyGotItemCorrect = false;
+
+          if (_.keys(studentQuestionsCorrect).indexOf(studentId) >= 0) {
+            if (studentQuestionsCorrect[studentId].indexOf(itemId) >= 0) {
+              studentAlreadyGotItemCorrect = true;
+            }
+          }
+
+          if (!studentAlreadyGotItemCorrect) {
+            if (!response) { // null
+              itemsByStudentWithAttemptsCounter[itemId][studentId]++;
+            } else if (_.keys(response).indexOf('missingResponse') >= 0) {
+              // no response counts as wrong
+              itemsByStudentWithAttemptsCounter[itemId][studentId]++;
+            } else if (!response.isCorrect) {
+              itemsByStudentWithAttemptsCounter[itemId][studentId]++;
+            } else if (response.isCorrect) {
+              if (_.keys(studentQuestionsCorrect).indexOf(studentId) < 0) {
+                studentQuestionsCorrect[studentId] = [];
+              }
+              studentQuestionsCorrect[studentId].push(itemId);
+            }
+          }
+        });
+      })
+    })
+    // now let's count stuff for each item and put into an array
+    // now map sortedQuestions into an array for ListView
+    _.each(itemsByStudentWithAttemptsCounter, (studentData, itemId) => {
+      let numberStudentsWhoSawThisItem = _.keys(studentData).length;
+      let numberStudentsCorrectByAttempt = 0;
+
+      _.each(studentData, (studentAttempts, studentId) => {
+        // only add these attempts if the student actually got the
+        // question correct ...
+        if (_.keys(studentQuestionsCorrect).indexOf(studentId) >= 0) {
+          if (studentQuestionsCorrect[studentId].indexOf(itemId) >= 0) {
+            // do < here instead of <= because the counter above
+            // only counts wrong attempts BEFORE you get it right ...
+            // so if the view is showing # students who the question
+            // right in <= 1 attempt, for example, we only take counter == 0
+            // cases here.
+            if (studentAttempts < selectorValue) {
+              numberStudentsCorrectByAttempt++;
+            }
           }
         }
-      });
+      })
 
-      // now for each item, we add back in this student's
-      // attempts
-      _.each(_.keys(studentAttemptsBeforeCorrect), (itemId) => {
-        let numberAttempts = studentAttemptsBeforeCorrect[itemId];
-        if (numberAttempts > 0 && numberAttempts <= selectorValue) {
-          sortedQuestions[itemId].numberStudentsByAttempt++;
-        }
-      });
-    });
-
-    // now map sortedQuestions into an array for ListView
-    sortedQuestions = _.map(sortedQuestions, (question, itemId) => {
-      return {
+      sortedQuestions.push({
         itemId: itemId,
-        text: question.text,
-        numberStudentsByAttempt: question.numberStudentsByAttempt
-      };
+        text: questionTexts[itemId],
+        numberStudentsByAttempt: numberStudentsCorrectByAttempt,
+        numberStudentsWhoSawThisItem: numberStudentsWhoSawThisItem
+      })
     });
+
+    console.log(studentQuestionsCorrect)
+    console.log(itemsByStudentWithAttemptsCounter)
+    console.log(itemsByStudentAndResponses)
 
     // sort in descending order by # of students?
-    sortedQuestions = _.reverse(_.sortBy(sortedQuestions, ['numberStudentsByAttempt', 'text']));
+    sortedQuestions = _.reverse(_.sortBy(sortedQuestions, ['numberStudentsByAttempt', 'numberStudentsWhoSawThisItem', 'text']));
 
     questions = sortedQuestions.length > 0 ?
               ( <ListView

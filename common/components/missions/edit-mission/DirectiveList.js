@@ -18,11 +18,16 @@ import {
 var _ = require('lodash');
 
 import {getItemsByDirective} from '../../../selectors/selectors';
+import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view';
 
 var ModuleStore = require('../../../stores/Module');
 
+var _lineHeight = 18;
+var sidebarBackground = '#f0f0f0';
+
 let styles = StyleSheet.create({
   cell: {
+    flex: 1,
     flexDirection: 'row',
     paddingLeft: 10.5,
     paddingRight: 10.5,
@@ -59,7 +64,39 @@ let styles = StyleSheet.create({
     fontWeight: "300",
     color: '#46B29D',
     flex: 1
-  }
+  },
+  directiveRow: {
+    borderBottomColor: '#e5e5e5',
+    borderBottomWidth: 1,
+    position: 'relative',
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    paddingLeft: 9,
+    paddingRight: 9,
+    paddingBottom: _lineHeight / 2,
+    paddingTop: _lineHeight / 2,
+    backgroundColor: sidebarBackground
+  },
+  rowBack: {
+    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingRight: 15,
+    backgroundColor: '#445577',
+    marginBottom: 21
+  },
+  rowBackButtonText: {
+    color: '#fff'
+  },
+  deleteDirective: {
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    backgroundColor: '#9a0000',
+    justifyContent: 'center',
+    width: 60
+  },
 });
 
 class DirectiveList extends Component {
@@ -85,7 +122,7 @@ class DirectiveList extends Component {
 
   renderItem = (item, idx) => {
     console.log('directive item', item);
-    
+
     return (
       <View key={item.id} style={styles.itemContainer}>
         <Image style={styles.itemIcon} source={require('../../../assets/target-question--correct.png')} />
@@ -94,14 +131,14 @@ class DirectiveList extends Component {
     )
   }
 
-  renderRow = (directive) => {
+  renderRow = (directive, sectionId, rowId, rowMap) => {
     let minimumRequired = directive.minimumProficiency !== '' ?
                           directive.minimumProficiency :
                           0,
       directiveItems = getItemsByDirective(this.props.missionItems, directive);
 
-    return (
-      <TouchableHighlight style={{marginBottom: 21}}
+    let directiveRow = (
+      <TouchableHighlight style={[styles.directiveRow, {marginBottom: 21}]}
                           key={directive.id}
                           onPress={() => this.props.onSelectDirective(directive)}>
         <View style={styles.cell}>
@@ -119,7 +156,22 @@ class DirectiveList extends Component {
 
         </View>
       </TouchableHighlight>
-    )
+    );
+
+    return (<SwipeRow	leftOpenValue={60}
+                      rightOpenValue={-60}
+                      disableLeftSwipe={true}>
+      <View style={styles.rowBack}>
+        <TouchableHighlight onPress={() => {
+              this._deleteDirective(directive);
+              rowMap[`${sectionId}${rowId}`].closeRow();
+              }}
+            style={styles.deleteDirective}>
+          <Text style={styles.rowBackButtonText}>Delete</Text>
+        </TouchableHighlight>
+      </View>
+      {directiveRow}
+    </SwipeRow>);
   }
 
   render() {
@@ -127,12 +179,17 @@ class DirectiveList extends Component {
       return <View />
     } else {
       return (
-        <ListView style={[styles.listView, this.props.style]}
+        <SwipeListView style={[styles.listView, this.props.style]}
                 dataSource={this.state.ds.cloneWithRows(this.props.directives)}
                 renderRow={this.renderRow}>
-        </ListView>
+        </SwipeListView>
       )
     }
+  }
+
+  _deleteDirective = (directive) => {
+    console.log('deleting directive');
+    this.props.onDeleteDirective(directive.id);
   }
 
 

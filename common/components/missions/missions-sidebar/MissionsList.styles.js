@@ -100,5 +100,13 @@ module.exports = StyleSheet.create({
   sidebarFooter: {
     height: 10
   },
-
+  swipeButton: {
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    justifyContent: 'center',
+    width: 60
+  },
+  editMission: {
+    marginRight: -15
+  }
 });

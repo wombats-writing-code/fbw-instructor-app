@@ -1,9 +1,10 @@
 
 
 
-function wrapHTML (markup, withStyleURL, withKatexURL, withKatexExtension) {
-  markup = markup.replace(/&nbsp;/g, ' ');
-  return `<!DOCTYPE html>
+function wrapHTML (markup) {
+
+  return `
+  <DOCTYPE html>
     <html>
       <head>
         <style type="text/css">
@@ -16,36 +17,46 @@ function wrapHTML (markup, withStyleURL, withKatexURL, withKatexExtension) {
             font-size: 14px;
             line-height: 1.4;
           }
+          .collapsible__header {
+            padding-top: 1.5em;
+          }
         </style>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.css">
         <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
-        <link rel="stylesheet" href="${withStyleURL}">
+
+        <script src="https://cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-AMS_HTML"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/contrib/auto-render.min.js"></script>
       </head>
 
       <body>
-        ${markup}
+        <div id="markup">
+          ${markup}
+        </div>
 
+        <script>
+            MathJax.Hub.Config({
+              "HTML-CSS": { scale: 100, linebreaks: { automatic: true } },
+              displayAlign: "left",
+              TeX: {
+                extensions: ['cancel.js']
+              }
+           });
+        </script>
 
-      <script src="${withKatexURL}"></script>
-      <script src="${withKatexExtension}"></script>
-      <script defer>
-        renderMathInElement(document.body);
-      </script>
-      <script defer>
-        // window.setTimeout(function() {
-          window.location.hash = 1;
-          var body = document.body;
-          var html = document.documentElement;
+        <script type="text/javascript">
+            var el = document.getElementById('markup');
+            renderMathInElement(el);
 
-          // document.title = Math.max( body.scrollHeight, body.offsetHeight,
-          //                  html.clientHeight, html.scrollHeight, html.offsetHeight);
+            // MathJax.Hub.Queue(["Typeset", MathJax.Hub, document.body]);
 
-          document.title = body.scrollHeight || body.offsetHeight ||
-                           html.clientHeight || html.scrollHeight || html.offsetHeight;
+            var rawHeight = parseInt(Math.max(el.offsetHeight, el.clientHeight));
 
-          // document.title = 200;
+            document.title = rawHeight + 14*1.4*2;
 
-        // }, 5000);
-      </script>
+            window.location.hash = Math.random();
+        </script>
+
       </body>
 
 
