@@ -64,6 +64,10 @@ var styles = StyleSheet.create({
   },
   directives: {
     marginTop: 42
+  },
+  directivesScrollView: {
+    maxHeight: Dimensions.get('window').height - 325,
+    marginBottom: 25
   }
 });
 
@@ -117,13 +121,14 @@ class EditMission extends Component {
 
         <EditMissionMetaData mission={this.props.mission}/>
 
-        <DirectiveList style={styles.directives}
-                       directives={this.props.mission.sections || []}
-                       missionItems={this.props.missionItems}
-                       onSelectDirective={this.props.onSelectDirective}
-                       onDeleteDirective={this.props.onDeleteDirective}
-        />
-
+        <ScrollView style={styles.directivesScrollView}>
+          <DirectiveList style={styles.directives}
+                         directives={this.props.mission.sections || []}
+                         missionItems={this.props.missionItems}
+                         onSelectDirective={this.props.onSelectDirective}
+                         onDeleteDirective={this.props.onDeleteDirective}
+          />
+        </ScrollView>
         <TouchableHighlight style={styles.addDirectiveButton}
                             onPress={this.props.onAddDirective}>
           <View style={styles.addDirectiveButtonWrapper}>

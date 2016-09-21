@@ -37,12 +37,12 @@ class MissionsList extends Component {
 
     this.state = {
       ds: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
-      sortedMissions: _.sortBy(this.props.missions, 'displayName.text'), // this should be passed in already sorted by date
+      sortedMissions: _.sortBy(this.props.missions, ['startTime.year', 'startTime.month', 'startTime.day', 'displayName.text']), // this should be passed in already sorted by date
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ sortedMissions: _.sortBy(nextProps.missions, 'displayName.text') });
+    this.setState({ sortedMissions: _.sortBy(nextProps.missions, ['startTime.year', 'startTime.month', 'startTime.day', 'displayName.text']) });
   }
 
   renderRow = (rowData, sectionId, rowId, rowMap) => {
@@ -77,7 +77,18 @@ class MissionsList extends Component {
     }
 
     let missionRow = (
-      <TouchableHighlight onPress={() => this._viewMission(rowData)}
+      <TouchableHighlight onPress={() => {
+                            _.each(rowMap, (rowObj, hash) => {
+                              if (hash !== `${sectionId}${rowId}`) {
+                                try {
+                                  rowMap[hash].closeRow();
+                                } catch(e) {
+                                  // this will fail for non-swipeable missions
+                                }
+                              }
+                            });
+                            this._viewMission(rowData)
+                          }}
                           style={rowStyles}>
 
         <View style={styles.missionRow}>
@@ -111,6 +122,7 @@ class MissionsList extends Component {
 
     let hiddenRow;
     if (missionStatus === 'future') {
+      // TODO: might have to close other rows on swipe, too?
       row = (
         <SwipeRow	leftOpenValue={60}
   								rightOpenValue={-60}
