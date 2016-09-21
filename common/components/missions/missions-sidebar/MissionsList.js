@@ -77,7 +77,14 @@ class MissionsList extends Component {
     }
 
     let missionRow = (
-      <TouchableHighlight onPress={() => this._viewMission(rowData)}
+      <TouchableHighlight onPress={() => {
+                            _.each(rowMap, (rowObj, hash) => {
+                              if (hash !== `${sectionId}${rowId}`) {
+                                rowObj.closeRow();
+                              }
+                            });
+                            this._viewMission(rowData)
+                          }}
                           style={rowStyles}>
 
         <View style={styles.missionRow}>
@@ -111,6 +118,7 @@ class MissionsList extends Component {
 
     let hiddenRow;
     if (missionStatus === 'future') {
+      // TODO: might have to close other rows on swipe, too?
       row = (
         <SwipeRow	leftOpenValue={60}
   								rightOpenValue={-60}
