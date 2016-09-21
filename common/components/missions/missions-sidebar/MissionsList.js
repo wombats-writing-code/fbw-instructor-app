@@ -80,7 +80,11 @@ class MissionsList extends Component {
       <TouchableHighlight onPress={() => {
                             _.each(rowMap, (rowObj, hash) => {
                               if (hash !== `${sectionId}${rowId}`) {
-                                rowObj.closeRow();
+                                try {
+                                  rowMap[hash].closeRow();
+                                } catch(e) {
+                                  // this will fail for non-swipeable missions
+                                }
                               }
                             });
                             this._viewMission(rowData)
