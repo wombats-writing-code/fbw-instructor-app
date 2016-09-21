@@ -174,7 +174,7 @@ class MissionsManager extends Component {
         id: this.state.selectedDirective.id,
         itemIds: itemIds
       },
-      callback: this.handleSelectDirective
+      callback: this.updateMissionDirectiveWithItems
     };
     AssessmentDispatcher.dispatch({
         type: ActionTypes.UPDATE_ASSESSMENT_PART,
@@ -189,7 +189,7 @@ class MissionsManager extends Component {
         id: this.state.selectedDirective.id,
         minimumProficiency: minimumRequired.toString()  // qbank expects a string here, not an int
       },
-      callback: this.handleSelectDirective
+      callback: this.updateMissionDirectives
     };
     AssessmentDispatcher.dispatch({
         type: ActionTypes.UPDATE_ASSESSMENT_PART,
@@ -313,9 +313,54 @@ class MissionsManager extends Component {
     updatedMission.sections = updatedSections;
     this.setState({
       selectedMission: updatedMission,
-      missionItems: updatedSections,
-      selectedDirective: updatedDirective
+      missionItems: updatedSections
     });
+
+    if (this.state.selectedDirective) {
+      this.setState({ selectedDirective: updatedDirective });
+    }
+  }
+
+  updateMissionDirectiveWithItems = (updatedDirective, itemIds) => {
+    // * Update the directive LO in this.state.selectedMission.sections
+    //   and this.state.missionItems and this.state.selectedDirective
+    // * Also set the items based on itemIds, pull from this.state.allItems
+    //   and add them to updatedDirective.questions
+    console.log('updating with these items: ', itemIds);
+    let updatedSections = [],
+      updatedMission = this.state.selectedMission,
+      isNewDirective = true;
+
+    if (itemIds.length > 0) {
+      updatedDirective.questions = _.filter(this.state.allItems, (item) => {
+        return itemIds.indexOf(item.id) >= 0;
+      });
+    } else {
+      updatedDirective.questions = [];
+    }
+
+    _.each(this.state.missionItems, (section) => {
+      if (section.id !== updatedDirective.id) {
+        updatedSections.push(section);
+      } else {
+        updatedSections.push(updatedDirective);
+        isNewDirective = false;
+      }
+    });
+
+    if (isNewDirective) {
+      updatedSections.push(updatedDirective);
+    }
+
+    updatedMission.sections = updatedSections;
+    this.setState({
+      selectedMission: updatedMission,
+      missionItems: updatedSections
+    });
+
+    if (this.state.selectedDirective) {
+      this.setState({ selectedDirective: updatedDirective });
+    }
   }
 
   render() {
@@ -324,8 +369,6 @@ class MissionsManager extends Component {
     let deleteMission;
     let editMission;
     let dashboard;
-    console.log(this.state.content);
-    console.log(this.state.selectedDirective);
 
     if (this.state.content === 'editMission' && this.state.selectedDirective) {
       editDirective = <EditDirective allItems={this.state.allItems}

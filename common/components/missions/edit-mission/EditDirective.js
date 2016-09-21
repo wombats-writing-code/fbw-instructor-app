@@ -79,14 +79,17 @@ class EditDirective extends Component {
     let selectedIcon = <View />;
 
     if (this.state.directiveItemIds.indexOf(question.id) >= 0) {
-      selectedIcon = <Icon name="check" />;
+      selectedIcon = <Icon name="check"
+                           style={styles.questionText}/>;
     }
     return (
       <TouchableOpacity key={question.id}
                         onPress={() => this._updateDirectiveItemIds(question.id)}>
-        <View>
-          {selectedIcon}
-          <Text>{question.displayName.text}</Text>
+        <View style={styles.questionRow}>
+          <View style={styles.questionIcon}>
+            {selectedIcon}
+          </View>
+          <Text style={styles.questionText}>{question.displayName.text}</Text>
         </View>
       </TouchableOpacity>
     )
@@ -142,7 +145,8 @@ class EditDirective extends Component {
 
     }
     return (
-      <Animated.View style={[styles.container, {opacity: this.state.fadeInAnimation, top: this.state.moveUpAnimation}]}>
+      <Animated.View style={[styles.container, {opacity: this.state.fadeInAnimation,
+                                                top: this.state.moveUpAnimation}]}>
         <TouchableOpacity onPress={this.closeAndSave}
                           style={styles.closeButton}>
           <Image source={require('../../../assets/cancel--light.png')}/>
@@ -171,20 +175,22 @@ class EditDirective extends Component {
           </View>
         </ScrollView>
 
-        <View style={styles.searchQuestionsWrapper}>
-          <View style={styles.kControl}>
-            <Text style={styles.kControlText}>Required</Text>
-            <TouchableHighlight style={styles.minusKButton} onPress={this.onMinusK}>
-              <Image source={require('../../../assets/minus--light.png')}/>
-            </TouchableHighlight>
+        <ScrollView>
+          <View style={styles.searchQuestionsWrapper}>
+            <View style={styles.kControl}>
+              <Text style={styles.kControlText}>Required</Text>
+              <TouchableHighlight style={styles.minusKButton} onPress={this.onMinusK}>
+                <Image source={require('../../../assets/minus--light.png')}/>
+              </TouchableHighlight>
 
-            <TouchableHighlight style={styles.addKButton} onPress={this.onAddK}>
-              <Text style={styles.addKButtonText}>{this.state.minimumRequired}</Text>
-            </TouchableHighlight>
+              <TouchableHighlight style={styles.addKButton} onPress={this.onAddK}>
+                <Text style={styles.addKButtonText}>{this.state.minimumRequired}</Text>
+              </TouchableHighlight>
+            </View>
+
+            {itemsList}
           </View>
-
-          {itemsList}
-        </View>
+        </ScrollView>
 
       </Animated.View>
     )

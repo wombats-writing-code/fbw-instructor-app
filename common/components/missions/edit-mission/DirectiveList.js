@@ -36,16 +36,27 @@ let styles = StyleSheet.create({
   },
   cellInfoWrapper: {
     flex: 9,
+    flexWrap: 'wrap'
+  },
+  cellCountWrapper: {
+    flex: 1,
+    paddingLeft: 10
   },
   cellTitle: {
     fontSize: 18,
     color: '#333',
-    fontWeight: "300"
+    fontWeight: "300",
+  },
+  cellTitleWrapper: {
+    flex: 11
+  },
+  cellIconWrapper: {
+    flex: 1
   },
   directiveContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 21
+    marginBottom: 21,
   },
   itemContainer: {
     flexDirection: 'row',
@@ -114,14 +125,19 @@ class DirectiveList extends Component {
       'No learning outcome assigned yet';
     return (
       <View key={directive.id} style={styles.directiveContainer}>
-        <Image style={styles.directiveIcon} source={require('../../../assets/directive.png')} />
-        <Text style={styles.cellTitle}>{outcomeName}</Text>
+        <View style={styles.cellIconWrapper}>
+          <Image style={styles.directiveIcon} source={require('../../../assets/directive.png')} />
+        </View>
+        <View style={styles.cellTitleWrapper}>
+          <Text style={styles.cellTitle}
+                numberOfLines={1}>{outcomeName}</Text>
+        </View>
       </View>
     )
   }
 
   renderItem = (item, idx) => {
-    console.log('directive item', item);
+    //console.log('directive item', item);
 
     return (
       <View key={item.id} style={styles.itemContainer}>
@@ -149,11 +165,9 @@ class DirectiveList extends Component {
 
           </View>
 
-          {/*hook into this.requiredNumberByDirectiveId and this.props.itemsByDirectiveId.length.
-            feel free to rename and / or make a selector out of it
-            */}
-          <Text style={styles.countIndicator}>{minimumRequired} of {directiveItems.length}</Text>
-
+          <View style={styles.cellCountWrapper}>
+            <Text style={styles.countIndicator}>{minimumRequired} of {directiveItems.length}</Text>
+          </View>
         </View>
       </TouchableHighlight>
     );
