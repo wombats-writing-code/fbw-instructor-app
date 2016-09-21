@@ -24,7 +24,7 @@ var {
 
 var styles = StyleSheet.create({
   container: {
-    backgroundColor: '#3498DB',
+    backgroundColor: '#FF6F69',
     flex: 1,
     paddingTop: 80
   },

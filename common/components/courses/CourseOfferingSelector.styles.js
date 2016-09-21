@@ -11,7 +11,7 @@ module.exports = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     backgroundColor: '#f0f0f0',
-    maxHeight: 100
+    maxHeight: 120
   },
   addNewMissionButton: {
     flex: 0,
