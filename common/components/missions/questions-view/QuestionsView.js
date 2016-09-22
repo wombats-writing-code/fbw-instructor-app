@@ -163,7 +163,7 @@ class QuestionsView extends Component {
 
     _.each(itemsByStudentAndResponses, (studentData, itemId) => {
       _.each(studentData, (responses, studentId) => {
-        responses.sort(_this.submissionTime);
+        responses = _.orderBy(_this.submissionTime);
       });
     });
 
