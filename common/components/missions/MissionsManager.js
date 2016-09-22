@@ -23,6 +23,7 @@ var _ = require('lodash');
 var AssessmentStore = require('../../stores/Assessment');
 var AssessmentConstants = require('../../constants/Assessment');
 var ActionTypes = AssessmentConstants.ActionTypes;
+var GenusTypes = AssessmentConstants.GenusTypes;
 var AssessmentDispatcher = require('../../dispatchers/Assessment');
 var AssessmentItemConstants = require('../../constants/AssessmentItem');
 var AssessmentItemDispatcher = require('../../dispatchers/AssessmentItem');
@@ -216,6 +217,41 @@ class MissionsManager extends Component {
                     selectedMission: null });
   }
 
+  handleSetMissionType = () => {
+    let data = {
+        assessmentId: this.state.selectedMission.id,
+        params: {
+          genusTypeId: this.state.selectedMission.genusTypeId === GenusTypes.HOMEWORK ? GenusTypes.IN_CLASS : GenusTypes.HOMEWORK
+        },
+        callback: this._updateMissionType
+      };
+    AssessmentDispatcher.dispatch({
+        type: ActionTypes.UPDATE_ASSESSMENT,
+        content: data
+    });
+  }
+
+  _updateMissionType = (updatedMission) => {
+    let mission = this.state.selectedMission,
+      updatedMissions = [];
+
+    _.each(this.state.missions, (currentMission) => {
+      if (currentMission.id == updatedMission.id) {
+        currentMission.genusTypeId = updatedMission.genusTypeId;
+        updatedMissions.push(currentMission);
+      } else {
+        updatedMissions.push(currentMission);
+      }
+    });
+
+    mission.genusTypeId = updatedMission.genusTypeId;
+
+    this.setState({
+      selectedMission: mission,
+      missions: updatedMissions
+    });
+  }
+
   _changeContent = (newContent) => {
     this.setState({ content: newContent });
   }
@@ -326,7 +362,7 @@ class MissionsManager extends Component {
     //   and this.state.missionItems and this.state.selectedDirective
     // * Also set the items based on itemIds, pull from this.state.allItems
     //   and add them to updatedDirective.questions
-    console.log('updating with these items: ', itemIds);
+    //console.log('updating with these items: ', itemIds);
     let updatedSections = [],
       updatedMission = this.state.selectedMission,
       isNewDirective = true;
@@ -388,6 +424,7 @@ class MissionsManager extends Component {
                                   onAddDirective={this.handleAddDirective}
                                   onSelectDirective={this.handleSelectDirective}
                                   onDeleteDirective={this.handleDeleteDirective}
+                                  onSetMissionType={this.handleSetMissionType}
       />)
 
     } else if (this.state.content === 'addMission') {
