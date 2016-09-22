@@ -99,14 +99,22 @@ class QuestionsView extends Component {
   }
 
   submissionTime = (responseA, responseB) => {
-    if (responseA.submissionTime && responseB.submissionTime) {
-      return moment(_.assign({}, responseA.submissionTime)).unix() < moment(_.assign({}, responseB.submissionTime)).unix();
-    } else if (responseA.submissionTime) {
+    if (responseA && responseB) {
+      if (typeof responseA.submissionTime !== "undefined" && typeof responseB.submissionTime !== "undefined") {
+        return moment(responseA.submissionTime).unix() < moment(responseB.submissionTime).unix();
+      } else if (typeof responseA.submissionTime !== "undefined") {
+        return false;
+      } else if (typeof responseB.submissionTime !== "undefined") {
+        return true;
+      } else {
+        return true; // arbitrarily let the first unanswered response be <
+      }
+    } else if (responseA) {
       return false;
-    } else if (responseB.submissionTime) {
+    } else if (responseB) {
       return true;
     } else {
-      return true; // arbitrarily let the first unanswered response be <
+      return true;
     }
   }
 
