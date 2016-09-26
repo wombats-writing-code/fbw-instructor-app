@@ -106,7 +106,17 @@ class AddMission extends Component {
                          </ListView> ) :
                        ( <View style={styles.noItemsWarning}>
                            <Text style={[styles.itemLabel, styles.noItemsText]}>No questions</Text>
-                         </View> )
+                         </View> ),
+        homeworkButtonStyles = [styles.missionTypeButton],
+        inClassButtonStyles=[styles.missionTypeButton];
+
+    if (this.state.selectedMissionType === 'in-class') {
+      homeworkButtonStyles.push(styles.unselectedMissionType);
+      inClassButtonStyles.push(styles.selectedMissionType);
+    } else {
+      homeworkButtonStyles.push(styles.selectedMissionType);
+      inClassButtonStyles.push(styles.unselectedMissionType);
+    }
 
     return (
       <View style={styles.container}>
@@ -132,16 +142,16 @@ class AddMission extends Component {
             <View style={styles.selectMissionType}>
               <Text style={styles.selectMissionTypeHeader}>Mission type</Text>
               <View style={styles.missionTypeButtons}>
-                <TouchableHighlight style={styles.missionTypeButton} onPress={() => this._onSelectMissionType('homework')}>
+                <TouchableHighlight style={homeworkButtonStyles} onPress={() => this._onSelectMissionType('homework')}>
                   <Image
                     source={require('../../../assets/mission-selector-icon--homework.png')}
-                    style={[styles.missionTypeIcon, this.state.selectedMissionType === 'homework' && styles.activeIcon]}
+                    style={[styles.missionTypeIcon]}
                   />
                 </TouchableHighlight>
-                <TouchableHighlight style={styles.missionTypeButton} onPress={() => this._onSelectMissionType('in-class')}>
+                <TouchableHighlight style={inClassButtonStyles} onPress={() => this._onSelectMissionType('in-class')}>
                   <Image
                     source={require('../../../assets/mission-selector-icon--in-class.png')}
-                    style={[styles.missionTypeIcon, this.state.selectedMissionType === 'in-class' && styles.activeIcon]}
+                    style={[styles.missionTypeIcon]}
                   />
                 </TouchableHighlight>
               </View>

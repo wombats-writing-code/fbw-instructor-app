@@ -119,7 +119,8 @@ class EditMission extends Component {
     return (
       <View style={styles.container}>
 
-        <EditMissionMetaData mission={this.props.mission}/>
+        <EditMissionMetaData mission={this.props.mission}
+                             changeType={this.props.onSetMissionType} />
 
         <ScrollView style={styles.directivesScrollView}>
           <DirectiveList style={styles.directives}

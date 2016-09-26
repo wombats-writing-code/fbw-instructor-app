@@ -7,6 +7,7 @@ import {
   Animated,
   DatePickerIOS,
   Dimensions,
+  Image,
   ListView, ScrollView,
   StyleSheet,
   Switch,
@@ -17,6 +18,9 @@ import {
 var moment = require('moment');
 require('moment-timezone');
 var _ = require('lodash');
+
+var AssessmentConstants = require('../../../constants/Assessment');
+var GenusTypes = AssessmentConstants.GenusTypes;
 
 var styles = StyleSheet.create({
   missionNameSection: {
@@ -36,6 +40,9 @@ var styles = StyleSheet.create({
     marginLeft: 10.5,
     marginBottom: 21
   },
+  missionTypeIcon: {
+    width: 40
+  },
   section: {
     paddingLeft: 10.5,
     paddingRight: 10.5,
@@ -50,7 +57,8 @@ var styles = StyleSheet.create({
     alignItems: 'center'
   },
   sectionInfoWrapper: {
-    flex: 9
+    flex: 9,
+    flexDirection: 'row'
   },
   sectionTitle: {
     fontSize: 18,
@@ -59,14 +67,15 @@ var styles = StyleSheet.create({
     marginBottom: 8,
   },
   sectionSubTitle: {
-    fontSize: 14,
-    color: '#333',
-    fontWeight: "300",
+    marginLeft: 25
   },
   sectionChangeIndicator: {
     fontSize: 18,
     fontWeight: "300",
     color: '#46B29D',
+    flex: 1
+  },
+  sectionChangeIndicatorWrapper: {
     flex: 1
   },
   muted: {
@@ -109,6 +118,17 @@ class EditMissionMetaData extends Component {
     nativeStartTime = moment.tz(nativeStartTime, "Europe/London").clone().tz(timezone).format();
     nativeDeadline = moment.tz(nativeDeadline, "Europe/London").clone().tz(timezone).format();
 
+    let typeIcon = (<Image
+                      source={require('../../../assets/mission-selector-icon--homework.png')}
+                      style={[styles.missionTypeIcon]}
+                    />);
+    if (this.props.mission.genusTypeId === GenusTypes.IN_CLASS) {
+      typeIcon = (<Image
+                    source={require('../../../assets/mission-selector-icon--in-class.png')}
+                    style={[styles.missionTypeIcon]}
+                  />);
+    }
+
     return (
       <View>
         {/*<TouchableHighlight></TouchableHighlight>*/}
@@ -124,7 +144,7 @@ class EditMissionMetaData extends Component {
         <TouchableHighlight style={[styles.section]}>
           <View style={styles.sectionWrapper}>
             <View style={styles.sectionInfoWrapper}>
-              <Text style={[styles.sectionTitle]}>Dates</Text>
+              <Text style={[styles.sectionTitle]}>Dates: </Text>
               <Text style={[styles.sectionSubTitle]}>
                 <Text style={styles.muted}>Start </Text><Text>{moment.tz(nativeStartTime, timezone).format('ddd, h:mmA MMM D')}</Text>
                 <Text style={styles.muted}>   Deadline </Text><Text >{moment.tz(nativeDeadline, timezone).format('ddd, h:mmA MMM D')}</Text>
@@ -137,10 +157,15 @@ class EditMissionMetaData extends Component {
         <TouchableHighlight style={styles.section}>
           <View style={styles.sectionWrapper}>
             <View style={styles.sectionInfoWrapper}>
-              <Text style={[styles.sectionTitle]}>Type</Text>
-              <Text style={styles.sectionSubTitle}>{this.props.mission.genusTypeId}</Text>
+              <Text style={[styles.sectionTitle]}>Type: </Text>
+              <View style={styles.sectionSubTitle}>
+                {typeIcon}
+              </View>
             </View>
-            <Text style={styles.sectionChangeIndicator}>Change</Text>
+            <TouchableHighlight onPress={() => this.props.changeType()}
+                                style={styles.sectionChangeIndicatorWrapper}>
+              <Text style={styles.sectionChangeIndicator}>Change</Text>
+            </TouchableHighlight>
           </View>
         </TouchableHighlight>
       </View>

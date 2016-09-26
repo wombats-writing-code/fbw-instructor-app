@@ -316,6 +316,32 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
       })
       .done();
   },
+  updateAssessment: function (data) {
+    var _this = this;
+    store.get('bankId')
+      .then((bankId) => {
+        var updateSectionParams = {
+          data: {
+          },
+          method: 'PUT',
+          path: `assessment/banks/${bankId}/assessments/${data.assessmentId}`
+        };
+        _.assign(updateSectionParams.data, data.params);
+
+        return qbankFetch(updateSectionParams);
+      })
+      .then((res) => {
+        return res.json();
+      })
+      .then((updatedAssessment) => {
+        // return the newly updated assessment
+        data.callback(updatedAssessment);
+      })
+      .catch((error) => {
+        console.log('error updating assessment');
+      })
+      .done();
+  },
 });
 
 AssessmentStore.dispatchToken = AssessmentDispatcher.register(function (action) {
