@@ -17,7 +17,7 @@ var UserStore = require('../../stores/User');
 
 var styles = StyleSheet.create({
   container: {
-    backgroundColor: '#3498DB',
+    backgroundColor: '#FF6F69',
     flex: 1,
     padding: 100
   }

@@ -55,6 +55,8 @@ class TreeView extends Component {
       )
     });
 
+
+    // render nodes as circles
     let nodes = _.map(this.props.nodes, (node, idx) => {
       return (
         <Circle id={node.id} cx={node.x} cy={node.y} r={node.r} fill={node.fill} stroke={node.stroke} strokeWidth={node.strokeWidth}

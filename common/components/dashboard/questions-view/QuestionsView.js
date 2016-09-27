@@ -90,7 +90,7 @@ class QuestionsView extends Component {
           <MathWebView content={rowData.text} />
         </View>
         <View style={styles.attemptsTextWrapper}>
-          <Text>
+          <Text style={styles.attemptNumber}>
             {rowData.numberStudentsByAttempt} of {rowData.numberStudentsWhoSawThisItem}
           </Text>
         </View>

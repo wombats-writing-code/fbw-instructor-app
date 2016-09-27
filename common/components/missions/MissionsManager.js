@@ -36,7 +36,7 @@ var SortItemsByModules = require('../../stores/sortItemsByModules');
 
 var MissionsSidebar = require('./missions-sidebar/MissionsSidebar');
 var EditDirective = require('./edit-mission/EditDirective')
-var Dashboard = require('./Dashboard');
+var Dashboard = require('../dashboard/Dashboard');
 var AddMission = require('./add-mission/AddMission');
 var EditMission = require('./edit-mission/EditMission');
 var DeleteMission = require('./delete-mission/DeleteMission');
@@ -431,7 +431,7 @@ class MissionsManager extends Component {
           addMission = <AddMission onClose={() => this.setState({content: 'dashboard'})} />
 
     } else if (this.state.content === 'dashboard' && this.state.selectedMission) {
-      dashboard = <Dashboard mission={this.state.selectedMission}/>
+      dashboard = <Dashboard mission={this.state.selectedMission} modules={this.state.modules}/>
     } else if (this.state.content === 'deleteMission' && this.state.selectedMission) {
       deleteMission = <DeleteMission mission={this.state.selectedMission}
                                      reset={this.handleResetContent} />;

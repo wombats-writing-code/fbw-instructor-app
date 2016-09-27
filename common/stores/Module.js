@@ -54,6 +54,8 @@ var ModuleStore = _.assign({}, EventEmitter.prototype, {
             _outcomes[outcome.id] = outcome;
           });
         });
+        // console.log(' modules', _modules);
+
         _this.emitChange();
       })
       .catch((error) => {
@@ -62,15 +64,7 @@ var ModuleStore = _.assign({}, EventEmitter.prototype, {
       .done();
   },
   getOutcome: function (outcomeId) {
-    if (_.keys(_outcomes).indexOf(outcomeId) >= 0) {
-      return _outcomes[outcomeId];
-    } else {
-      return {
-        displayName: {
-          text: 'Unknown LO'
-        }
-      }
-    }
+    return _outcomes[outcomeId];
   },
   getOutcomes: function () {
     return _outcomes;

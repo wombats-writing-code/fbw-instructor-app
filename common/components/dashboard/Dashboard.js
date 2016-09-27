@@ -9,60 +9,38 @@ import {
   ActivityIndicator,
   Animated,
   Text,
-  ListView,
-  Picker,
-  ScrollView,
-  View,
+  ListView, View, ScrollView,
+  Slider,
   TouchableHighlight,
   StyleSheet
 } from 'react-native';
 
 var _ = require('lodash');
+var styles = require('./Dashboard.styles');
 
-var styles = StyleSheet.create({
-  container: {
-    marginTop: 60,
-    flex: 3
-  },
-  dashboardNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 18
-  },
-  dashboardNavButton: {
-    padding: 9,
-    borderRadius: 3,
-    borderWidth: 1,
-    borderColor: 'transparent'
-  },
-  selectedButton: {
-    borderColor: '#888'
-  },
-  buttonText: {
-    color: '#666',
-    fontWeight: "500",
-    letterSpacing: 1
-  },
-  scrollContainer: {
-    height: 650
-  }
-});
-
-import TreeView from './tree-view/TreeView';
-import QuestionsView from './questions-view/QuestionsView';
 let ActionTypes = require('../../constants/Assessment').ActionTypes;
 let AssessmentDispatcher = require('../../dispatchers/Assessment');
+let ModuleStore = require('../../stores/Module')
+
+import QuestionsView from './questions-view/QuestionsView';
+import TreeView from './tree-view/TreeView';
+import Xoces from 'xoces/components'
+// import Dao from 'rhumbl-dao'
+
+// import {} from './processResults'
+
 
 class Dashboard extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      activeView: 'outcomesView',
+      // activeView: 'outcomesView',
+      activeView: 'questionsView',
       loading: true,
       opacity: new Animated.Value(0),
       results: [],
-      selector: 1
+      number: 1
     }
   }
   componentWillUnmount() {
@@ -70,6 +48,7 @@ class Dashboard extends Component {
       toValue: 0
     }).start();
   }
+
   componentDidMount() {
     Animated.timing(this.state.opacity, {
       toValue: 1
@@ -101,39 +80,24 @@ class Dashboard extends Component {
   render() {
     if (this.state.loading) {
       return (
-        <View>
-          <ActivityIndicator size="large" />
-        </View>
+          <ActivityIndicator style={styles.loadingIndicator} size="large" />
       )
     }
 
     let questionsView;
     if (this.state.activeView === 'questionsView') {
-      // TODO: remove the picker ... right now it's just here to verify the
-      // functionality of picking different # attempts.
-
       questionsView = (
-        <ScrollView>
-          <Picker onValueChange={(attempts) => this.setState({selector: attempts})}
-                  selectedValue={this.state.selector}>
-            <Picker.Item label="1" value={1} />
-            <Picker.Item label="2" value={2} />
-            <Picker.Item label="3" value={3} />
-            <Picker.Item label="4" value={4} />
-          </Picker>
-          <QuestionsView results={this.state.results}
-                         attemptsSelector={this.state.selector} />
-        </ScrollView>
+        <QuestionsView results={this.state.results}
+               attemptsSelector={this.state.selector} />
       )
     }
 
     let treeView;
-    if (this.state.activeView === 'outcomesView') {
+    if (this.props.modules && this.state.activeView === 'outcomesView') {
       treeView = (
-        <ScrollView>
-          <TreeView nodes={this._getNodes()} edges={this._getEdges()}
+          <TreeView
+                    outcomes={this._getNodes()} relationships={this._getEdges()}
                     onPressNode={this.handlePressNode} />
-        </ScrollView>
       )
     }
 
@@ -151,10 +115,27 @@ class Dashboard extends Component {
               <Text style={styles.buttonText}>OUTCOMES</Text>
             </TouchableHighlight>
           </View>
-          <View style={styles.scrollContainer}>
+
+          <View>
+            <View style={styles.pickNumberPromptWrapper}>
+              <Text style={styles.pickNumberPrompt}>How many students got it right by the</Text>
+              <View style={styles.numberWrapper}>
+                <Text style={styles.number}>{this.state.number}</Text>
+                <Text style={styles.ordinal}>{this._getOrdinal(this.state.number)}</Text>
+              </View>
+              <Text style={styles.pickNumberPrompt}>try?</Text>
+            </View>
+
+            <Slider minimumValue={1} maximumValue={4} step={1}
+                    minimumTrackTintColor="#FF6F69" maximumTrackTintColor="#aaaaaa"
+                    onSlidingComplete={(number) => this.setState({number})} />
+          </View>
+
+          <ScrollView style={styles.scrollContainer}>
             {questionsView}
             {treeView}
-          </View>
+          </ScrollView>
+
         </Animated.View>
       </View>
     );
@@ -182,9 +163,21 @@ class Dashboard extends Component {
 
       // So first, let's save the results in state, then
       // pass that along to the QuestionsView
-      // Remember to pass a selector value (i.e. student got it right in X tries)
+      // Remember to pass a number value (i.e. student got it right in X tries)
       this.setState({results: offeredResults,
                      loading: false});
+  }
+
+  _getOrdinal(number) {
+    if (number === 1) {
+      return 'st';
+    } else if (number === 2) {
+      return 'nd';
+    } else if (number === 3) {
+      return 'rd';
+    } else {
+      return 'th'
+    }
   }
 
   handlePressNode(node) {
@@ -194,17 +187,35 @@ class Dashboard extends Component {
   // below are just dummy methods. will compute real stuff later
 
   _getNodes() {
-    return _.map(_.range(0, 5), (idx) => {
-      return {
-        id: idx + '-dummy-node',
-        x: idx*100 + 50,
-        y: _.random(30, 80),
+
+    let outcomeIds = _.uniq(_.flatMap(this.state.results, (response) => _.flatMap(response.questions, 'learningObjectiveIds')));
+    let outcomes = _.map(outcomeIds, ModuleStore.getOutcome);
+    console.log('outcomes', outcomes);
+
+    let params = {
+      drawing: {
+        background: '#eee',
+        width: 600,
+        height: 500,
+      },
+      node: {
         r: 20,
         fill: '#FFEEAD',
         stroke: '#cccccc',
         strokeWidth: 1
       }
-    });
+    };
+
+    let daoData = {entities, relationships};
+    let dag = dao.getPathway(outcomeIds, ['mc3-relationship%3Amc3.lo.2.lo.requisite%40MIT-OEIT'], 'OUTGOING_ALL', daoData);
+    let ranked = dao.rankDAG(dag, (item) => dao.getIncomingEntitiesAll(item.id, [''], 'OUTGOING_ALL', daoData));
+    let relationships = [];
+
+    let layout = Xoces.tree.layout(params, ranked, relationships);
+
+    console.log('layout', layout);
+
+    return layout.nodes;
   }
 
   _getEdges() {
