@@ -55,8 +55,6 @@ var styles = StyleSheet.create({
   },
   missionsMainContentContainer: {
     flex: 3.2,
-    paddingLeft: 21,
-    paddingRight: 21
   },
   questionDrawer: {
     backgroundColor: '#7A7A7A',

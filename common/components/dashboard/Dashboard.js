@@ -104,21 +104,27 @@ class Dashboard extends Component {
     return (
       <View style={styles.container}>
         <Animated.View style={{opacity: this.state.opacity}}>
+
           <View style={styles.dashboardNav}>
+            <TouchableHighlight style={[styles.dashboardNavButton, this.state.activeView === 'outcomesView' ? styles.selectedButton : null]}
+                onPress={() => this.setState({activeView: 'outcomesView'})}>
+              <Text style={styles.buttonText}>OUTCOMES</Text>
+            </TouchableHighlight>
+
             <TouchableHighlight style={[styles.dashboardNavButton, this.state.activeView === 'questionsView' ? styles.selectedButton : null]}
                 onPress={() => this.setState({activeView: 'questionsView'})}>
               <Text style={styles.buttonText}>QUESTIONS</Text>
             </TouchableHighlight>
 
-            <TouchableHighlight style={[styles.dashboardNavButton, this.state.activeView === 'outcomesView' ? styles.selectedButton : null]}
-                onPress={() => this.setState({activeView: 'outcomesView'})}>
-              <Text style={styles.buttonText}>OUTCOMES</Text>
+            <TouchableHighlight style={[styles.dashboardNavButton, this.state.activeView === 'studentView' ? styles.selectedButton : null]}
+                onPress={() => this.setState({activeView: 'studentView'})}>
+              <Text style={styles.buttonText}>STUDENT</Text>
             </TouchableHighlight>
           </View>
 
-          <View>
+          <View style={styles.sidePadding}>
             <View style={styles.pickNumberPromptWrapper}>
-              <Text style={styles.pickNumberPrompt}>How many students got it right by the</Text>
+              <Text style={styles.pickNumberPrompt}>How <Text style={styles.studentNumber}>many</Text> students could not get it right by the</Text>
               <View style={styles.numberWrapper}>
                 <Text style={styles.number}>{this.state.number}</Text>
                 <Text style={styles.ordinal}>{this._getOrdinal(this.state.number)}</Text>
@@ -127,11 +133,11 @@ class Dashboard extends Component {
             </View>
 
             <Slider minimumValue={1} maximumValue={4} step={1}
-                    minimumTrackTintColor="#FF6F69" maximumTrackTintColor="#aaaaaa"
+                    minimumTrackTintColor="#444" maximumTrackTintColor="#aaaaaa"
                     onSlidingComplete={(number) => this.setState({number})} />
           </View>
 
-          <ScrollView style={styles.scrollContainer}>
+          <ScrollView style={[styles.scrollContainer, styles.sidePadding]}>
             {questionsView}
             {treeView}
           </ScrollView>
