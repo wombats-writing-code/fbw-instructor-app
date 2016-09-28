@@ -74,6 +74,39 @@ var ModuleStore = _.assign({}, EventEmitter.prototype, {
   },
   getOutcomes: function () {
     return _outcomes;
+  },
+  getRelationships: function (callback) {
+    // gets the parent-child and requisite relationships for
+    // the active bank.
+    let _this = this;
+    UserStore.getDepartment()
+      .then((department) => {
+        let departmentCode = GuessDepartmentCode(department),
+          params = {
+            path: `/relationship/familyidforbank/${BankMap[departmentCode]}`
+          };
+
+        return HandcarFetch(params);
+      })
+      .then((res) => {
+        return res.text();
+      })
+      .then((familyId) => {
+        let params = {
+          path: `/relationship/families/${familyId}/relationships?genustypeid=mc3-relationship%3Amc3.lo.2.lo.requisite%40MIT-OEIT&genustypeid=mc3-relationship%3Amc3.lo.2.lo.parent.child%40MIT-OEIT`
+        };
+        return HandcarFetch(params);
+      })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        callback(data);
+      })
+      .catch((error) => {
+        console.log('error getting bank relationships');
+      })
+      .done();
   }
 });
 
