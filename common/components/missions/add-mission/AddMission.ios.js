@@ -157,7 +157,7 @@ class AddMission extends Component {
               </View>
             </View>
 
-           <View styles={styles.startDateWrapper}>
+            <View styles={styles.startDateWrapper}>
               <Text style={styles.inputLabel}>Start Date</Text>
               <DatePickerIOS date={this.state.missionStartDate}
                              minuteInterval={30}

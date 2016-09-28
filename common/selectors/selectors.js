@@ -1,4 +1,6 @@
 var _ = require('lodash');
+let moment = require('moment');
+require('moment-timezone');
 
 export const filterItemsByOutcome = (outcomeId, items) => {
   return _.filter(items, {learningObjectiveIds: [outcomeId]});
@@ -29,4 +31,25 @@ export const getDirectiveModule = (modules, directive) => {
     let childIndices = _.map(module.childNodes, 'id');
     return childIndices.indexOf(directive.learningObjectiveId) >= 0;
   });
+}
+
+export const localDateTime = (utcDateObject) => {
+  // do this weird stuff instead of using moment.utc() because
+  // that still seems to generate stuff of an hour and not account
+  // for DST in GMT...
+  let localTime = _.assign({}, utcDateObject),
+    timezone = moment.tz.guess();
+
+  localTime.month = localTime.month - 1;  // because JavaScript is 0-index, not like Python
+
+  if (localTime.month < 0) {
+    localTime.month = localTime.month + 12;
+  }
+
+  if (moment.tz(localTime, "Europe/London").isDST()) {
+    localTime.hour = localTime.hour + 1;
+    // let moment.js handle numbers > 23 by also changing the day internally
+  }
+
+  return moment.tz(localTime, "Europe/London").clone().tz(timezone);
 }

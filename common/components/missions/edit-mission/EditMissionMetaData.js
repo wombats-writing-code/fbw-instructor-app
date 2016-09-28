@@ -19,8 +19,15 @@ var moment = require('moment');
 require('moment-timezone');
 var _ = require('lodash');
 
+import {localDateTime} from '../../../selectors/selectors';
+
 var AssessmentConstants = require('../../../constants/Assessment');
 var GenusTypes = AssessmentConstants.GenusTypes;
+var ActionTypes = AssessmentConstants.ActionTypes;
+
+var credentials = require('../../../constants/credentials');
+var DateConvert = require('fbw-utils')(credentials).ConvertDateToDictionary;
+var Dispatcher = require('../../../dispatchers/Assessment');
 
 var styles = StyleSheet.create({
   missionNameSection: {
@@ -51,10 +58,17 @@ var styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ccc'
   },
+  dateEditorWrapper: {
+    flex: 9,
+    flexDirection: 'column'
+  },
   sectionWrapper: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center'
+    flexDirection: 'row'
+  },
+  sectionCurrentInfoWrapper: {
+    flex: 1,
+    flexDirection: 'column'
   },
   sectionInfoWrapper: {
     flex: 9,
@@ -67,7 +81,8 @@ var styles = StyleSheet.create({
     marginBottom: 8,
   },
   sectionSubTitle: {
-    marginLeft: 25
+    marginLeft: 25,
+    paddingTop: 3
   },
   sectionChangeIndicator: {
     fontSize: 18,
@@ -84,39 +99,63 @@ var styles = StyleSheet.create({
   bold: {
     fontWeight: "600"
   },
+  dateSection: {
+    flex: 1,
+    flexDirection: 'column',
+    borderWidth: 1
+  }
 })
 
 class EditMissionMetaData extends Component {
   constructor(props) {
     super(props);
+
+    let tzOffset = (-1) * (new Date()).getTimezoneOffset() / 60;
+
+    // using moment.js as below, need to convert the new deadline and startTime
+    // to local timezone, from UTC
+    let newDeadline = localDateTime(this.props.mission.deadline);
+    let newStartTime = localDateTime(this.props.mission.startTime);
+
     this.state = {
-      missionName: this.props.mission.displayName.text
+      missionName: this.props.mission.displayName.text,
+      showDateEditors: false,
+      newMissionDeadline: newDeadline.toDate(),
+      newMissionStartDate: newStartTime.toDate(),
+      timeZoneOffsetInHours: tzOffset,
     }
   }
 
+  saveNewDates = () => {
+    // the change should trickle down from the store, so only dispatch
+    // the change here.
+    let data = {
+      assessmentOfferedId: this.props.mission.assessmentOfferedId,
+      params: {
+        deadline: DateConvert(this.state.newMissionDeadline),
+        startTime: DateConvert(this.state.newMissionStartDate)
+      }
+    };
+
+    Dispatcher.dispatch({
+        type: ActionTypes.UPDATE_ASSESSMENT_OFFERED,
+        content: data
+    });
+
+    this.toggleShowChangeDates();
+  }
+
+  toggleShowChangeDates = () => {
+    this.setState({ showDateEditors: !this.state.showDateEditors });
+  }
 
   render() {
-    let nativeStartTime = _.assign({}, this.props.mission.startTime),
-      nativeDeadline = _.assign({}, this.props.mission.deadline),
+    // do this weird stuff instead of using moment.utc() because
+    // that still seems to generate stuff of an hour and not account
+    // for DST in GMT...
+    let nativeStartTime = localDateTime(this.props.mission.startTime).format(),
+      nativeDeadline = localDateTime(this.props.mission.deadline).format(),
       timezone = moment.tz.guess();
-
-    nativeStartTime.month = nativeStartTime.month - 1;
-    nativeDeadline.month = nativeDeadline.month - 1;
-    if (nativeStartTime.month < 0) {
-      nativeStartTime.month = nativeStartTime.month + 12;
-    }
-    if (nativeDeadline.month < 0) {
-      nativeDeadline.month = nativeDeadline.month + 12;
-    }
-    if (moment.tz(nativeStartTime, "Europe/London").isDST()) {
-      nativeStartTime.hour = nativeStartTime.hour + 1;
-      // let moment.js handle numbers > 23 by also changing the day internally
-    }
-    if (moment.tz(nativeDeadline, "Europe/London").isDST()) {
-      nativeDeadline.hour = nativeDeadline.hour + 1;
-    }
-    nativeStartTime = moment.tz(nativeStartTime, "Europe/London").clone().tz(timezone).format();
-    nativeDeadline = moment.tz(nativeDeadline, "Europe/London").clone().tz(timezone).format();
 
     let typeIcon = (<Image
                       source={require('../../../assets/mission-selector-icon--homework.png')}
@@ -127,6 +166,51 @@ class EditMissionMetaData extends Component {
                     source={require('../../../assets/mission-selector-icon--in-class.png')}
                     style={[styles.missionTypeIcon]}
                   />);
+    }
+
+    let dateEditors = <View />,
+      changeDateButton = (<TouchableHighlight onPress={() => this.toggleShowChangeDates()}
+                                      style={styles.sectionChangeIndicatorWrapper}>
+                    <Text style={styles.sectionChangeIndicator}>Change</Text>
+                  </TouchableHighlight>);
+
+    if (this.state.showDateEditors) {
+      dateEditors = (
+        <View style={styles.dateEditorWrapper}>
+          <View>
+            <Text style={styles.inputLabel}>Start Date</Text>
+            <DatePickerIOS date={this.state.newMissionStartDate}
+                           minuteInterval={30}
+                           mode="datetime"
+                           onDateChange={(date) => this.setState({newMissionStartDate: new Date(date)})}
+                           ref="startDateDatepicker"
+                           timeZoneOffsetInMinutes={this.state.timeZoneOffsetInHours * 60}/>
+          </View>
+
+          <View>
+            <Text style={styles.inputLabel}>Deadline</Text>
+            <DatePickerIOS date={this.state.newMissionDeadline}
+                           minimumDate={this.state.newMissionStartDate}
+                           minuteInterval={30}
+                           mode="datetime"
+                           onDateChange={(date) => this.setState({newMissionDeadline: new Date(date)})}
+                           ref="deadlineDatepicker"
+                           timeZoneOffsetInMinutes={this.state.timeZoneOffsetInHours * 60}/>
+          </View>
+        </View>
+      );
+      changeDateButton = (
+        <View>
+          <TouchableHighlight onPress={() => this.toggleShowChangeDates()}
+                              style={styles.sectionChangeIndicatorWrapper}>
+            <Text style={styles.sectionChangeIndicator}>Cancel</Text>
+          </TouchableHighlight>
+          <TouchableHighlight onPress={() => this.saveNewDates()}
+                              style={styles.sectionChangeIndicatorWrapper}>
+            <Text style={styles.sectionChangeIndicator}>Save</Text>
+          </TouchableHighlight>
+        </View>
+      );
     }
 
     return (
@@ -142,15 +226,18 @@ class EditMissionMetaData extends Component {
         <View style={styles.missionNameBorderContainer}></View>
 
         <TouchableHighlight style={[styles.section]}>
-          <View style={styles.sectionWrapper}>
-            <View style={styles.sectionInfoWrapper}>
-              <Text style={[styles.sectionTitle]}>Dates: </Text>
-              <Text style={[styles.sectionSubTitle]}>
-                <Text style={styles.muted}>Start </Text><Text>{moment.tz(nativeStartTime, timezone).format('ddd, h:mmA MMM D')}</Text>
-                <Text style={styles.muted}>   Deadline </Text><Text >{moment.tz(nativeDeadline, timezone).format('ddd, h:mmA MMM D')}</Text>
-              </Text>
+          <View style={styles.sectionCurrentInfoWrapper}>
+            <View style={[styles.sectionWrapper]}>
+              <View style={styles.sectionInfoWrapper}>
+                <Text style={[styles.sectionTitle]}>Dates: </Text>
+                <Text style={[styles.sectionSubTitle]}>
+                  <Text style={styles.muted}>Start </Text><Text>{moment.tz(nativeStartTime, timezone).format('ddd, h:mmA MMM D')}</Text>
+                  <Text style={styles.muted}>   Deadline </Text><Text >{moment.tz(nativeDeadline, timezone).format('ddd, h:mmA MMM D')}</Text>
+                </Text>
+              </View>
+              {changeDateButton}
             </View>
-            <Text style={styles.sectionChangeIndicator}>Change</Text>
+            {dateEditors}
           </View>
         </TouchableHighlight>
 
