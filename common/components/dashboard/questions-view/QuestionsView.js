@@ -44,37 +44,7 @@ var MathWebView = require('../../math-webview/MathWebView');
 
 import {uniqueQuestions, notCorrectWithinAttempts} from '../processResults'
 
-let styles = StyleSheet.create({
-  notification: {
-    backgroundColor: '#ff9c9c',
-    padding: 3
-  },
-  notificationText: {
-    fontSize: 10,
-    padding: 5
-  },
-  progressIcon: {
-    marginRight: 3
-  },
-  rounded: {
-    borderRadius: 3
-  },
-  questionRow: {
-    borderWidth: 1,
-    flex: 1,
-    flexDirection: 'row',
-    margin: 10,
-    padding: 5
-  },
-  questionTextWrapper: {
-    flex: 5
-  },
-  attemptsTextWrapper: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center'
-  }
-});
+let styles = require('./QuestionsView.styles')
 
 class QuestionsView extends Component {
   constructor(props) {
@@ -85,31 +55,44 @@ class QuestionsView extends Component {
     }
   }
 
-  renderRow = (question) => {
+  renderRow = (questionWithComputed) => {
 
-    let numStudentsWrong = notCorrectWithinAttempts(question.itemId, this.props.attemptsSelector);
+    // console.log('questionWithComputed', questionWithComputed)
+
+    if (questionWithComputed.numStudentsDidNotAchieve === 0) {
+      return null;
+    }
 
     return (
       <View style={styles.questionRow}>
         <View style={styles.questionTextWrapper}>
-          <MathWebView content={question.text.text} />
+          <MathWebView content={questionWithComputed.text} />
         </View>
         <View style={styles.attemptsTextWrapper}>
-          <Text style={styles.attemptNumber}>
-            {numStudentsWrong}
-          </Text>
+          <Text style={styles.numStudentsDidNotAchieve}>{questionWithComputed.numStudentsDidNotAchieve}</Text>
         </View>
       </View>
     )
   }
 
   render() {
+    let questionsList = uniqueQuestions(this.props.takenResults);
+    let questionsWithComputed = _.orderBy(_.map(questionsList, (question) => {
+      let didNotAchieveTakens = notCorrectWithinAttempts(question.itemId, this.props.takenResults, this.props.maxAttempts);
+      console.log(didNotAchieveTakens);
 
-    let questionsList = uniqueQuestions(this.props.results);
-    console.log('questionsList', questionsList)
+      return {
+        text: question.text.text,
+        numStudentsDidNotAchieve: didNotAchieveTakens.length
+      }
+    }), ['numStudentsDidNotAchieve'], ['desc']);
+
+
+    // console.log('taken results', this.props.takenResults);
+    // console.log('questionsList', questionsList)
 
     return (
-      <ListView dataSource={this.state.ds.cloneWithRows(questionsList)}
+      <ListView dataSource={this.state.ds.cloneWithRows(questionsWithComputed)}
                 renderRow={this.renderRow}>
       </ListView>
     );

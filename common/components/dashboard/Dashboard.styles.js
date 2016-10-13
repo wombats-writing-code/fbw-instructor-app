@@ -18,7 +18,7 @@ module.exports = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 50,
     marginBottom: 21,
-    backgroundColor: '#FF6F69',
+    backgroundColor: '#2980B9',
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginBottom: 18
@@ -58,9 +58,11 @@ module.exports = StyleSheet.create({
     color: "#FF6F69"
   },
   number: {
+    color: '#E37B40',
     fontWeight: "600",
   },
   ordinal: {
+    color: '#E37B40',
     fontWeight: "500",
     fontSize: 8
   }

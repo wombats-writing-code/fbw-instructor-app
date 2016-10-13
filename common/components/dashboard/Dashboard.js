@@ -87,18 +87,18 @@ class Dashboard extends Component {
     let questionsView;
     if (this.state.activeView === 'questionsView') {
       questionsView = (
-        <QuestionsView results={this.state.results}
-               attemptsSelector={this.state.selector} />
+        <QuestionsView takenResults={this.state.results}
+               maxAttempts={this.state.number} />
       )
     }
 
     let treeView;
     if (this.props.modules && this.state.activeView === 'outcomesView') {
-      treeView = (
-          <TreeView
-                    outcomes={this._getNodes()} relationships={this._getEdges()}
-                    onPressNode={this.handlePressNode} />
-      )
+      // treeView = (
+      //     <TreeView
+      //               outcomes={this._getNodes()} relationships={this._getEdges()}
+      //               onPressNode={this.handlePressNode} />
+      // )
     }
 
     return (
@@ -133,7 +133,7 @@ class Dashboard extends Component {
             </View>
 
             <Slider minimumValue={1} maximumValue={4} step={1}
-                    minimumTrackTintColor="#444" maximumTrackTintColor="#aaaaaa"
+                    minimumTrackTintColor="#E37B40" maximumTrackTintColor="#aaaaaa"
                     onSlidingComplete={(number) => this.setState({number})} />
           </View>
 
@@ -211,6 +211,8 @@ class Dashboard extends Component {
         strokeWidth: 1
       }
     };
+
+    let entities = []; // temporary, TODO
 
     let daoData = {entities, relationships};
     let dag = dao.getPathway(outcomeIds, ['mc3-relationship%3Amc3.lo.2.lo.requisite%40MIT-OEIT'], 'OUTGOING_ALL', daoData);

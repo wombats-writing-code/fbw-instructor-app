@@ -9,4 +9,4 @@ import {
 
 var FbWRouter = require('./common/components/FbWRouter');
 
-AppRegistry.registerComponent('FbW', () => FbWRouter);
+AppRegistry.registerComponent('InstructorApp', () => FbWRouter);
