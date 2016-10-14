@@ -25,7 +25,7 @@ let ModuleStore = require('../../stores/Module')
 import QuestionsView from './questions-view/QuestionsView';
 import TreeView from './tree-view/TreeView';
 import Xoces from 'xoces/components'
-// import Dao from 'rhumbl-dao'
+import Dao from 'rhumbl-dao'
 
 // import {} from './processResults'
 
@@ -35,8 +35,8 @@ class Dashboard extends Component {
     super(props);
 
     this.state = {
-      // activeView: 'outcomesView',
-      activeView: 'questionsView',
+      activeView: 'outcomesView',
+      // activeView: 'questionsView',
       loading: true,
       opacity: new Animated.Value(0),
       results: [],
@@ -94,11 +94,10 @@ class Dashboard extends Component {
 
     let treeView;
     if (this.props.modules && this.state.activeView === 'outcomesView') {
-      // treeView = (
-      //     <TreeView
-      //               outcomes={this._getNodes()} relationships={this._getEdges()}
-      //               onPressNode={this.handlePressNode} />
-      // )
+      treeView = (
+          <TreeView outcomes={this._getNodes()} relationships={this._getEdges()}
+                    onPressNode={this.handlePressNode} />
+      )
     }
 
     return (
@@ -196,7 +195,7 @@ class Dashboard extends Component {
 
     let outcomeIds = _.uniq(_.flatMap(this.state.results, (response) => _.flatMap(response.questions, 'learningObjectiveIds')));
     let outcomes = _.map(outcomeIds, ModuleStore.getOutcome);
-    console.log('outcomes', outcomes);
+    console.log('outcomes', outcomes, 'outcomeIds', outcomeIds);
 
     let params = {
       drawing: {
@@ -212,12 +211,16 @@ class Dashboard extends Component {
       }
     };
 
-    let entities = []; // temporary, TODO
+    let daoData = {entities: outcomes, relationships: relationships};
+    let dag = Dao.getPathway(outcomeIds, ['mc3-relationship%3Amc3.lo.2.lo.requisite%40MIT-OEIT'], 'OUTGOING_ALL', daoData);
+    console.log('dag', dag);
 
-    let daoData = {entities, relationships};
-    let dag = dao.getPathway(outcomeIds, ['mc3-relationship%3Amc3.lo.2.lo.requisite%40MIT-OEIT'], 'OUTGOING_ALL', daoData);
-    let ranked = dao.rankDAG(dag, (item) => dao.getIncomingEntitiesAll(item.id, [''], 'OUTGOING_ALL', daoData));
+    let ranked = Dao.rankDAG(dag, (item) => Dao.getIncomingEntitiesAll(item.id, [''], 'OUTGOING_ALL', daoData));
+    console.log('ranked', ranked);
+
+
     let relationships = [];
+
 
     let layout = Xoces.tree.layout(params, ranked, relationships);
 
