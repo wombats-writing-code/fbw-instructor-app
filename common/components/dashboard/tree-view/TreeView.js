@@ -30,6 +30,7 @@ import Svg,{
 } from 'react-native-svg';
 
 let _ = require('lodash');
+let ModuleStore = require('../../../stores/Module');
 
 let styles = {
   svg: {
@@ -39,6 +40,11 @@ let styles = {
 };
 
 class TreeView extends Component {
+  componentDidMount() {
+    ModuleStore.getRelationships((data) => {
+      console.log(data);
+    });
+  }
 
   render() {
 

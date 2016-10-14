@@ -342,6 +342,48 @@ var AssessmentStore = _.assign({}, EventEmitter.prototype, {
       })
       .done();
   },
+  updateAssessmentOffered: function (data) {
+    var _this = this;
+    store.get('bankId')
+      .then((bankId) => {
+        var updateOfferedParams = {
+          data: {
+          },
+          method: 'PUT',
+          path: `assessment/banks/${bankId}/assessmentsoffered/${data.assessmentOfferedId}`
+        };
+        _.assign(updateOfferedParams.data, data.params);
+        console.log(updateOfferedParams);
+        return qbankFetch(updateOfferedParams);
+      })
+      .then((res) => {
+        return res.json();
+      })
+      .then((updatedAssessmentOffered) => {
+        // update the mission deadline and startTime
+        // in stores, then emit a change
+        let updatedMissions = [];
+        console.log(updatedAssessmentOffered);
+        _.each(_assessments, (assessment) => {
+          if (assessment.id == updatedAssessmentOffered.assessmentId) {
+            // update it before appending
+            assessment.startTime = updatedAssessmentOffered.startTime;
+            assessment.deadline = updatedAssessmentOffered.deadline;
+            updatedMissions.push(assessment);
+          } else {
+            updatedMissions.push(assessment);
+          }
+        })
+
+        _assessments = updatedMissions;
+        _this.emitChange();
+      })
+      .catch((error) => {
+        console.log('error updating assessment offered');
+        console.log(error);
+      })
+      .done();
+  },
 });
 
 AssessmentStore.dispatchToken = AssessmentDispatcher.register(function (action) {
@@ -351,6 +393,9 @@ AssessmentStore.dispatchToken = AssessmentDispatcher.register(function (action) 
             break;
         case ActionTypes.UPDATE_ASSESSMENT:
             AssessmentStore.updateAssessment(action.content);
+            break;
+        case ActionTypes.UPDATE_ASSESSMENT_OFFERED:
+            AssessmentStore.updateAssessmentOffered(action.content);
             break;
         case ActionTypes.DELETE_ASSESSMENT:
             AssessmentStore.deleteAssessment(action.content);

@@ -129,7 +129,7 @@ class MissionsManager extends Component {
 
   handleSelectMission = (mission, mode) => {
     if (typeof mode === 'undefined') {
-      mode = 'missionStatus'
+      mode = this.state.content;
     }
     this.setState({ content: mode });
     this._updateSelectedMissionAndItems(mission, mode);
