@@ -27,7 +27,7 @@ import React, {
 
 import {
   Animated,
-  View,
+  View, Image,
   TouchableHighlight,
   ListView,
   StyleSheet,
@@ -43,6 +43,7 @@ var MathJaxURL = credentials.MathJaxURL;
 var MathWebView = require('../../math-webview/MathWebView');
 
 import {uniqueQuestions, notCorrectWithinAttempts} from '../processResults'
+import {isTarget} from '../../../selectors/selectors'
 
 let styles = require('./QuestionsView.styles')
 
@@ -57,19 +58,36 @@ class QuestionsView extends Component {
 
   renderRow = (questionWithComputed) => {
 
-    // console.log('questionWithComputed', questionWithComputed)
-
     if (questionWithComputed.numStudentsDidNotAchieve === 0) {
       return null;
     }
 
+    let questionTypeIcon;
+    if (isTarget(questionWithComputed)) {
+      questionTypeIcon = <Image style={styles.questionTypeIcon} source={require('../../../assets/target-question.png')} />
+    } else {
+      questionTypeIcon = <Image style={styles.questionTypeIcon} source={require('../../../assets/waypoint-question.png')} />
+    }
+
     return (
-      <View style={styles.questionRow}>
-        <View style={styles.questionTextWrapper}>
-          <MathWebView content={questionWithComputed.text} />
+      <View style={styles.row}>
+        <View style={styles.questionWrapper}>
+          {questionTypeIcon}
+          <View style={styles.questionTextWrapper}>
+            <MathWebView content={questionWithComputed.text.text} />
+          </View>
+          <View style={styles.attemptsTextWrapper}>
+            <Text style={styles.numStudentsDidNotAchieve}>{questionWithComputed.numStudentsDidNotAchieve}</Text>
+          </View>
         </View>
-        <View style={styles.attemptsTextWrapper}>
-          <Text style={styles.numStudentsDidNotAchieve}>{questionWithComputed.numStudentsDidNotAchieve}</Text>
+
+        <View style={styles.controls}>
+          <TouchableHighlight style={styles.getAnotherQuestionButton} onPress={_.noop} >
+            <Text style={styles.getAnotherQuestionButtonText}>Get another question</Text>
+          </TouchableHighlight>
+          <TouchableHighlight style={styles.seeStudentResponsesButton} onPress={_.noop} >
+            <Text style={styles.seeStudentResponsesButtonText}>See student responses</Text>
+          </TouchableHighlight>
         </View>
       </View>
     )
@@ -79,16 +97,15 @@ class QuestionsView extends Component {
     let questionsList = uniqueQuestions(this.props.takenResults);
     let questionsWithComputed = _.orderBy(_.map(questionsList, (question) => {
       let didNotAchieveTakens = notCorrectWithinAttempts(question.itemId, this.props.takenResults, this.props.maxAttempts);
-      console.log(didNotAchieveTakens);
 
-      return {
-        text: question.text.text,
+      return _.assign({}, question, {
         numStudentsDidNotAchieve: didNotAchieveTakens.length
-      }
+      })
     }), ['numStudentsDidNotAchieve'], ['desc']);
 
 
-    // console.log('taken results', this.props.takenResults);
+    console.log('taken results', this.props.takenResults);
+    console.log('questionsWithComputed', questionsWithComputed);
     // console.log('questionsList', questionsList)
 
     return (

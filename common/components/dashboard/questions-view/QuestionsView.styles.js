@@ -15,13 +15,16 @@ module.exports = StyleSheet.create({
   progressIcon: {
     marginRight: 3
   },
-  questionRow: {
+  row: {
+    margin: 10,
+    padding: 5,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+  },
+  questionWrapper: {
     flex: 1,
     flexDirection: 'row',
-    margin: 10,
-    padding: 5
+    alignItems: 'flex-start',
   },
   questionTextWrapper: {
     flex: 5
@@ -32,7 +35,36 @@ module.exports = StyleSheet.create({
     justifyContent: 'center'
   },
 
+  questionTypeIcon: {
+    width: 30,
+    height: 30,
+    marginRight: 12,
+  },
   numStudentsDidNotAchieve: {
-    color: '#E37B40'
-  }
+    fontSize: 20,
+    color: '#FF6F69'
+  },
+
+  controls: {
+    flexDirection: 'row',
+    marginBottom: 18,
+    marginLeft: 48,
+    justifyContent: 'space-between'
+  },
+  getAnotherQuestionButton: {
+    padding: 9,
+    backgroundColor: '#2980B9',
+    borderRadius: 3,
+  },
+  getAnotherQuestionButtonText: {
+    color: '#fff'
+  },
+  seeStudentResponsesButton: {
+    padding: 9,
+    backgroundColor: '#FF6F69',
+    borderRadius: 3,
+  },
+  seeStudentResponsesButtonText: {
+    color: '#fff'
+  },
 });

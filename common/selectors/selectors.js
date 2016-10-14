@@ -1,5 +1,13 @@
 var _ = require('lodash');
 
+export const isTarget = (question) => {
+  if (question && question.displayName) {
+    return question.displayName.text.indexOf('.') < 0;
+  }
+
+  return undefined;
+}
+
 export const filterItemsByOutcome = (outcomeId, items) => {
   return _.filter(items, {learningObjectiveIds: [outcomeId]});
 }
