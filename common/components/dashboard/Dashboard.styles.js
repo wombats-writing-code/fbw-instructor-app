@@ -44,7 +44,9 @@ module.exports = StyleSheet.create({
   pickNumberPromptWrapper: {
     flexDirection: 'row',
     marginBottom: 21,
-
+  },
+  pickNumberPrompt: {
+    fontSize: 18,
   },
   numberWrapper: {
     flexDirection: 'row',
@@ -58,10 +60,12 @@ module.exports = StyleSheet.create({
     color: "#FF6F69"
   },
   number: {
+    fontSize: 18,
     color: '#E37B40',
     fontWeight: "600",
   },
   ordinal: {
+    fontSize: 18,
     color: '#E37B40',
     fontWeight: "500",
     fontSize: 8
