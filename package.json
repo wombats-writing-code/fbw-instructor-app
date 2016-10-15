@@ -35,7 +35,7 @@
     "react-native-svg": "^4.3.0",
     "react-native-swipe-list-view": "^0.3.0",
     "react-native-vector-icons": "^2.0.2",
-    "rhumbl-dao": "^0.3.1",
+    "rhumbl-dao": "^0.5.3",
     "valence": "github:wombats-writing-code/valence-sdk-javascript",
     "xoces": "^1.2.0"
   },

@@ -49,6 +49,7 @@ class TreeView extends Component {
 
     // render edges as lines
     let edges = _.map(layout.links, (edge, idx) => {
+      console.log('edge', edge.x1, edge.y1);
       return (
         <Line id={edge.id} x1={edge.x1} y1={edge.y1} x2={edge.x2} y2={edge.y2} stroke={edge.stroke}
               strokeWidth={edge.strokeWidth}
@@ -60,6 +61,7 @@ class TreeView extends Component {
 
     // render nodes as circles
     let nodes = _.map(layout.nodes, (node, idx) => {
+      console.log('node', node.x, node.y);
       return (
         <Circle id={node.id} cx={node.x} cy={node.y} r={node.r}
                 fill={node.fill} stroke={node.stroke} strokeWidth={node.strokeWidth}
@@ -70,11 +72,11 @@ class TreeView extends Component {
     });
 
     // render nodeBottomLabels
-    let nodeBottomLabels = _.map(layout.nodeBottomLabels, (label) => {
-      console.log(label);
+    let nodeBottomLabels = _.map(layout.nodeBottomLabels, (label, idx) => {
+      // console.log(label);
       return (
-        <Text x={label.x} y={label.y} fontSize={label.fontSize} lineHeight={label.lineHeight}>
-          {label.text}
+        <Text key={idx+1} x={label.x} y={label.y} fontSize={label.fontSize} lineHeight={label.lineHeight}>
+          {label.text || ''}
         </Text>
       )
     });

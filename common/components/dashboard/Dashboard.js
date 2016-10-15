@@ -207,6 +207,13 @@ class Dashboard extends Component {
 
 
   _getLayout() {
+    let allOutcomes = _.map(_.toArray(ModuleStore.getOutcomes()), (outcome) => {
+      return _.assign({}, outcome, {
+        type: 'outcome',
+        name: outcome.displayName.text
+      })
+    });
+
     let outcomeIds = _.uniq(_.flatMap(this.state.results, (response) => _.flatMap(response.questions, 'learningObjectiveIds')));
     let outcomes = _.map(outcomeIds, (id) => {
       let outcome = ModuleStore.getOutcome(id)
@@ -225,7 +232,8 @@ class Dashboard extends Component {
       })
     });;
 
-    console.log('outcomes', outcomes, 'outcomeIds', outcomeIds, 'target questions', targetQuestions, 'target outcomes', targetOutcomes);
+    console.log('outcomes', _.map(outcomes, 'displayName.text'))
+    console.log('target questions', targetQuestions, 'target outcomes', targetOutcomes);
 
     let params = {
       drawing: {
@@ -237,15 +245,27 @@ class Dashboard extends Component {
         r: 20,
         fill: '#FFEEAD',
         stroke: '#cccccc',
-        strokeWidth: 1
+        strokeWidth: 1,
+        borderRadius: '50%',
+      },
+      nodeCenterLabel: {
+        fontSize: 12,
+        property: (outcome) => {
+            return outcome.id.split('%')[1];
+        }
+      },
+      nodeBottomLabel: {
+        fontSize: 12,
+        property: outcome => _.truncate(outcome.name)
       }
+
     };
 
-    let daoData = {entities: outcomes, relationships: this.state.relationships};
-    let dag = dao.getPathway(targetOutcomes[0].id, ['mc3-relationship%3Amc3.lo.2.lo.requisite%40MIT-OEIT'], 'OUTGOING_ALL', daoData);
+    let daoData = {entities: allOutcomes, relationships: this.state.relationships};
+    let dag = dao.getPathway(_.map(targetOutcomes, 'id'), ['mc3-relationship%3Amc3.lo.2.lo.requisite%40MIT-OEIT'], 'OUTGOING_ALL', daoData);
     console.log('dag', dag);
 
-    let ranked = dao.rankDAG(dag, (item) => dao.getIncomingEntitiesAll(item.id, [''], 'OUTGOING_ALL', daoData));
+    let ranked = dao.rankDAG(dag, (item) => dao.getIncomingEntitiesAll(item.id, ['mc3-relationship%3Amc3.lo.2.lo.requisite%40MIT-OEIT'], daoData));
     console.log('ranked', ranked);
 
     let layout = Xoces.tree.layout(params, ranked, dag.edges);

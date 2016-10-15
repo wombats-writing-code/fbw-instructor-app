@@ -69,5 +69,8 @@ module.exports = StyleSheet.create({
     color: '#E37B40',
     fontWeight: "500",
     fontSize: 8
+  },
+  loadingIndicator: {
+    marginTop: 80
   }
 });
