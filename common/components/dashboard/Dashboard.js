@@ -22,10 +22,14 @@ let ActionTypes = require('../../constants/Assessment').ActionTypes;
 let AssessmentDispatcher = require('../../dispatchers/Assessment');
 let ModuleStore = require('../../stores/Module')
 
+import {isTarget} from '../../selectors/selectors'
+
+
 import QuestionsView from './questions-view/QuestionsView';
 import TreeView from './tree-view/TreeView';
 import Xoces from 'xoces/components'
-import Dao from 'rhumbl-dao'
+
+var dao = require('rhumbl-dao');
 
 // import {} from './processResults'
 
@@ -40,7 +44,8 @@ class Dashboard extends Component {
       loading: true,
       opacity: new Animated.Value(0),
       results: [],
-      number: 1
+      number: 1,
+      relationships: null
     }
   }
   componentWillUnmount() {
@@ -61,6 +66,17 @@ class Dashboard extends Component {
           assessmentOfferedId: this.props.mission.assessmentOfferedId,
           callback: this.setResults
         }
+    });
+
+    ModuleStore.getRelationships((data) => {
+      this.setState({
+        relationships: _.map(data, (item) => {
+          return _.assign({}, item, {
+            type: item.genusTypeId,
+            targetId: item.destinationId
+          })
+        })
+      })
     });
   }
 
@@ -93,9 +109,9 @@ class Dashboard extends Component {
     }
 
     let treeView;
-    if (this.props.modules && this.state.activeView === 'outcomesView') {
+    if (this.props.modules && this.state.relationships && this.state.activeView === 'outcomesView') {
       treeView = (
-          <TreeView outcomes={this._getNodes()} relationships={this._getEdges()}
+          <TreeView layout={this._getLayout()}
                     onPressNode={this.handlePressNode} />
       )
     }
@@ -189,13 +205,27 @@ class Dashboard extends Component {
     console.log('node was pressed', node);
   }
 
-  // below are just dummy methods. will compute real stuff later
 
-  _getNodes() {
-
+  _getLayout() {
     let outcomeIds = _.uniq(_.flatMap(this.state.results, (response) => _.flatMap(response.questions, 'learningObjectiveIds')));
-    let outcomes = _.map(outcomeIds, ModuleStore.getOutcome);
-    console.log('outcomes', outcomes, 'outcomeIds', outcomeIds);
+    let outcomes = _.map(outcomeIds, (id) => {
+      let outcome = ModuleStore.getOutcome(id)
+      return _.assign({}, outcome, {
+        type: 'outcome',
+        name: outcome.displayName.text
+      })
+    });
+
+    let targetQuestions =  _.filter(_.uniqBy(_.flatMap(this.state.results, 'questions'), 'itemId'), (q) => isTarget(q));
+    let targetOutcomes = _.map(_.uniq(_.flatMap(targetQuestions, 'learningObjectiveIds')), (id) => {
+      let outcome = ModuleStore.getOutcome(id)
+      return _.assign({}, outcome, {
+        type: 'outcome',
+        name: outcome.displayName.text
+      })
+    });;
+
+    console.log('outcomes', outcomes, 'outcomeIds', outcomeIds, 'target questions', targetQuestions, 'target outcomes', targetOutcomes);
 
     let params = {
       drawing: {
@@ -211,36 +241,25 @@ class Dashboard extends Component {
       }
     };
 
-    let daoData = {entities: outcomes, relationships: relationships};
-    let dag = Dao.getPathway(outcomeIds, ['mc3-relationship%3Amc3.lo.2.lo.requisite%40MIT-OEIT'], 'OUTGOING_ALL', daoData);
+    let daoData = {entities: outcomes, relationships: this.state.relationships};
+    let dag = dao.getPathway(targetOutcomes[0].id, ['mc3-relationship%3Amc3.lo.2.lo.requisite%40MIT-OEIT'], 'OUTGOING_ALL', daoData);
     console.log('dag', dag);
 
-    let ranked = Dao.rankDAG(dag, (item) => Dao.getIncomingEntitiesAll(item.id, [''], 'OUTGOING_ALL', daoData));
+    let ranked = dao.rankDAG(dag, (item) => dao.getIncomingEntitiesAll(item.id, [''], 'OUTGOING_ALL', daoData));
     console.log('ranked', ranked);
 
+    let layout = Xoces.tree.layout(params, ranked, dag.edges);
 
-    let relationships = [];
-
-
-    let layout = Xoces.tree.layout(params, ranked, relationships);
+    layout.links = _.map(layout.links, (link) => {
+      return _.assign({}, link, {
+        stroke: '#ccc',
+        strokeWidth: 1
+      })
+    });
 
     console.log('layout', layout);
 
-    return layout.nodes;
-  }
-
-  _getEdges() {
-    return _.map(_.range(0, 5), (idx) => {
-      return {
-        id: idx + '-dummy-edge',
-        x1: idx*100 + 50,
-        y1: _.random(30, 80),
-        x2: _.random(30, 500),
-        y2: _.random(80, 500),
-        stroke: '#cccccc',
-        strokeWidth: 1
-      }
-    });
+    return layout;
   }
 
 }
