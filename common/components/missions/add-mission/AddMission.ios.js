@@ -123,11 +123,11 @@ class AddMission extends Component {
         <Animated.View style={{opacity: this.state.opacity}}>
 
           <View style={styles.navBar}>
-            <TouchableHighlight onPress={() => this.props.onClose()}>
-                <Text style={styles.button}>Cancel</Text>
+            <TouchableHighlight style={styles.button} onPress={() => this.props.onClose()}>
+                <Text style={styles.buttonText}>Cancel</Text>
             </TouchableHighlight>
-            <TouchableHighlight onPress={() => this.createAssessment()}>
-                <Text style={styles.button}>Create</Text>
+            <TouchableHighlight style={styles.button} onPress={() => this.createAssessment()}>
+                <Text style={styles.buttonText}>Create</Text>
             </TouchableHighlight>
           </View>
 

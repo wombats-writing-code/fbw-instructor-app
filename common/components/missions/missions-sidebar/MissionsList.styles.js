@@ -14,11 +14,12 @@ module.exports = StyleSheet.create({
     backgroundColor: sidebarBackground,
   },
   addMissionButton: {
+    padding: 10.5,
+    paddingRight: 21,
     flexWrap: 'nowrap',
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    marginRight: _lineHeight,
     marginBottom: _lineHeight
   },
 

@@ -5,6 +5,8 @@ import {
 
 module.exports = StyleSheet.create({
   container: {
+    paddingLeft: 21,
+    paddingRight: 21,
     justifyContent: 'space-between'
   },
   missionNameInput: {
@@ -20,9 +22,9 @@ module.exports = StyleSheet.create({
     marginBottom: 21
   },
   button: {
-    borderColor: 'white',
-    borderRadius: 3,
-    borderWidth: 1,
+    padding: 10.5
+  },
+  buttonText: {
     color: '#444'
   },
   selectMissionType: {
@@ -43,6 +45,7 @@ module.exports = StyleSheet.create({
   },
   missionTypeIcon: {
     width: 40,
+    height: 40
   },
   selectedMissionType: {
     opacity: 1
