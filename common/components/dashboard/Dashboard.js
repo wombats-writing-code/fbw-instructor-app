@@ -105,7 +105,8 @@ class Dashboard extends Component {
     if (this.state.activeView === 'questionsView') {
       questionsView = (
         <QuestionsView takenResults={this.state.results}
-               maxAttempts={this.state.number} />
+                       maxAttempts={this.state.number}
+                       allItems={this.props.allItems} />
       )
 
       pickNumberPrompt = (

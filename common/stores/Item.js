@@ -38,7 +38,7 @@ var ItemStore = _.assign({}, EventEmitter.prototype, {
       .then((department) => {
         var departmentCode = GuessDepartmentCode(department),
           params = {
-            path: `assessment/banks/${BankMap[departmentCode]}/items?page=all`
+            path: `assessment/banks/${BankMap[departmentCode]}/items?page=all&unrandomized`
           };
         return qbankFetch(params);
       })

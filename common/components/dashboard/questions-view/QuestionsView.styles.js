@@ -67,4 +67,20 @@ module.exports = StyleSheet.create({
   seeStudentResponsesButtonText: {
     color: '#fff'
   },
+  studentResponseBlock: {
+    marginBottom: 18,
+    marginLeft: 98,
+    marginRight: 98,
+    justifyContent: 'space-between'
+  },
+  studentResponseRow: {
+    flex: 1,
+    flexDirection: 'row'
+  },
+  rowLabelColumn: {
+    flex: 9
+  },
+  attemptsColumnWrapper: {
+    flex: 1
+  }
 });
