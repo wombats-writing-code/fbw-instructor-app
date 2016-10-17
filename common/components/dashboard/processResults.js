@@ -72,7 +72,7 @@ export const grabQuestionByChoiceId = (takenResults, choiceId) => {
  Sort the submissions by time?
 */
 export const selectedChoiceXWithinAttempts = (takenResults, choiceId, maxAttempts) => {
-  let attemptsCounter = [];
+  let attemptsCounter = _.range(maxAttempts).map(() => {return 0;});
   let itemId = grabQuestionByChoiceId(takenResults, choiceId).itemId;
   _.each(takenResults, (taken) => {
     let responses = _.compact(_.concat([], _.flatten(_.map(_.filter(taken.questions, {'itemId': itemId}), 'responses'))));
@@ -80,13 +80,12 @@ export const selectedChoiceXWithinAttempts = (takenResults, choiceId, maxAttempt
 
     for (var i=1; i<=maxAttempts; i++) {
       let shiftedIndex = i - 1;
-      attemptsCounter[shiftedIndex] = 0;
 
-      if (responses.length >= i && responses.length <= maxAttempts) {
+      if (responses.length >= i) {
         if (!responses[shiftedIndex].isCorrect) {
           if (responses[shiftedIndex].choiceIds.length == 0) {
-            // surrendering is equivalent to not getting it right
-            attemptsCounter[shiftedIndex]++;
+            // when surrendering, we don't know what choice they picked ... so
+            // don't count it
           } else if (responses[shiftedIndex].choiceIds[0] == choiceId) {
             attemptsCounter[shiftedIndex]++;
           }
