@@ -5,6 +5,7 @@ import React, {
 } from 'react';
 
 import {
+  Dimensions,
   Animated,
   View,
   TouchableHighlight,
@@ -32,15 +33,20 @@ import Svg,{
 let _ = require('lodash');
 let ModuleStore = require('../../../stores/Module');
 
+const sidePadding = 21;
 let styles = {
   svg: {
-    borderWidth: 1,
-    borderColor: '#ccc'
+    // borderWidth: 1,
+    // borderColor: '#ccc'
   }
 };
 
 class TreeView extends Component {
+
   render() {
+    let {height, width} = Dimensions.get('window');
+    console.log('width', width);
+
     let layout = this.props.layout;
 
     if (!(layout && layout.nodes && layout.links)) {
@@ -82,7 +88,7 @@ class TreeView extends Component {
     });
 
     return (
-      <Svg height="500" width="600" style={styles.svg}>
+      <Svg height={height} width={width*3.2/4.2 - sidePadding*2} style={styles.svg}>
         {edges}
         {nodes}
         {nodeBottomLabels}

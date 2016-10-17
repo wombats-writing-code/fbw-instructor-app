@@ -101,10 +101,28 @@ class Dashboard extends Component {
     }
 
     let questionsView;
+    let pickNumberPrompt, pickNumberSlider;
     if (this.state.activeView === 'questionsView') {
       questionsView = (
         <QuestionsView takenResults={this.state.results}
                maxAttempts={this.state.number} />
+      )
+
+      pickNumberPrompt = (
+        <View style={styles.pickNumberPromptWrapper}>
+          <Text style={styles.pickNumberPrompt}>How <Text style={styles.studentNumber}>many</Text> students could not get it right by the</Text>
+          <View style={styles.numberWrapper}>
+            <Text style={styles.number}>{this.state.number}</Text>
+            <Text style={styles.ordinal}>{this._getOrdinal(this.state.number)}</Text>
+          </View>
+          <Text style={styles.pickNumberPrompt}>try?</Text>
+        </View>
+      )
+
+      pickNumberSlider = (
+        <Slider minimumValue={1} maximumValue={4} step={1}
+                minimumTrackTintColor="#E37B40" maximumTrackTintColor="#aaaaaa"
+                onSlidingComplete={(number) => this.setState({number})} />
       )
     }
 
@@ -138,18 +156,8 @@ class Dashboard extends Component {
           </View>
 
           <View style={styles.sidePadding}>
-            <View style={styles.pickNumberPromptWrapper}>
-              <Text style={styles.pickNumberPrompt}>How <Text style={styles.studentNumber}>many</Text> students could not get it right by the</Text>
-              <View style={styles.numberWrapper}>
-                <Text style={styles.number}>{this.state.number}</Text>
-                <Text style={styles.ordinal}>{this._getOrdinal(this.state.number)}</Text>
-              </View>
-              <Text style={styles.pickNumberPrompt}>try?</Text>
-            </View>
-
-            <Slider minimumValue={1} maximumValue={4} step={1}
-                    minimumTrackTintColor="#E37B40" maximumTrackTintColor="#aaaaaa"
-                    onSlidingComplete={(number) => this.setState({number})} />
+            {pickNumberPrompt}
+            {pickNumberSlider}
           </View>
 
           <ScrollView style={[styles.scrollContainer, styles.sidePadding]}>

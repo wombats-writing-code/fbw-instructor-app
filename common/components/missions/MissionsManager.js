@@ -8,7 +8,6 @@ import React, {
 import {
   Text,
   ListView,
-  ScrollView,
   View,
   ActivityIndicator,
   TouchableHighlight,
