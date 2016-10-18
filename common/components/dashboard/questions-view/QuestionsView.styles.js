@@ -81,6 +81,12 @@ module.exports = StyleSheet.create({
     flex: 9
   },
   attemptsColumnWrapper: {
-    flex: 1
+    flex: 1,
+    paddingTop: 8,
+    alignItems: 'center'
+  },
+  showedAnswerColumn: {
+    paddingLeft: 8,
+    paddingTop: 8
   }
 });

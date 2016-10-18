@@ -44,6 +44,7 @@ var MathWebView = require('../../math-webview/MathWebView');
 
 import {uniqueQuestions,
   notCorrectWithinAttempts,
+  grabAndSortResponses,
   selectedChoiceXWithinAttempts} from '../processResults'
 import {isTarget} from '../../../selectors/selectors'
 
@@ -77,8 +78,7 @@ class QuestionsView extends Component {
       studentResponses;
 
     if (this.state.expandedStudentResponses.indexOf(questionWithComputed.id) >= 0) {
-      let ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
-        headerRow = [];
+      let headerRow = [];
       studentResponseButtonVerb = 'Hide';
 
       for (var i=1; i<=this.props.maxAttempts; i++) {
@@ -102,16 +102,26 @@ class QuestionsView extends Component {
       //  $1200 X             10     4     2     0
       //  $6000 X              2     0     0     0
       //  $0    X              5     1     0     0
+      //  Showed answer        1     0     0     0
 
+      // for debugging
+      // notCorrectWithinAttempts(questionWithComputed.itemId, this.props.takenResults, this.props.maxAttempts);
+
+      let surrenderData = selectedChoiceXWithinAttempts(this.props.takenResults,
+        questionWithComputed.choices[0].id,
+        this.props.maxAttempts,
+        true);
       studentResponses = (
         <View style={styles.studentResponseBlock}>
           <View style={styles.studentResponseRow}>
             <View style={styles.rowLabelColumn}></View>
             {_.map(headerRow, (label, index) => {return <View key={index} style={styles.attemptsColumnWrapper}><Text>{label}</Text></View>})}
           </View>
-          <ListView dataSource={ds.cloneWithRows(_.orderBy(questionWithComputed.choices, 'text'))}
-                    renderRow={this.renderStudentResponseMatrix}>
-          </ListView>
+          {_.map(_.orderBy(questionWithComputed.choices, 'name'), this.renderStudentResponseMatrix)}
+          <View style={styles.studentResponseRow}>
+            <View style={[styles.rowLabelColumn, styles.showedAnswerColumn]}><Text>Showed Answer</Text></View>
+            {_.map(surrenderData, (label, index) => {return <View key={index} style={styles.attemptsColumnWrapper}><Text>{label}</Text></View>})}
+          </View>
         </View>
       );
     }
@@ -144,7 +154,10 @@ class QuestionsView extends Component {
   renderStudentResponseMatrix = (rowData) => {
     // to calculate how many students fall into each bin, need to inspect this.props.takenResults
     // and see how many answers match this rowData.id
-    let attemptsData = selectedChoiceXWithinAttempts(this.props.takenResults, rowData.id, this.props.maxAttempts);
+    let attemptsData = selectedChoiceXWithinAttempts(this.props.takenResults,
+      rowData.id,
+      this.props.maxAttempts,
+      false);
     return (<View key={rowData.id} style={styles.studentResponseRow}>
       <View style={styles.rowLabelColumn}>
         <MathWebView content={rowData.text} />
@@ -167,7 +180,13 @@ class QuestionsView extends Component {
     let questionsList = uniqueQuestions(this.props.takenResults);
     let questionsWithComputed = _.orderBy(_.map(questionsList, (question) => {
       let didNotAchieveTakens = notCorrectWithinAttempts(question.itemId, this.props.takenResults, this.props.maxAttempts);
-
+      if (this.props.maxAttempts == 2) {
+        console.log('introspecting maxAttempts 2');
+        console.log(didNotAchieveTakens);
+        _.each(didNotAchieveTakens, (taken) => {
+          console.log(grabAndSortResponses(taken.questions, question.itemId));
+        });
+      }
       return _.assign({}, question, {
         numStudentsDidNotAchieve: didNotAchieveTakens.length
       })

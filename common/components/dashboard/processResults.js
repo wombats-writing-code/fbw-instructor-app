@@ -10,11 +10,6 @@ export const uniqueQuestions = (takenResults) => {
 /* given a list of responses, a questionId and the number of attempts,
 calculate how many students did not get it correct within numAttempts
 **/
-// Note that currently, this seems to ignore the submissionTime
-// factor ... so it is possible that someone answered a waypoint
-// question in Route 2 correct before answering it wrong in Route 1,
-// but here they will show up at requiring 2 attempts.
-
 // Note that this calculation means that the student may NOT have ever gotten it right
 export const notCorrectWithinAttempts = (questionId, takenResults, maxAttempts) => {
 
@@ -25,28 +20,22 @@ export const notCorrectWithinAttempts = (questionId, takenResults, maxAttempts) 
 
     let numAttempts = 0;
     let numSeen = 0;
-    for (let i=0; i<taken.questions.length; i++) {
-      let question = taken.questions[i];
+    let responses = grabAndSortResponses(taken.questions, questionId);
+    for (let i=0; i<responses.length; i++) {
+      let response = responses[i];
+      if (!response.isCorrect) {
+        numAttempts++;
+      }
 
-      // match the question by its itemId
-      if (question.itemId === questionId) {
-        numSeen++;
+      // console.log(response, 'numAttempts', numAttempts, maxAttempts, 'max attempt');
 
-        // console.log('matched question. its reponses', question.responses[0]);
-        let response = question.responses[0];
-
-        if (response) {
-          numAttempts++;
-
-          // console.log(response, 'numAttempts', numAttempts, maxAttempts, 'max attempt');
-
-          // if the response is not correct, and the number of student attempts equals or exceeded the given attempt number,
-          // then we say the student has not achieved
-          if (!response.isCorrect && numAttempts >= maxAttempts) {
-            return taken;
-          }
-        }
-
+      // if the response is not correct, and the number of student attempts equals or exceeded the given attempt number,
+      // then we say the student has not achieved
+      // TODO: clean this up somehow? This could still be Wrong / Right / Wrong
+      //    pattern ...
+      if (!response.isCorrect && numAttempts >= maxAttempts) {
+        //console.log(_.filter(taken.questions, {'itemId': questionId}));
+        return taken;
       }
     }
 
@@ -54,6 +43,14 @@ export const notCorrectWithinAttempts = (questionId, takenResults, maxAttempts) 
   }));
 
 }
+
+/* standardize how to extract and sort the responses, based on
+ submissionTime. Given a taken and itemId*/
+ export const grabAndSortResponses = (questionsList, itemId) => {
+   let responses = _.compact(_.concat([], _.flatten(_.map(_.filter(questionsList, {'itemId': itemId}), 'responses'))));
+   responses = _.orderBy(responses, sortBySubmissionTime);
+   return responses;
+ }
 
 /* Kind of a hack ... we know that FbW choiceIds are unique
 in the system, even across questions.
@@ -71,22 +68,20 @@ export const grabQuestionByChoiceId = (takenResults, choiceId) => {
 
  Sort the submissions by time?
 */
-export const selectedChoiceXWithinAttempts = (takenResults, choiceId, maxAttempts) => {
+export const selectedChoiceXWithinAttempts = (takenResults, choiceId, maxAttempts, surrenderCount) => {
   let attemptsCounter = _.range(maxAttempts).map(() => {return 0;});
   let itemId = grabQuestionByChoiceId(takenResults, choiceId).itemId;
   _.each(takenResults, (taken) => {
-    let responses = _.compact(_.concat([], _.flatten(_.map(_.filter(taken.questions, {'itemId': itemId}), 'responses'))));
-    responses = _.orderBy(responses, sortBySubmissionTime);
-
-    for (var i=1; i<=maxAttempts; i++) {
+    let responses = grabAndSortResponses(taken.questions, itemId);
+    for (let i=1; i<=maxAttempts; i++) {
       let shiftedIndex = i - 1;
 
       if (responses.length >= i) {
         if (!responses[shiftedIndex].isCorrect) {
-          if (responses[shiftedIndex].choiceIds.length == 0) {
-            // when surrendering, we don't know what choice they picked ... so
-            // don't count it
-          } else if (responses[shiftedIndex].choiceIds[0] == choiceId) {
+          if (responses[shiftedIndex].choiceIds.length == 0 && surrenderCount) {
+            // when surrendering, show it separately
+            attemptsCounter[shiftedIndex]++;
+          } else if (responses[shiftedIndex].choiceIds[0] == choiceId && !surrenderCount) {
             attemptsCounter[shiftedIndex]++;
           }
         }
