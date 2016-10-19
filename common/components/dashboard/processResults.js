@@ -1,4 +1,3 @@
-
 import _ from 'lodash'
 let moment = require('moment');
 require('moment-timezone');
@@ -125,6 +124,7 @@ export const correctWithinAttempts = (questionId, takenResults, maxAttempts) => 
 
     return null;
   }));
+}
 
 export const sortBySubmissionTime  = (responseA, responseB) => {
   if (responseA && responseB) {
