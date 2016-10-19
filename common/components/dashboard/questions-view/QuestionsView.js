@@ -42,7 +42,10 @@ var credentials = require('../../../constants/credentials');
 var MathJaxURL = credentials.MathJaxURL;
 var MathWebView = require('../../math-webview/MathWebView');
 
-import {uniqueQuestions, notCorrectWithinAttempts} from '../processResults'
+import {uniqueQuestions,
+  notCorrectWithinAttempts,
+  grabAndSortResponses,
+  selectedChoiceXWithinAttempts} from '../processResults'
 import {isTarget} from '../../../selectors/selectors'
 
 let styles = require('./QuestionsView.styles')
@@ -52,7 +55,8 @@ class QuestionsView extends Component {
     super(props);
 
     this.state = {
-      ds: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2})
+      ds: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
+      expandedStudentResponses: []
     }
   }
 
@@ -67,6 +71,59 @@ class QuestionsView extends Component {
       questionTypeIcon = <Image style={styles.questionTypeIcon} source={require('../../../assets/target-question.png')} />
     } else {
       questionTypeIcon = <Image style={styles.questionTypeIcon} source={require('../../../assets/waypoint-question.png')} />
+    }
+
+
+    let studentResponseButtonVerb = 'See',
+      studentResponses;
+
+    if (this.state.expandedStudentResponses.indexOf(questionWithComputed.id) >= 0) {
+      let headerRow = [];
+      studentResponseButtonVerb = 'Hide';
+
+      for (var i=1; i<=this.props.maxAttempts; i++) {
+        if (i == 1) {
+          headerRow.push('1st');
+        } else if (i == 2) {
+          headerRow.push('2nd');
+        } else if (i == 3) {
+          headerRow.push('3rd');
+        } else {
+          headerRow.push('4th');
+        }
+      }
+
+      let rowLabels = _.map(questionWithComputed.choices, 'text');
+      // let's create a table that shows choices as rows, versus # attempts
+      // as columns, up to this.props.maxAttempts
+      //
+      //                      1st   2nd   3rd   4th
+      //  $4000 +              0     0     0     0  Should correct answer show #'s as well?
+      //  $1200 X             10     4     2     0
+      //  $6000 X              2     0     0     0
+      //  $0    X              5     1     0     0
+      //  Showed answer        1     0     0     0
+
+      // for debugging
+      // notCorrectWithinAttempts(questionWithComputed.itemId, this.props.takenResults, this.props.maxAttempts);
+
+      let surrenderData = selectedChoiceXWithinAttempts(this.props.takenResults,
+        questionWithComputed.choices[0].id,
+        this.props.maxAttempts,
+        true);
+      studentResponses = (
+        <View style={styles.studentResponseBlock}>
+          <View style={styles.studentResponseRow}>
+            <View style={styles.rowLabelColumn}></View>
+            {_.map(headerRow, (label, index) => {return <View key={index} style={styles.attemptsColumnWrapper}><Text>{label}</Text></View>})}
+          </View>
+          {_.map(_.orderBy(questionWithComputed.choices, 'name'), this.renderStudentResponseMatrix)}
+          <View style={styles.studentResponseRow}>
+            <View style={[styles.rowLabelColumn, styles.showedAnswerColumn]}><Text>Showed Answer</Text></View>
+            {_.map(surrenderData, (label, index) => {return <View key={index} style={styles.attemptsColumnWrapper}><Text>{label}</Text></View>})}
+          </View>
+        </View>
+      );
     }
 
     return (
@@ -85,27 +142,59 @@ class QuestionsView extends Component {
           <TouchableHighlight style={styles.getAnotherQuestionButton} onPress={_.noop} >
             <Text style={styles.getAnotherQuestionButtonText}>Get another question</Text>
           </TouchableHighlight>
-          <TouchableHighlight style={styles.seeStudentResponsesButton} onPress={_.noop} >
-            <Text style={styles.seeStudentResponsesButtonText}>See student responses</Text>
+          <TouchableHighlight style={styles.seeStudentResponsesButton} onPress={() => this.toggleStudentResponseState(questionWithComputed.id)} >
+            <Text style={styles.seeStudentResponsesButtonText}>{studentResponseButtonVerb} student responses</Text>
           </TouchableHighlight>
         </View>
+        {studentResponses}
       </View>
     )
+  }
+
+  renderStudentResponseMatrix = (rowData) => {
+    // to calculate how many students fall into each bin, need to inspect this.props.takenResults
+    // and see how many answers match this rowData.id
+    let attemptsData = selectedChoiceXWithinAttempts(this.props.takenResults,
+      rowData.id,
+      this.props.maxAttempts,
+      false);
+    return (<View key={rowData.id} style={styles.studentResponseRow}>
+      <View style={styles.rowLabelColumn}>
+        <MathWebView content={rowData.text} />
+      </View>
+      {_.map(attemptsData, (label, index) => {return <View key={index} style={styles.attemptsColumnWrapper}><Text>{label}</Text></View>})}
+    </View>);
+  }
+
+  toggleStudentResponseState = (questionId) => {
+    if (this.state.expandedStudentResponses.indexOf(questionId) < 0) {
+      this.setState({ expandedStudentResponses: _.concat(this.state.expandedStudentResponses, questionId)});
+    } else {
+      this.setState({ expandedStudentResponses: _.filter(this.state.expandedStudentResponses, (qId) => {
+        return qId !== questionId;
+      })});
+    }
   }
 
   render() {
     let questionsList = uniqueQuestions(this.props.takenResults);
     let questionsWithComputed = _.orderBy(_.map(questionsList, (question) => {
       let didNotAchieveTakens = notCorrectWithinAttempts(question.itemId, this.props.takenResults, this.props.maxAttempts);
-
+      if (this.props.maxAttempts == 2) {
+        console.log('introspecting maxAttempts 2');
+        console.log(didNotAchieveTakens);
+        _.each(didNotAchieveTakens, (taken) => {
+          console.log(grabAndSortResponses(taken.questions, question.itemId));
+        });
+      }
       return _.assign({}, question, {
         numStudentsDidNotAchieve: didNotAchieveTakens.length
       })
     }), ['numStudentsDidNotAchieve'], ['desc']);
 
 
-    console.log('taken results', this.props.takenResults);
-    console.log('questionsWithComputed', questionsWithComputed);
+    //console.log('taken results', this.props.takenResults);
+    //console.log('questionsWithComputed', questionsWithComputed);
     // console.log('questionsList', questionsList)
 
     return (
