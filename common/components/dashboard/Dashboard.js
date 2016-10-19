@@ -22,14 +22,10 @@ let ActionTypes = require('../../constants/Assessment').ActionTypes;
 let AssessmentDispatcher = require('../../dispatchers/Assessment');
 let ModuleStore = require('../../stores/Module')
 
-import {isTarget} from '../../selectors/selectors'
-
 
 import QuestionsView from './questions-view/QuestionsView';
 import TreeView from './tree-view/TreeView';
-import Xoces from 'xoces/components'
 
-var dao = require('rhumbl-dao');
 
 // import {} from './processResults'
 
@@ -44,7 +40,7 @@ class Dashboard extends Component {
       loading: true,
       opacity: new Animated.Value(0),
       results: [],
-      number: 1,
+      numberTries: 1,
       relationships: null
     }
   }
@@ -105,15 +101,15 @@ class Dashboard extends Component {
     if (this.state.activeView === 'questionsView') {
       questionsView = (
         <QuestionsView takenResults={this.state.results}
-               maxAttempts={this.state.number} />
+               maxAttempts={this.state.numberTries} />
       )
 
       pickNumberPrompt = (
         <View style={styles.pickNumberPromptWrapper}>
           <Text style={styles.pickNumberPrompt}>How <Text style={styles.studentNumber}>many</Text> students could not get it right by the</Text>
           <View style={styles.numberWrapper}>
-            <Text style={styles.number}>{this.state.number}</Text>
-            <Text style={styles.ordinal}>{this._getOrdinal(this.state.number)}</Text>
+            <Text style={styles.numberTries}>{this.state.numberTries}</Text>
+            <Text style={styles.ordinal}>{this._getOrdinal(this.state.numberTries)}</Text>
           </View>
           <Text style={styles.pickNumberPrompt}>try?</Text>
         </View>
@@ -122,14 +118,32 @@ class Dashboard extends Component {
       pickNumberSlider = (
         <Slider minimumValue={1} maximumValue={4} step={1}
                 minimumTrackTintColor="#E37B40" maximumTrackTintColor="#aaaaaa"
-                onSlidingComplete={(number) => this.setState({number})} />
+                onSlidingComplete={(numberTries) => this.setState({numberTries})} />
       )
     }
 
     let treeView;
     if (this.props.modules && this.state.relationships && this.state.activeView === 'outcomesView') {
+      pickNumberPrompt = (
+        <View style={styles.pickNumberPromptWrapper}>
+          <Text style={styles.pickNumberPrompt}>Definition of mastery: students need to get it right by the</Text>
+          <View style={styles.numberWrapper}>
+            <Text style={styles.numberTries}>{this.state.numberTries}</Text>
+            <Text style={styles.ordinal}>{this._getOrdinal(this.state.numberTries)}</Text>
+          </View>
+          <Text style={styles.pickNumberPrompt}>try?</Text>
+        </View>
+      )
+
+      pickNumberSlider = (
+        <Slider minimumValue={1} maximumValue={4} step={1}
+                minimumTrackTintColor="#E37B40" maximumTrackTintColor="#aaaaaa"
+                onSlidingComplete={(numberTries) => this.setState({numberTries})} />
+      )
+
       treeView = (
-          <TreeView layout={this._getLayout()}
+          <TreeView takenResults={this.state.results} relationships={this.state.relationships}
+                    maxAttempts={this.state.numberTries}
                     onPressNode={this.handlePressNode} />
       )
     }
@@ -211,83 +225,6 @@ class Dashboard extends Component {
 
   handlePressNode(node) {
     console.log('node was pressed', node);
-  }
-
-
-  _getLayout() {
-    let allOutcomes = _.map(_.toArray(ModuleStore.getOutcomes()), (outcome) => {
-      return _.assign({}, outcome, {
-        type: 'outcome',
-        name: outcome.displayName.text
-      })
-    });
-
-    let outcomeIds = _.uniq(_.flatMap(this.state.results, (response) => _.flatMap(response.questions, 'learningObjectiveIds')));
-    let outcomes = _.map(outcomeIds, (id) => {
-      let outcome = ModuleStore.getOutcome(id)
-      return _.assign({}, outcome, {
-        type: 'outcome',
-        name: outcome.displayName.text
-      })
-    });
-
-    let targetQuestions =  _.filter(_.uniqBy(_.flatMap(this.state.results, 'questions'), 'itemId'), (q) => isTarget(q));
-    let targetOutcomes = _.map(_.uniq(_.flatMap(targetQuestions, 'learningObjectiveIds')), (id) => {
-      let outcome = ModuleStore.getOutcome(id)
-      return _.assign({}, outcome, {
-        type: 'outcome',
-        name: outcome.displayName.text
-      })
-    });;
-
-    console.log('outcomes', _.map(outcomes, 'displayName.text'))
-    console.log('target questions', targetQuestions, 'target outcomes', targetOutcomes);
-
-    let params = {
-      drawing: {
-        background: '#eee',
-        width: 600,
-        height: 500,
-      },
-      node: {
-        r: 20,
-        fill: '#FFEEAD',
-        stroke: '#cccccc',
-        strokeWidth: 1,
-        borderRadius: '50%',
-      },
-      nodeCenterLabel: {
-        fontSize: 12,
-        property: (outcome) => {
-            return outcome.id.split('%')[1];
-        }
-      },
-      nodeBottomLabel: {
-        fontSize: 12,
-        property: outcome => _.truncate(outcome.name)
-      }
-
-    };
-
-    let daoData = {entities: allOutcomes, relationships: this.state.relationships};
-    let dag = dao.getPathway(_.map(targetOutcomes, 'id'), ['mc3-relationship%3Amc3.lo.2.lo.requisite%40MIT-OEIT'], 'OUTGOING_ALL', daoData);
-    console.log('dag', dag);
-
-    let ranked = dao.rankDAG(dag, (item) => dao.getIncomingEntitiesAll(item.id, ['mc3-relationship%3Amc3.lo.2.lo.requisite%40MIT-OEIT'], daoData));
-    console.log('ranked', ranked);
-
-    let layout = Xoces.tree.layout(params, ranked, dag.edges);
-
-    layout.links = _.map(layout.links, (link) => {
-      return _.assign({}, link, {
-        stroke: '#ccc',
-        strokeWidth: 1
-      })
-    });
-
-    console.log('layout', layout);
-
-    return layout;
   }
 
 }

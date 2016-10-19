@@ -44,5 +44,40 @@ export const notCorrectWithinAttempts = (questionId, takenResults, maxAttempts) 
 
     return null;
   }));
+}
 
+export const correctWithinAttempts = (questionId, takenResults, maxAttempts) => {
+
+  return _.compact(_.map(takenResults, (taken) => {
+    // console.log(taken);
+    // let question = _.find(taken.questions, {itemId: questionId});
+    let numAttempts = 0;
+    let numSeen = 0;
+    for (let i=0; i<taken.questions.length; i++) {
+      let question = taken.questions[i];
+
+      // match the question by its itemId
+      if (question.itemId === questionId) {
+        numSeen++;
+
+        // console.log('matched question. its reponses', question.responses[0]);
+        let response = question.responses[0];
+
+        if (response) {
+          numAttempts++;
+
+          // console.log(response, 'numAttempts', numAttempts, maxAttempts, 'max attempt');
+
+          // if the response is not correct, and the number of student attempts equals or exceeded the given attempt number,
+          // then we say the student has not achieved
+          if (response.isCorrect && numAttempts <= maxAttempts) {
+            return taken;
+          }
+        }
+
+      }
+    }
+
+    return null;
+  }));
 }

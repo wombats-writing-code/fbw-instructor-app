@@ -59,7 +59,7 @@ module.exports = StyleSheet.create({
     fontWeight: "600",
     color: "#FF6F69"
   },
-  number: {
+  numberTries: {
     fontSize: 18,
     color: '#E37B40',
     fontWeight: "600",
